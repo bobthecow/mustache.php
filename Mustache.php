@@ -1,0 +1,293 @@
+<?php
+
+/**
+ * A Mustache implementation in PHP.
+ *
+ * {@link http://defunkt.github.com/mustache}
+ *
+ * Mustache is a framework-agnostic logic-less templating language. It enforces separation of view
+ * logic from template files. In fact, it is not even possible to embed logic in the template.
+ *
+ * This is very, very rad.
+ *
+ * @author Justin Hileman {@link http://justinhileman.com}
+ */
+class Mustache {
+
+	protected $otag = '{{';
+	protected $ctag = '}}';
+	protected $tagRegEx;
+
+	protected $template;
+	protected $view;
+	protected $partials;
+
+	/**
+	 * Mustache class constructor.
+	 *
+	 * This method accepts a $template string and a $view object.
+	 *
+	 * @access public
+	 * @param mixed $template (default: null)
+	 * @param mixed $view (default: null)
+	 * @return void
+	 */
+	public function __construct($template = null, $view = null, $partials = null) {
+		$this->template = $template;
+		$this->view     = $view;
+		$this->partials = $partials;
+	}
+
+	/**
+	 * Render the given template and view object.
+	 *
+	 * Defaults to the template and view passed to the class constructor unless a new one is provided.
+	 *
+	 * @access public
+	 * @param string $template (default: null)
+	 * @param mixed $view (default: null)
+	 * @return string Rendered Mustache template.
+	 */
+	public function render($template = null, $view = null, $partials = null) {
+		if ($template === null) $template = $this->template;
+		if ($view === null)     $view = $this->view;
+		if ($partials === null) $partials = $this->partials;
+
+		$template = $this->renderSection($template, $view);
+		return $this->renderTags($template, $view);
+	}
+
+	/**
+	 * Render boolean and enumerable sections.
+	 *
+	 * @access protected
+	 * @param string $template
+	 * @param mixed $view
+	 * @return string
+	 */
+	protected function renderSection($template, $view) {
+		if (strpos($template, $this->otag . '#') === false) {
+			return $template;
+		}
+
+		$otag  = $this->prepareRegEx($this->otag);
+		$ctag  = $this->prepareRegEx($this->ctag);
+		$regex = '/' . $otag . '\\#(.+?)' . $ctag . '\\s*([\\s\\S]+?)' . $otag . '\\/\\1' . $ctag . '\\s*/m';
+
+		$matches = array();
+		while (preg_match($regex, $template, $matches, PREG_OFFSET_CAPTURE)) {
+			$section  = $matches[0][0];
+			$offset   = $matches[0][1];
+			$tag_name = trim($matches[1][0]);
+			$content  = $matches[2][0];
+
+			$replace = '';
+			$val = $this->getVariable($tag_name, $view);
+			if (is_array($val)) {
+				foreach ($val as $local_view) {
+					$replace .= $this->render($content, $local_view);
+				}
+			} else if ($val) {
+				$replace .= $content;
+			}
+
+			$template = substr_replace($template, $replace, $offset, strlen($section));
+		}
+
+		return $template;
+	}
+
+	/**
+	 * Loop through and render individual Mustache tags.
+	 *
+	 * @access protected
+	 * @param string $template
+	 * @param mixed $view
+	 * @return void
+	 */
+	protected function renderTags($template, $view) {
+		if (strpos($template, $this->otag) === false) {
+			return $template;
+		}
+
+		$otag  = $this->prepareRegEx($this->otag);
+		$ctag  = $this->prepareRegEx($this->ctag);
+		$this->tagRegEx = '/' . $otag . "(=|!|>|\\{|&)?([^\/#]+?)\\1?" . $ctag . "+/";
+		$html = '';
+		$matches = array();
+		while (preg_match($this->tagRegEx, $template, $matches, PREG_OFFSET_CAPTURE)) {
+			$tag      = $matches[0][0];
+			$offset   = $matches[0][1];
+			$modifier = $matches[1][0];
+			$tag_name = trim($matches[2][0]);
+
+			$html .= substr($template, 0, $offset);
+			$html .= $this->renderTag($modifier, $tag_name, $view);
+			$template = substr($template, $offset + strlen($tag));
+		}
+
+		return $html . $template;
+	}
+
+	/**
+	 * Render the named tag, given the specified modifier.
+	 *
+	 * Accepted modifiers are `=` (change delimiter), `!` (comment), `>` (partial)
+	 * `{` or `&` (don't escape output), or none (render escaped output).
+	 *
+	 * @access protected
+	 * @param string $modifier
+	 * @param string $tag_name
+	 * @param mixed $view
+	 * @return string
+	 */
+	protected function renderTag($modifier, $tag_name, $view) {
+		switch ($modifier) {
+			case '=':
+				return $this->changeDelimiter($tag_name, $view);
+				break;
+			case '!':
+				return $this->renderComment($tag_name, $view);
+				break;
+			case '>':
+				return $this->renderPartial($tag_name, $view);
+				break;
+			case '{':
+			case '&':
+				return $this->renderUnescaped($tag_name, $view);
+				break;
+			case '':
+			default:
+				return $this->renderEscaped($tag_name, $view);
+				break;
+		}
+	}
+
+	/**
+	 * Escape and return the requested tag.
+	 *
+	 * @access protected
+	 * @param string $tag_name
+	 * @param mixed $view
+	 * @return string
+	 */
+	protected function renderEscaped($tag_name, $view) {
+		return htmlentities($this->getVariable($tag_name, $view));
+	}
+
+	/**
+	 * Render a comment (i.e. return an empty string).
+	 *
+	 * @access protected
+	 * @param string $tag_name
+	 * @param mixed $view
+	 * @return string
+	 */
+	protected function renderComment($tag_name, $view) {
+		return '';
+	}
+
+	/**
+	 * Return the requested tag unescaped.
+	 *
+	 * @access protected
+	 * @param string $tag_name
+	 * @param mixed $view
+	 * @return string
+	 */
+	protected function renderUnescaped($tag_name, $view) {
+		return $this->getVariable($tag_name, $view);
+	}
+
+	/**
+	 * Render the requested partial.
+	 *
+	 * @access protected
+	 * @param string $tag_name
+	 * @param mixed $view
+	 * @return string
+	 */
+	protected function renderPartial($tag_name, $view) {
+		$view = new self($this->getPartial($tag_name), $view);
+		return $view->render();
+	}
+
+	/**
+	 * Change the Mustache tag delimiter. This method also replaces this object's current
+	 * tag RegEx with one using the new delimiters.
+	 *
+	 * @access protected
+	 * @param string $tag_name
+	 * @param mixed $view
+	 * @return string
+	 */
+	protected function changeDelimiter($tag_name, $view) {
+		$tags = explode(' ', $tag_name);
+		$this->otag = $tags[0];
+		$this->ctag = $tags[1];
+
+		$otag  = $this->prepareRegEx($this->otag);
+		$ctag  = $this->prepareRegEx($this->ctag);
+		$this->tagRegEx = '/' . $otag . "(=|!|>|\\{|%)?([^\/#]+?)\\1?" . $ctag . "+/";
+		return '';
+	}
+
+	/**
+	 * Get a variable from the view object.
+	 *
+	 * If the view is an array, returns the value with array key $tag_name.
+	 * If the view is an object, this will check for a public member variable
+	 * named $tag_name. If none is available, this method will execute and return
+	 * any class method named $tag_name. Failing all of the above, this method will
+	 * return an empty string.
+	 *
+	 * @access protected
+	 * @param string $tag_name
+	 * @param mixed $view
+	 * @return string
+	 */
+	protected function getVariable($tag_name, $view) {
+		if (is_object($view)) {
+			if (isset($view->$tag_name)) {
+				return $view->$tag_name;
+			} else if (method_exists($view, $tag_name)) {
+				return $view->$tag_name();
+			}
+		} else if (isset($view[$tag_name])) {
+			return $view[$tag_name];
+		}
+		return '';
+	}
+
+	/**
+	 * Retrieve the partial corresponding to the requested tag name.
+	 *
+	 * Silently fails (i.e. returns '') when the requested partial is not found.
+	 *
+	 * @access protected
+	 * @param string $tag_name
+	 * @return string
+	 */
+	protected function getPartial($tag_name) {
+		if (is_array($this->partials) && isset($this->partials[$tag_name])) {
+			return $this->partials[$tag_name];
+		}
+		return '';
+	}
+
+	/**
+	 * Prepare a string to be used in a regular expression.
+	 *
+	 * @access protected
+	 * @param string $str
+	 * @return string
+	 */
+	protected function prepareRegEx($str) {
+		$replace = array(
+			'\\' => '\\\\', '^' => '\^', '.' => '\.', '$' => '\$', '|' => '\|', '(' => '\(',
+			')' => '\)', '[' => '\[', ']' => '\]', '*' => '\*', '+' => '\+', '?' => '\?',
+			'{' => '\{', '}' => '\}', ',' => '\,'
+		);
+		return strtr($str, $replace);
+	}
+}
