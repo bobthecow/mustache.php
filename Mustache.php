@@ -14,8 +14,8 @@
  */
 class Mustache {
 
-	protected $otag = '{{';
-	protected $ctag = '}}';
+	public $otag = '{{';
+	public $ctag = '}}';
 	protected $tagRegEx;
 
 	protected $template;
