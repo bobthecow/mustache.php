@@ -19,7 +19,7 @@ class Mustache {
 	protected $tagRegEx;
 
 	protected $template;
-	protected $view;
+	protected $context;
 	protected $partials;
 
 	/**
@@ -29,15 +29,18 @@ class Mustache {
 	 * array of partials as well.
 	 *
 	 * @access public
-	 * @param mixed $template (default: null)
+	 * @param string $template (default: null)
 	 * @param mixed $view (default: null)
-	 * @param mixed $partials (default: null)
+	 * @param array $partials (default: null)
 	 * @return void
 	 */
 	public function __construct($template = null, $view = null, $partials = null) {
 		$this->template = $template;
-		$this->view     = $view;
 		$this->partials = $partials;
+
+		if ($view) {
+			$this->context = array($view);
+		}
 	}
 
 	/**
@@ -49,23 +52,34 @@ class Mustache {
 	 * @access public
 	 * @param string $template (default: null)
 	 * @param mixed $view (default: null)
-	 * @param mixed $partials (default: null)
+	 * @param array $partials (default: null)
 	 * @return string Rendered Mustache template.
 	 */
 	public function render($template = null, $view = null, $partials = null) {
 		if ($template === null) $template = $this->template;
 		if ($partials !== null) $this->partials = $partials;
 
-		if ($view === null) {
-			if ($this->view) {
-				$view = $this->view;
-			} else {
-				$view = $this;
-			}
+		if ($view) {
+			$this->context = array($view);
+		} else if (empty($this->context)) {
+			$this->context = array($this);
 		}
 
-		$template = $this->renderSection($template, $view);
-		return $this->renderTags($template, $view);
+		return $this->_render($template, $this->context);
+	}
+
+
+	/**
+	 * Internal render function, used for recursive calls.
+	 *
+	 * @access protected
+	 * @param string $template
+	 * @param array &$context
+	 * @return string Rendered Mustache template.
+	 */
+	protected function _render($template, &$context) {
+		$template = $this->renderSection($template, $context);
+		return $this->renderTags($template, $context);
 	}
 
 	/**
@@ -73,10 +87,10 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $template
-	 * @param mixed $view
+	 * @param array $context
 	 * @return string
 	 */
-	protected function renderSection($template, $view) {
+	protected function renderSection($template, &$context) {
 		if (strpos($template, $this->otag . '#') === false) {
 			return $template;
 		}
@@ -93,10 +107,10 @@ class Mustache {
 			$content  = $matches[2][0];
 
 			$replace = '';
-			$val = $this->getVariable($tag_name, $view);
+			$val = $this->getVariable($tag_name, $context);
 			if (is_array($val)) {
-				foreach ($val as $local_view) {
-					$replace .= $this->render($content, $local_view);
+				foreach ($val as $local_context) {
+					$replace .= $this->_render($content, $this->getContext($context, $local_context));
 				}
 			} else if ($val) {
 				$replace .= $content;
@@ -113,10 +127,10 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $template
-	 * @param mixed $view
+	 * @param array $context
 	 * @return void
 	 */
-	protected function renderTags($template, $view) {
+	protected function renderTags($template, &$context) {
 		if (strpos($template, $this->otag) === false) {
 			return $template;
 		}
@@ -133,7 +147,7 @@ class Mustache {
 			$tag_name = trim($matches[2][0]);
 
 			$html .= substr($template, 0, $offset);
-			$html .= $this->renderTag($modifier, $tag_name, $view);
+			$html .= $this->renderTag($modifier, $tag_name, $context);
 			$template = substr($template, $offset + strlen($tag));
 		}
 
@@ -149,27 +163,27 @@ class Mustache {
 	 * @access protected
 	 * @param string $modifier
 	 * @param string $tag_name
-	 * @param mixed $view
+	 * @param array $context
 	 * @return string
 	 */
-	protected function renderTag($modifier, $tag_name, $view) {
+	protected function renderTag($modifier, $tag_name, &$context) {
 		switch ($modifier) {
 			case '=':
-				return $this->changeDelimiter($tag_name, $view);
+				return $this->changeDelimiter($tag_name, $context);
 				break;
 			case '!':
-				return $this->renderComment($tag_name, $view);
+				return $this->renderComment($tag_name, $context);
 				break;
 			case '>':
-				return $this->renderPartial($tag_name, $view);
+				return $this->renderPartial($tag_name, $context);
 				break;
 			case '{':
 			case '&':
-				return $this->renderUnescaped($tag_name, $view);
+				return $this->renderUnescaped($tag_name, $context);
 				break;
 			case '':
 			default:
-				return $this->renderEscaped($tag_name, $view);
+				return $this->renderEscaped($tag_name, $context);
 				break;
 		}
 	}
@@ -179,11 +193,11 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
-	 * @param mixed $view
+	 * @param array $context
 	 * @return string
 	 */
-	protected function renderEscaped($tag_name, $view) {
-		return htmlentities($this->getVariable($tag_name, $view));
+	protected function renderEscaped($tag_name, &$context) {
+		return htmlentities($this->getVariable($tag_name, $context));
 	}
 
 	/**
@@ -191,10 +205,10 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
-	 * @param mixed $view
+	 * @param array $context
 	 * @return string
 	 */
-	protected function renderComment($tag_name, $view) {
+	protected function renderComment($tag_name, &$context) {
 		return '';
 	}
 
@@ -203,11 +217,11 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
-	 * @param mixed $view
+	 * @param array $context
 	 * @return string
 	 */
-	protected function renderUnescaped($tag_name, $view) {
-		return $this->getVariable($tag_name, $view);
+	protected function renderUnescaped($tag_name, &$context) {
+		return $this->getVariable($tag_name, $context);
 	}
 
 	/**
@@ -215,11 +229,13 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
-	 * @param mixed $view
+	 * @param array $context
 	 * @return string
 	 */
-	protected function renderPartial($tag_name, $view) {
-		$view = new self($this->getPartial($tag_name), $view);
+	protected function renderPartial($tag_name, &$context) {
+		$view = new self($this->getPartial($tag_name), $context, $this->partials);
+		$view->otag = $this->otag;
+		$view->ctag = $this->ctag;
 		return $view->render();
 	}
 
@@ -229,10 +245,10 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
-	 * @param mixed $view
+	 * @param array $context
 	 * @return string
 	 */
-	protected function changeDelimiter($tag_name, $view) {
+	protected function changeDelimiter($tag_name, &$context) {
 		$tags = explode(' ', $tag_name);
 		$this->otag = $tags[0];
 		$this->ctag = $tags[1];
@@ -243,8 +259,28 @@ class Mustache {
 		return '';
 	}
 
+
 	/**
-	 * Get a variable from the view object.
+	 * Prepare a new context reference array.
+	 *
+	 * This is used to create context arrays for iterable blocks.
+	 *
+	 * @access protected
+	 * @param array $context
+	 * @param mixed $local_context
+	 * @return void
+	 */
+	protected function getContext(&$context, &$local_context) {
+		$ret = array();
+		$ret[] =& $local_context;
+		foreach ($context as $view) {
+			$ret[] =& $view;
+		}
+		return $ret;
+	}
+
+	/**
+	 * Get a variable from the context array.
 	 *
 	 * If the view is an array, returns the value with array key $tag_name.
 	 * If the view is an object, this will check for a public member variable
@@ -254,18 +290,20 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
-	 * @param mixed $view
+	 * @param array $context
 	 * @return string
 	 */
-	protected function getVariable($tag_name, $view) {
-		if (is_object($view)) {
-			if (isset($view->$tag_name)) {
-				return $view->$tag_name;
-			} else if (method_exists($view, $tag_name)) {
-				return $view->$tag_name();
+	protected function getVariable($tag_name, &$context) {
+		foreach ($context as $view) {
+			if (is_object($view)) {
+				if (isset($view->$tag_name)) {
+					return $view->$tag_name;
+				} else if (method_exists($view, $tag_name)) {
+					return $view->$tag_name();
+				}
+			} else if (isset($view[$tag_name])) {
+				return $view[$tag_name];
 			}
-		} else if (isset($view[$tag_name])) {
-			return $view[$tag_name];
 		}
 		return '';
 	}
