@@ -167,6 +167,7 @@ class Mustache {
 	 * @param string $modifier
 	 * @param string $tag_name
 	 * @param array $context
+	 * @throws MustacheException Unmatched section tag encountered.
 	 * @return string
 	 */
 	protected function renderTag($modifier, $tag_name, &$context) {
@@ -308,6 +309,7 @@ class Mustache {
 	 * @access protected
 	 * @param string $tag_name
 	 * @param array $context
+	 * @throws MustacheException Unknown variable name.
 	 * @return string
 	 */
 	protected function getVariable($tag_name, &$context) {
@@ -337,6 +339,7 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
+	 * @throws MustacheException Unknown partial name.
 	 * @return string
 	 */
 	protected function getPartial($tag_name) {
