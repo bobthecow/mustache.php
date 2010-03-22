@@ -16,6 +16,10 @@ class Mustache {
 
 	public $otag = '{{';
 	public $ctag = '}}';
+
+	// Should this Mustache throw exceptions when it finds unexpected tags?
+	protected $throwExceptions = false;
+
 	protected $tagRegEx;
 
 	protected $template = '';
@@ -134,7 +138,7 @@ class Mustache {
 
 		$otag  = $this->prepareRegEx($this->otag);
 		$ctag  = $this->prepareRegEx($this->ctag);
-		$this->tagRegEx = '/' . $otag . "(=|!|>|\\{|&)?([^\/#]+?)\\1?" . $ctag . "+/";
+		$this->tagRegEx = '/' . $otag . "(#|\/|=|!|>|\\{|&)?([^\/#]+?)\\1?" . $ctag . "+/";
 		$html = '';
 		$matches = array();
 		while (preg_match($this->tagRegEx, $template, $matches, PREG_OFFSET_CAPTURE)) {
@@ -165,6 +169,20 @@ class Mustache {
 	 */
 	protected function renderTag($modifier, $tag_name, &$context) {
 		switch ($modifier) {
+			case '#':
+				if ($this->throwExceptions) {
+					throw new MustacheException('Unclosed section: ' . $tag_name, MustacheException::UNCLOSED_SECTION);
+				} else {
+					return '';
+				}
+				break;
+			case '/':
+				if ($this->throwExceptions) {
+					throw new MustacheException('Unexpected close section: ' . $tag_name, MustacheException::UNEXPECTED_CLOSE_SECTION);
+				} else {
+					return '';
+				}
+				break;
 			case '=':
 				return $this->changeDelimiter($tag_name, $context);
 				break;
@@ -302,7 +320,12 @@ class Mustache {
 				return $view[$tag_name];
 			}
 		}
-		return '';
+
+		if ($this->throwExceptions) {
+			throw new MustacheException("Unknown variable: " . $tag_name, MustacheException::UNKNOWN_VARIABLE);
+		} else {
+			return '';
+		}
 	}
 
 	/**
@@ -318,7 +341,12 @@ class Mustache {
 		if (is_array($this->partials) && isset($this->partials[$tag_name])) {
 			return $this->partials[$tag_name];
 		}
-		return '';
+
+		if ($this->throwExceptions) {
+			throw new MustacheException('Unknown partial: ' . $tag_name, MustacheException::UNKNOWN_PARTIAL);
+		} else {
+			return '';
+		}
 	}
 
 	/**
@@ -336,4 +364,29 @@ class Mustache {
 		);
 		return strtr($str, $replace);
 	}
+}
+
+
+/**
+ * MustacheException class.
+ *
+ * @extends Exception
+ */
+class MustacheException extends Exception {
+
+	// An UNKNOWN_VARIABLE exception is thrown when a {{variable}} is not found
+	// in the current context.
+	const UNKNOWN_VARIABLE         = 0;
+
+	// An UNCLOSED_SECTION exception is thrown when a {{#section}} is not closed.
+	const UNCLOSED_SECTION         = 1;
+
+	// An UNEXPECTED_CLOSE_SECTION exception is thrown when {{/section}} appears
+	// without a corresponding {{#section}}.
+	const UNEXPECTED_CLOSE_SECTION = 2;
+
+	// An UNKNOWN_PARTIAL exception is thrown whenever a {{>partial}} tag appears
+	// with no associated partial.
+	const UNKNOWN_PARTIAL          = 3;
+
 }
