@@ -18,9 +18,9 @@ class Mustache {
 	public $ctag = '}}';
 	protected $tagRegEx;
 
-	protected $template;
-	protected $context;
-	protected $partials;
+	protected $template = '';
+	protected $context  = array();
+	protected $partials = array();
 
 	/**
 	 * Mustache class constructor.
@@ -35,12 +35,9 @@ class Mustache {
 	 * @return void
 	 */
 	public function __construct($template = null, $view = null, $partials = null) {
-		$this->template = $template;
-		$this->partials = $partials;
-
-		if ($view) {
-			$this->context = array($view);
-		}
+		if ($template !== null) $this->template = $template;
+		if ($partials !== null) $this->partials = $partials;
+		if ($view !== null)     $this->context = array($view);
 	}
 
 	/**
