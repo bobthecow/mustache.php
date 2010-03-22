@@ -45,7 +45,7 @@ class Mustache {
 	 *
 	 * Defaults to the template and view passed to the class constructor unless a new one is provided.
 	 * Optionally, pass an associative array of partials as well.
-	 * 
+	 *
 	 * @access public
 	 * @param string $template (default: null)
 	 * @param mixed $view (default: null)
@@ -54,8 +54,15 @@ class Mustache {
 	 */
 	public function render($template = null, $view = null, $partials = null) {
 		if ($template === null) $template = $this->template;
-		if ($view === null)     $view = $this->view;
 		if ($partials !== null) $this->partials = $partials;
+
+		if ($view === null) {
+			if ($this->view) {
+				$view = $this->view;
+			} else {
+				$view = $this;
+			}
+		}
 
 		$template = $this->renderSection($template, $view);
 		return $this->renderTags($template, $view);
