@@ -18,7 +18,9 @@ class Mustache {
 	public $ctag = '}}';
 
 	// Should this Mustache throw exceptions when it finds unexpected tags?
-	protected $throwExceptions = false;
+	protected $throwSectionExceptions  = true;
+	protected $throwPartialExceptions  = false;
+	protected $throwVariableExceptions = false;
 
 	protected $tagRegEx;
 
@@ -170,14 +172,14 @@ class Mustache {
 	protected function renderTag($modifier, $tag_name, &$context) {
 		switch ($modifier) {
 			case '#':
-				if ($this->throwExceptions) {
+				if ($this->throwSectionExceptions) {
 					throw new MustacheException('Unclosed section: ' . $tag_name, MustacheException::UNCLOSED_SECTION);
 				} else {
 					return '';
 				}
 				break;
 			case '/':
-				if ($this->throwExceptions) {
+				if ($this->throwSectionExceptions) {
 					throw new MustacheException('Unexpected close section: ' . $tag_name, MustacheException::UNEXPECTED_CLOSE_SECTION);
 				} else {
 					return '';
@@ -321,7 +323,7 @@ class Mustache {
 			}
 		}
 
-		if ($this->throwExceptions) {
+		if ($this->throwVariableExceptions) {
 			throw new MustacheException("Unknown variable: " . $tag_name, MustacheException::UNKNOWN_VARIABLE);
 		} else {
 			return '';
@@ -342,7 +344,7 @@ class Mustache {
 			return $this->partials[$tag_name];
 		}
 
-		if ($this->throwExceptions) {
+		if ($this->throwPartialExceptions) {
 			throw new MustacheException('Unknown partial: ' . $tag_name, MustacheException::UNKNOWN_PARTIAL);
 		} else {
 			return '';
