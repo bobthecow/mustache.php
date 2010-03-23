@@ -71,6 +71,23 @@ class Mustache {
 		return $this->_render($template, $this->context);
 	}
 
+	/**
+	 * Wrap the render() function for string conversion.
+	 *
+	 * @access public
+	 * @return string
+	 */
+	public function __toString() {
+		// PHP doesn't like exceptions in __toString.
+		// catch any exceptions and convert them to strings.
+		try {
+			$result = $this->render();
+			return $result;
+		} catch (Exception $e) {
+			return "Error rendering mustache: " . $e->getMessage();
+		}
+	}
+
 
 	/**
 	 * Internal render function, used for recursive calls.
