@@ -50,6 +50,24 @@ And render it:
     echo $m->render($template, $chris);
     ?>
 
+Here's the same thing, a different way:
+
+    <?php
+    class Chris extends Mustache {
+        public $name = "Chris";
+        public $value = 10000;
+    
+        public function taxed_value() {
+            return $this->value - ($this->value * 0.4);
+        }
+    
+        public $in_ca = true;
+    }
+    
+    $c = new Chris;
+    echo $chris->render($template);
+    ?>
+
 
 See Also
 --------
