@@ -290,7 +290,7 @@ class Mustache {
 
 		$otag  = $this->prepareRegEx($this->otag);
 		$ctag  = $this->prepareRegEx($this->ctag);
-		$this->tagRegEx = '/' . $otag . "(=|!|>|\\{|%)?([^\/#]+?)\\1?" . $ctag . "+/";
+		$this->tagRegEx = '/' . $otag . "(#|\/|=|!|>|\\{|&)?([^\/#]+?)\\1?" . $ctag . "+/";
 		return '';
 	}
 
