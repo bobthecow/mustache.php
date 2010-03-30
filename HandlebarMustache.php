@@ -57,15 +57,15 @@ class HandlebarMustache extends Mustache {
 	 * A '.mustache' file extension is assumed if none is provided in $file.
 	 *
 	 * @access public
-	 * @param string $file
+	 * @param string $name
 	 * @return void
 	 */
-	public function loadTemplate($file) {
-		if (strpos($file, '.') === false) {
-			$file .= '.mustache';
+	public function loadTemplate($name) {
+		if (strpos($name, '.') === false) {
+			$name .= '.mustache';
 		}
 
-		$filename = $this->templateBase . $file;
+		$filename = $this->templateBase . $name;
 		if (file_exists($filename)) {
 			$this->template = file_get_contents($filename);
 		} else {
