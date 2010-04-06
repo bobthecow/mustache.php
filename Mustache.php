@@ -24,7 +24,7 @@ class Mustache {
 
 	// Override charset passed to htmlentities() and htmlspecialchars(). Defaults to UTF-8.
 	protected $charset = 'UTF-8';
-	
+
 	protected $tagRegEx;
 
 	protected $template = '';
