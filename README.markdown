@@ -69,6 +69,13 @@ Here's the same thing, a different way:
     ?>
 
 
+Known Issues
+------------
+
+ * Sections don't respect delimiter changes -- `delimiters` example currently fails with an "unclosed section" exception.
+ * Test coverage is incomplete.
+
+
 See Also
 --------
 
