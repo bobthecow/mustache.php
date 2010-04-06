@@ -3,6 +3,8 @@
 /**
  * TraversableMustache class.
  *
+ * This is an implementaiton of the DOT_NOTATION pragma.
+ *
  * A Mustache subclass which allows variable traversal via dots, i.e.:
  *
  * @code

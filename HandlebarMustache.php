@@ -6,6 +6,9 @@
  * This is an extended Mustache class which contains file handling for templates
  * and partial templates.
  *
+ * Once it's a bit more complete, this class will be merged with the parent Mustache class
+ * to provide a full-featured view layer...
+ *
  * @extends Mustache
  */
 class HandlebarMustache extends Mustache {
