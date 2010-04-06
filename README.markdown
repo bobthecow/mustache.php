@@ -26,6 +26,31 @@ And a more in-depth example--this is the canonical Mustache template:
     {{/in_ca}}
 
 
+Along with the associated Mustache class:
+
+    <?php
+    class Chris extends Mustache {
+        public $name = "Chris";
+        public $value = 10000;
+    
+        public function taxed_value() {
+            return $this->value - ($this->value * 0.4);
+        }
+    
+        public $in_ca = true;
+    }
+
+
+Render it like so:
+
+    <?php
+    $c = new Chris;
+    echo $chris->render($template);
+    ?>
+
+
+Here's the same thing, a different way:
+
 Create a view object--which could also be an associative array, but those don't do functions quite as well:
 
     <?php
@@ -49,6 +74,16 @@ And render it:
     $m = new Mustache;
     echo $m->render($template, $chris);
     ?>
+
+
+
+
+Known Issues
+------------
+
+ * Sections don't respect delimiter changes -- `delimiters` example currently fails with an "unclosed section" exception.
+ * Since `complex` example emulates some fancy swizzling available in Ruby, it fails. Need to convert example to PHPisms (In PHP, Mustache class doesn't maintain current context stack -- available context is passed to methods via params).
+ * Test coverage is incomplete.
 
 
 See Also

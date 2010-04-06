@@ -22,6 +22,9 @@ class Mustache {
 	protected $throwPartialExceptions  = false;
 	protected $throwVariableExceptions = false;
 
+	// Override charset passed to htmlentities() and htmlspecialchars(). Defaults to UTF-8.
+	protected $charset = 'UTF-8';
+	
 	protected $tagRegEx;
 
 	protected $template = '';
@@ -232,7 +235,7 @@ class Mustache {
 	 * @return string
 	 */
 	protected function renderEscaped($tag_name, &$context) {
-		return htmlentities($this->getVariable($tag_name, $context));
+		return htmlentities($this->getVariable($tag_name, $context), null, $this->charset);
 	}
 
 	/**
@@ -290,7 +293,7 @@ class Mustache {
 
 		$otag  = $this->prepareRegEx($this->otag);
 		$ctag  = $this->prepareRegEx($this->ctag);
-		$this->tagRegEx = '/' . $otag . "(=|!|>|\\{|%)?([^\/#]+?)\\1?" . $ctag . "+/";
+		$this->tagRegEx = '/' . $otag . "(#|\/|=|!|>|\\{|&)?([^\/#]+?)\\1?" . $ctag . "+/";
 		return '';
 	}
 
