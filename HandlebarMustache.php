@@ -21,6 +21,16 @@ class HandlebarMustache extends Mustache {
 	protected $templateBase;
 
 	/**
+	 * templateName.
+	 *
+	 * If none is specified, this will default to an underscorified version of the class name.
+	 *
+	 * @var string
+	 * @access protected
+	 */
+	protected $templateName;
+
+	/**
 	 * HandlebarMustache class constructor.
 	 *
 	 * @access public
@@ -35,6 +45,11 @@ class HandlebarMustache extends Mustache {
 		// default template base is the current directory.
 		if (!isset($this->templateBase)) {
 			$this->setTemplateBase(dirname(__FILE__));
+		}
+
+		// default template name is the underscorified class name.
+		if (!isset($this->templateName)) {
+			$this->templateName = strtolower(preg_replace('#(?<!^)([A-Z]+)#', '_\1', get_class($this)));
 		}
 	}
 
@@ -53,19 +68,30 @@ class HandlebarMustache extends Mustache {
 	}
 
 	/**
+	 * Override the default templateName.
+	 *
+	 * @access public
+	 * @param string $name
+	 * @return void
+	 */
+	public function setTemplateName($name) {
+		$this->templateName = $name;
+	}
+
+	/**
 	 * Load a template file. This file will be relative to $this->templateBase.
 	 * A '.mustache' file extension is assumed if none is provided in $file.
 	 *
 	 * @access public
-	 * @param string $file
+	 * @param string $name
 	 * @return void
 	 */
-	public function loadTemplate($file) {
-		if (strpos($file, '.') === false) {
-			$file .= '.mustache';
+	public function loadTemplate($name) {
+		if (strpos($name, '.') === false) {
+			$name .= '.mustache';
 		}
 
-		$filename = $this->templateBase . $file;
+		$filename = $this->templateBase . $name;
 		if (file_exists($filename)) {
 			$this->template = file_get_contents($filename);
 		} else {
@@ -107,5 +133,25 @@ class HandlebarMustache extends Mustache {
 				return '';
 			}
 		}
+	}
+
+	/**
+	 * Render the given template and view object.
+	 *
+	 * Defaults to the template and view passed to the class constructor unless a new one is provided.
+	 * Optionally, pass an associative array of partials as well.
+	 *
+	 * @access public
+	 * @param string $template (default: null)
+	 * @param mixed $view (default: null)
+	 * @param array $partials (default: null)
+	 * @return string Rendered Mustache template.
+	 */
+	public function render($template = null, $view = null, $partials = null) {
+		if ($template === null && !isset($this->template)) {
+			$this->loadTemplate($this->templateName);
+		}
+
+		return parent::render($template, $view, $partials);
 	}
 }
