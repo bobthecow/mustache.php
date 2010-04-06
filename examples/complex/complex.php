@@ -9,16 +9,16 @@ class Complex extends Mustache {
 		array('name' => 'blue', 'current' => false, 'url' => '#Blue'),
 	);
 	
-	public function link() {	
+	public function isLink() {
 		// Exploit the fact that the current iteration item is at the top of the context stack.
-		return $this->getVariable($current) != true;
+		return $this->getVariable('current', $this->context) != true;
 	}
 	
-	public function list() {
-		return !($this->empty());
+	public function notEmpty() {
+		return !($this->isEmpty());
 	}
 	
-	public function empty() {
+	public function isEmpty() {
 		return count($this->item) === 0;
 	}
 }
