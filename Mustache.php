@@ -24,7 +24,7 @@ class Mustache {
 
 	// Override charset passed to htmlentities() and htmlspecialchars(). Defaults to UTF-8.
 	protected $charset = 'UTF-8';
-	
+
 	protected $tagRegEx;
 
 	protected $template = '';
@@ -333,6 +333,30 @@ class Mustache {
 	 * @return string
 	 */
 	protected function getVariable($tag_name, &$context) {
+		$chunks = explode('.', $tag_name);
+		$first = array_shift($chunks);
+
+		$ret = $this->_getVariable($first, $context);
+		while ($next = array_shift($chunks)) {
+			// Slice off a chunk of context for dot notation traversal.
+			$c = array($ret);
+			$ret = $this->_getVariable($next, $c);
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Get a variable from the context array. Internal helper used by getVariable() to abstract
+	 * variable traversal for dot notation.
+	 *
+	 * @access protected
+	 * @param string $tag_name
+	 * @param array &$context
+	 * @throws MustacheException Unknown variable name.
+	 * @return string
+	 */
+	protected function _getVariable($tag_name, &$context) {
 		foreach ($context as $view) {
 			if (is_object($view)) {
 				if (isset($view->$tag_name)) {
