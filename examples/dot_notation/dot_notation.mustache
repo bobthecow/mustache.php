@@ -1,1 +1,6 @@
-Grandchild is "{{foo.bar.baz}}".
+* {{person.name.first}} {{person.name.last}}
+* {{person.age}}
+* {{person.hometown.city}}, {{person.hometown.state}}
+* {{#person}}{{hometown.city}}, {{hometown.state}}{{/person}}
+* {{#person}}{{#hometown}}{{city}}, {{state}}{{/hometown}}{{/person}}
+* {{normal}}

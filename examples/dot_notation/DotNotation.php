@@ -2,13 +2,18 @@
 
 /**
  * DotNotation example class. Uses DOT_NOTATION pragma.
- * 
+ *
  * @extends Mustache
  */
 class DotNotation extends Mustache {
-	public $foo = array(
-		'bar' => array(
-			'baz' => 'Qux',
+	public $person = array(
+		'name' => array('first' => 'Chris', 'last' => 'Firescythe'),
+		'age' => 24,
+		'hometown' => array(
+			'city'  => 'Cincinnati',
+			'state' => 'OH',
 		)
 	);
+
+	public $normal = 'Normal';
 }
