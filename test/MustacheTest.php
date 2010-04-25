@@ -27,7 +27,7 @@ require_once 'PHPUnit/Framework.php';
  *
  *  1. {@link http://www.phpunit.de/manual/current/en/installation.html Install PHPUnit}
  *  2. run phpunit from the `test` directory:
- *        `phpunit MustacheTest` or just `phpunit`
+ *        `phpunit MustacheTest`
  *  3. Fix bugs. Lather, rinse, repeat.
  *
  * @extends PHPUnit_Framework_TestCase
