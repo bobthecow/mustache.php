@@ -81,6 +81,7 @@ And render it:
 Known Issues
 ------------
 
+ * There's no way to toggle a pragma other than checking out the feature branch for each pragma... Need a clean way to do this.
  * Sections don't respect delimiter changes -- `delimiters` example currently fails with an "unclosed section" exception.
  * Since `complex` example emulates some fancy swizzling available in Ruby, it fails. Need to convert example to PHPisms (In PHP, Mustache class doesn't maintain current context stack -- available context is passed to methods via params).
  * Test coverage is incomplete.
