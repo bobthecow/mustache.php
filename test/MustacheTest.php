@@ -46,7 +46,7 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testExamples($class, $template, $output) {
 		$m = new $class;
-		$this->assertEquals($m->render($template), $output);
+		$this->assertEquals($output, $m->render($template));
 	}
 
 
