@@ -177,7 +177,7 @@ class Mustache {
 
 		$otag  = $this->prepareRegEx($this->otag);
 		$ctag  = $this->prepareRegEx($this->ctag);
-		$this->tagRegEx = '/' . $otag . "(#|\/|=|!|>|\\{|&)?([^\/#]+?)\\1?" . $ctag . "+/";
+		$this->tagRegEx = '/' . $otag . "([#\^\/=!>\\{&])?(.+?)\\1?" . $ctag . "+/";
 		$html = '';
 		$matches = array();
 		while (preg_match($this->tagRegEx, $template, $matches, PREG_OFFSET_CAPTURE)) {
@@ -210,6 +210,7 @@ class Mustache {
 	protected function renderTag($modifier, $tag_name, &$context) {
 		switch ($modifier) {
 			case '#':
+			case '^':
 				if ($this->throwSectionExceptions) {
 					throw new MustacheException('Unclosed section: ' . $tag_name, MustacheException::UNCLOSED_SECTION);
 				} else {
@@ -310,7 +311,7 @@ class Mustache {
 
 		$otag  = $this->prepareRegEx($this->otag);
 		$ctag  = $this->prepareRegEx($this->ctag);
-		$this->tagRegEx = '/' . $otag . "(#|\/|=|!|>|\\{|&)?([^\/#\^]+?)\\1?" . $ctag . "+/";
+		$this->tagRegEx = '/' . $otag . "([#\^\/=!>\\{&])?(.+?)\\1?" . $ctag . "+/";
 		return '';
 	}
 
