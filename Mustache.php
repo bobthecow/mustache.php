@@ -106,7 +106,7 @@ class Mustache {
 	}
 
 	/**
-	 * Render boolean and enumerable sections.
+	 * Render boolean, enumerable and inverted sections.
 	 *
 	 * @access protected
 	 * @param string $template
@@ -120,23 +120,36 @@ class Mustache {
 
 		$otag  = $this->prepareRegEx($this->otag);
 		$ctag  = $this->prepareRegEx($this->ctag);
-		$regex = '/' . $otag . '\\#(.+?)' . $ctag . '\\s*([\\s\\S]+?)' . $otag . '\\/\\1' . $ctag . '\\s*/m';
+		$regex = '/' . $otag . '(\\^|\\#)(.+?)' . $ctag . '\\s*([\\s\\S]+?)' . $otag . '\\/\\2' . $ctag . '\\s*/m';
 
 		$matches = array();
 		while (preg_match($regex, $template, $matches, PREG_OFFSET_CAPTURE)) {
 			$section  = $matches[0][0];
 			$offset   = $matches[0][1];
-			$tag_name = trim($matches[1][0]);
-			$content  = $matches[2][0];
+			$type     = $matches[1][0];
+			$tag_name = trim($matches[2][0]);
+			$content  = $matches[3][0];
 
 			$replace = '';
 			$val = $this->getVariable($tag_name, $context);
-			if (is_array($val)) {
-				foreach ($val as $local_context) {
-					$replace .= $this->_render($content, $this->getContext($context, $local_context));
-				}
-			} else if ($val) {
-				$replace .= $content;
+			switch($type) {
+				// inverted section
+				case '^':
+					if (empty($val)) {
+						$replace .= $content;
+					}
+					break;
+
+				// regular section
+				case '#':
+					if (is_array($val)) {
+						foreach ($val as $local_context) {
+							$replace .= $this->_render($content, $this->getContext($context, $local_context));
+						}
+					} else if ($val) {
+						$replace .= $content;
+					}
+					break;
 			}
 
 			$template = substr_replace($template, $replace, $offset, strlen($section));
@@ -293,7 +306,7 @@ class Mustache {
 
 		$otag  = $this->prepareRegEx($this->otag);
 		$ctag  = $this->prepareRegEx($this->ctag);
-		$this->tagRegEx = '/' . $otag . "(#|\/|=|!|>|\\{|&)?([^\/#]+?)\\1?" . $ctag . "+/";
+		$this->tagRegEx = '/' . $otag . "(#|\/|=|!|>|\\{|&)?([^\/#\^]+?)\\1?" . $ctag . "+/";
 		return '';
 	}
 

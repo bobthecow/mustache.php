@@ -81,8 +81,10 @@ And render it:
 Known Issues
 ------------
 
- * Sections don't respect delimiter changes -- `delimiters` example currently fails with an "unclosed section" exception.
- * Since `complex` example emulates some fancy swizzling available in Ruby, it fails. Need to convert example to PHPisms (In PHP, Mustache class doesn't maintain current context stack -- available context is passed to methods via params).
+ * Sections don't respect delimiter changes -- `delimiters` example currently fails with an
+   "unclosed section" exception.
+ * Sections don't have access to child context, i.e. `{{#foo}}{{bar}}{{/foo}}` fails if the context
+   is `array('foo' => array('bar' => 'baz'));`
  * Test coverage is incomplete.
 
 
