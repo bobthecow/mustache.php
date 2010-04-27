@@ -142,7 +142,7 @@ class Mustache {
 
 				// regular section
 				case '#':
-					if (is_array($val)) {
+					if ($this->varIsIterable($val)) {
 						foreach ($val as $local_context) {
 							$replace .= $this->_render($content, $this->getContext($context, $local_context));
 						}
@@ -385,6 +385,17 @@ class Mustache {
 		} else {
 			return '';
 		}
+	}
+
+	/**
+	 * Check whether the given $var should be iterated (i.e. in a section context).
+	 *
+	 * @access protected
+	 * @param mixed $var
+	 * @return bool
+	 */
+	protected function varIsIterable($var) {
+		return is_object($var) || (is_array($var) && !array_diff_key($var, array_keys(array_keys($var))));
 	}
 
 	/**
