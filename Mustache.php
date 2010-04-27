@@ -114,10 +114,6 @@ class Mustache {
 	 * @return string
 	 */
 	protected function renderSection($template, &$context) {
-		if (strpos($template, $this->otag . '#') === false && strpos($template, $this->otag . '^') === false) {
-			return $template;
-		}
-
 		$otag  = $this->prepareRegEx($this->otag);
 		$ctag  = $this->prepareRegEx($this->ctag);
 		$regex = '/' . $otag . '(\\^|\\#)(.+?)' . $ctag . '\\s*([\\s\\S]+?)' . $otag . '\\/\\2' . $ctag . '\\s*/m';
