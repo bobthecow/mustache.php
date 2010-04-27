@@ -147,7 +147,11 @@ class Mustache {
 							$replace .= $this->_render($content, $this->getContext($context, $local_context));
 						}
 					} else if ($val) {
-						$replace .= $content;
+						if (is_array($val) || is_object($val)) {
+							$replace .= $this->_render($content, $this->getContext($context, $val));
+						} else {
+							$replace .= $content;
+						}
 					}
 					break;
 			}
