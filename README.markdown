@@ -81,7 +81,10 @@ And render it:
 Known Issues
 ------------
 
- * Sections don't respect delimiter changes -- `delimiters` example currently fails with an "unclosed section" exception.
+ * Sections don't respect delimiter changes -- `delimiters` example currently fails with an
+   "unclosed section" exception.
+ * Sections don't have access to child context, i.e. `{{#foo}}{{bar}}{{/foo}}' fails if the context
+   is `array('foo' => array('bar' => 'baz'));`
  * Test coverage is incomplete.
 
 
