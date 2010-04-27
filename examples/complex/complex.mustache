@@ -5,9 +5,9 @@
     {{#current}}
       <li><strong>{{name}}</strong></li>
     {{/current}}
-    {{#isLink}}
+    {{^current}}
       <li><a href="{{url}}">{{name}}</a></li>
-    {{/isLink}}
+    {{/current}}
   {{/item}}
   </ul>
 {{/notEmpty}}
