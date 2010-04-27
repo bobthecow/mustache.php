@@ -81,8 +81,10 @@ And render it:
 Known Issues
 ------------
 
- * There's no way to toggle a pragma other than checking out the feature branch for each pragma... Need a clean way to do this.
- * Sections don't respect delimiter changes -- `delimiters` example currently fails with an "unclosed section" exception.
+ * There's no way to toggle a pragma other than checking out the feature branch for each pragma...
+   Need a clean way to do this.
+ * Sections don't respect delimiter changes -- `delimiters` example currently fails with an
+   "unclosed section" exception.
  * Test coverage is incomplete.
 
 
