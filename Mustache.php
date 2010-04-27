@@ -114,7 +114,7 @@ class Mustache {
 	 * @return string
 	 */
 	protected function renderSection($template, &$context) {
-		if (strpos($template, $this->otag . '#') === false) {
+		if (strpos($template, $this->otag . '#') === false && strpos($template, $this->otag . '^') === false) {
 			return $template;
 		}
 
