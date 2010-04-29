@@ -7,17 +7,15 @@ class MustachePragmaTest extends PHPUnit_Framework_TestCase {
 
 	public function testUnknownPragmaException() {
 		$m = new Mustache();
-		$caught_exception = null;
 
 		try {
 			$m->render('{{%I-HAVE-THE-GREATEST-MUSTACHE}}');
-		} catch (Exception $e) {
-			$caught_exception = $e;
+		} catch (MustacheException $e) {
+			$this->assertEquals(MustacheException::UNKNOWN_PRAGMA, $e->getCode(), 'Caught exception code was not MustacheException::UNKNOWN_PRAGMA');
+			return;
 		}
 
-		$this->assertNotNull($caught_exception, 'No exception caught');
-		$this->assertType('MustacheException', $caught_exception);
-		$this->assertEquals($caught_exception->getCode(), MustacheException::UNKNOWN_PRAGMA, 'Caught exception code was not MustacheException::UNKNOWN_PRAGMA');
+		$this->fail('Mustache should have thrown an unknown pragma exception');
 	}
 
 	public function testPragmaReplace() {
@@ -37,4 +35,5 @@ class MustachePragmaTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($m->render("\n{{%DOT-NOTATION}}\n"), "\n", 'Too many newlines removed with pragma tag');
 		$this->assertEquals($m->render("1\n2{{%DOT-NOTATION}}\n3"), "1\n23", 'Wrong newline removed with pragma tag');
 	}
+
 }
