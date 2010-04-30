@@ -98,7 +98,6 @@ class Mustache {
 		}
 	}
 
-
 	/**
 	 * Internal render function, used for recursive calls.
 	 *
@@ -220,12 +219,29 @@ class Mustache {
 		return '';
 	}
 
+	/**
+	 * Check whether this Mustache has a specific pragma.
+	 *
+	 * @access protected
+	 * @param string $pragma_name
+	 * @return bool
+	 */
 	protected function hasPragma($pragma_name) {
 		if (array_key_exists($pragma_name, $this->pragmas) && $this->pragmas[$pragma_name]) {
 			return true;
+		} else {
+			return false;
 		}
 	}
 
+	/**
+	 * Return pragma options, if any.
+	 *
+	 * @access protected
+	 * @param string $pragma_name
+	 * @return mixed
+	 * @throws MustacheException Unknown pragma
+	 */
 	protected function getPragmaOptions($pragma_name) {
 		if (!$this->hasPragma()) {
 			throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
