@@ -68,21 +68,19 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($output, $m4->render($template));
 	}
 
+
 	/**
-	 * Test everything in the `examples` directory.
+	 * Test __toString() function.
 	 *
-	 * @dataProvider getExamples
 	 * @access public
-	 * @param mixed $class
-	 * @param mixed $template
-	 * @param mixed $output
 	 * @return void
 	 */
-	public function testExamples($class, $template, $output) {
-		$m = new $class;
-		$this->assertEquals($output, $m->render($template));
-	}
+	public function test__toString() {
+		$m = new Mustache('{{first_name}} {{last_name}}', array('first_name' => 'Karl', 'last_name' => 'Marx'));
 
+		$this->assertEquals('Karl Marx', $m->__toString());
+		$this->assertEquals('Karl Marx', (string) $m);
+	}
 
 	/**
 	 * Test render().
@@ -117,6 +115,21 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$m = new Mustache('{{first_name}} {{last_name}}');
 		$this->assertEquals('Charlie Chaplin', $m->render(null, array('first_name' => 'Charlie', 'last_name' => 'Chaplin')));
 		$this->assertEquals('Zappa, Frank', $m->render('{{last_name}}, {{first_name}}', array('first_name' => 'Frank', 'last_name' => 'Zappa')));
+	}
+
+	/**
+	 * Test everything in the `examples` directory.
+	 *
+	 * @dataProvider getExamples
+	 * @access public
+	 * @param mixed $class
+	 * @param mixed $template
+	 * @param mixed $output
+	 * @return void
+	 */
+	public function testExamples($class, $template, $output) {
+		$m = new $class;
+		$this->assertEquals($output, $m->render($template));
 	}
 
 	/**
