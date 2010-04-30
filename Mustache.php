@@ -27,6 +27,18 @@ class Mustache {
 
 	const PRAGMA_DOT_NOTATION = 'DOT-NOTATION';
 
+	/**
+	 * The {{%UNESCAPED}} pragma swaps the meaning of the {{normal}} and {{{unescaped}}}
+	 * Mustache tags. That is, once this pragma is activated the {{normal}} tag will not be
+	 * escaped while the {{{unescaped}}} tag will be escaped.
+	 *
+	 * Pragmas apply only to the current template. Partials, even those included after the
+	 * {{%UNESCAPED}} call, will need their own pragma declaration.
+	 *
+	 * his may be useful in non-HTML Mustache situations.
+	 */
+	const PRAGMA_UNESCAPED    = 'UNESCAPED';
+
 	protected $tagRegEx;
 
 	protected $template = '';
@@ -35,7 +47,8 @@ class Mustache {
 	protected $pragmas  = array();
 
 	protected $pragmasImplemented = array(
-		self::PRAGMA_DOT_NOTATION
+		self::PRAGMA_DOT_NOTATION,
+		self::PRAGMA_UNESCAPED
 	);
 
 	/**
@@ -310,11 +323,19 @@ class Mustache {
 				break;
 			case '{':
 			case '&':
-				return $this->renderUnescaped($tag_name, $context);
+				if ($this->hasPragma(self::PRAGMA_UNESCAPED)) {
+					return $this->renderEscaped($tag_name, $context);
+				} else {
+					return $this->renderUnescaped($tag_name, $context);
+				}
 				break;
 			case '':
 			default:
-				return $this->renderEscaped($tag_name, $context);
+				if ($this->hasPragma(self::PRAGMA_UNESCAPED)) {
+					return $this->renderUnescaped($tag_name, $context);
+				} else {
+					return $this->renderEscaped($tag_name, $context);
+				}
 				break;
 		}
 	}
