@@ -27,6 +27,18 @@ class Mustache {
 
 	const PRAGMA_DOT_NOTATION = 'DOT-NOTATION';
 
+	/**
+	 * The {{%UNESCAPED}} pragma swaps the meaning of the {{normal}} and {{{unescaped}}}
+	 * Mustache tags. That is, once this pragma is activated the {{normal}} tag will not be
+	 * escaped while the {{{unescaped}}} tag will be escaped.
+	 *
+	 * Pragmas apply only to the current template. Partials, even those included after the
+	 * {{%UNESCAPED}} call, will need their own pragma declaration.
+	 *
+	 * his may be useful in non-HTML Mustache situations.
+	 */
+	const PRAGMA_UNESCAPED    = 'UNESCAPED';
+
 	protected $tagRegEx;
 
 	protected $template = '';
@@ -35,7 +47,8 @@ class Mustache {
 	protected $pragmas  = array();
 
 	protected $pragmasImplemented = array(
-		self::PRAGMA_DOT_NOTATION
+		self::PRAGMA_DOT_NOTATION,
+		self::PRAGMA_UNESCAPED
 	);
 
 	/**
@@ -147,11 +160,13 @@ class Mustache {
 				case '#':
 					if ($this->varIsIterable($val)) {
 						foreach ($val as $local_context) {
-							$replace .= $this->_render($content, $this->getContext($context, $local_context));
+							$c = $this->getContext($context, $local_context);
+							$replace .= $this->_render($content, $c);
 						}
 					} else if ($val) {
 						if (is_array($val) || is_object($val)) {
-							$replace .= $this->_render($content, $this->getContext($context, $val));
+							$c = $this->getContext($context, $val);
+							$replace .= $this->_render($content, $c);
 						} else {
 							$replace .= $content;
 						}
@@ -181,7 +196,7 @@ class Mustache {
 
 		$otag = $this->prepareRegEx($this->otag);
 		$ctag = $this->prepareRegEx($this->ctag);
-		$regex = '/' . $otag . '%([\\w_-]+)((?: [\\w]+=[\\w]+)*)' . $ctag . '\\n?/';
+		$regex = '/' . $otag . '%\\s*([\\w_-]+)((?: [\\w]+=[\\w]+)*)\\s*' . $ctag . '\\n?/';
 		return preg_replace_callback($regex, array($this, 'renderPragma'), $template);
 	}
 
@@ -325,11 +340,19 @@ class Mustache {
 				break;
 			case '{':
 			case '&':
-				return $this->renderUnescaped($tag_name, $context);
+				if ($this->hasPragma(self::PRAGMA_UNESCAPED)) {
+					return $this->renderEscaped($tag_name, $context);
+				} else {
+					return $this->renderUnescaped($tag_name, $context);
+				}
 				break;
 			case '':
 			default:
-				return $this->renderEscaped($tag_name, $context);
+				if ($this->hasPragma(self::PRAGMA_UNESCAPED)) {
+					return $this->renderUnescaped($tag_name, $context);
+				} else {
+					return $this->renderEscaped($tag_name, $context);
+				}
 				break;
 		}
 	}
