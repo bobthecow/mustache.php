@@ -25,7 +25,8 @@ class Mustache {
 	// Override charset passed to htmlentities() and htmlspecialchars(). Defaults to UTF-8.
 	protected $charset = 'UTF-8';
 
-	const PRAGMA_DOT_NOTATION = 'DOT-NOTATION';
+	const PRAGMA_DOT_NOTATION      = 'DOT-NOTATION';
+	const PRAGMA_IMPLICIT_ITERATOR = 'IMPLICIT-ITERATOR';
 
 	protected $tagRegEx;
 
@@ -35,7 +36,8 @@ class Mustache {
 	protected $pragmas  = array();
 
 	protected $pragmasImplemented = array(
-		self::PRAGMA_DOT_NOTATION
+		self::PRAGMA_DOT_NOTATION,
+		self::PRAGMA_IMPLICIT_ITERATOR
 	);
 
 	/**
@@ -151,8 +153,23 @@ class Mustache {
 				// regular section
 				case '#':
 					if ($this->varIsIterable($val)) {
+						if ($this->hasPragma(self::PRAGMA_IMPLICIT_ITERATOR)) {
+							if ($opt = $this->getPragmaOptions(self::PRAGMA_IMPLICIT_ITERATOR)) {
+								$iterator = $opt['iterator'];
+							} else {
+								$iterator = '.';
+							}
+						} else {
+							$iterator = false;
+						}
+
 						foreach ($val as $local_context) {
-							$replace .= $this->_render($content, $this->getContext($context, $local_context));
+							if ($iterator) {
+								$c = array($iterator => $local_context);
+								$replace .= $this->_render($content, $this->getContext($context, $c));
+							} else {
+								$replace .= $this->_render($content, $this->getContext($context, $local_context));
+							}
 						}
 					} else if ($val) {
 						if (is_array($val) || is_object($val)) {
@@ -231,11 +248,11 @@ class Mustache {
 	}
 
 	protected function getPragmaOptions($pragma_name) {
-		if (!$this->hasPragma()) {
+		if (!$this->hasPragma($pragma_name)) {
 			throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
 		}
 
-		return $this->pragmas[$pragma_name];
+		return (is_array($this->pragmas[$pragma_name])) ? $this->pragmas[$pragma_name] : array();
 	}
 
 	/**
@@ -426,7 +443,9 @@ class Mustache {
 	 * @return string
 	 */
 	protected function getVariable($tag_name, &$context) {
-		if ($this->hasPragma(self::PRAGMA_DOT_NOTATION)) {
+		if ($ret = $this->_getVariable($tag_name, $context)) {
+			return $ret;
+		} else if ($this->hasPragma(self::PRAGMA_DOT_NOTATION)) {
 			$chunks = explode('.', $tag_name);
 			$first = array_shift($chunks);
 
@@ -438,7 +457,7 @@ class Mustache {
 			}
 			return $ret;
 		} else {
-			return $this->_getVariable($tag_name, $context);
+			return $ret;
 		}
 	}
 
