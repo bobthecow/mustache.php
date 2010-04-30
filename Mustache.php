@@ -25,6 +25,8 @@ class Mustache {
 	// Override charset passed to htmlentities() and htmlspecialchars(). Defaults to UTF-8.
 	protected $charset = 'UTF-8';
 
+	const PRAGMA_DOT_NOTATION = 'DOT-NOTATION';
+
 	protected $tagRegEx;
 
 	protected $template = '';
@@ -32,7 +34,9 @@ class Mustache {
 	protected $partials = array();
 	protected $pragmas  = array();
 
-	protected $pragmasImplemented = array('DOT-NOTATION');
+	protected $pragmasImplemented = array(
+		self::PRAGMA_DOT_NOTATION
+	);
 
 	/**
 	 * Mustache class constructor.
@@ -168,7 +172,7 @@ class Mustache {
 
 	/**
 	 * Initialize pragmas and remove all pragma tags.
-	 * 
+	 *
 	 * @access protected
 	 * @param string $template
 	 * @param array &$context
@@ -218,6 +222,20 @@ class Mustache {
 		}
 
 		return '';
+	}
+
+	protected function hasPragma($pragma_name) {
+		if (array_key_exists($pragma_name, $this->pragmas) && $this->pragmas[$pragma_name]) {
+			return true;
+		}
+	}
+
+	protected function getPragmaOptions($pragma_name) {
+		if (!$this->hasPragma()) {
+			throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
+		}
+
+		return $this->pragmas[$pragma_name];
 	}
 
 	/**
@@ -408,17 +426,20 @@ class Mustache {
 	 * @return string
 	 */
 	protected function getVariable($tag_name, &$context) {
-		$chunks = explode('.', $tag_name);
-		$first = array_shift($chunks);
+		if ($this->hasPragma(self::PRAGMA_DOT_NOTATION)) {
+			$chunks = explode('.', $tag_name);
+			$first = array_shift($chunks);
 
-		$ret = $this->_getVariable($first, $context);
-		while ($next = array_shift($chunks)) {
-			// Slice off a chunk of context for dot notation traversal.
-			$c = array($ret);
-			$ret = $this->_getVariable($next, $c);
+			$ret = $this->_getVariable($first, $context);
+			while ($next = array_shift($chunks)) {
+				// Slice off a chunk of context for dot notation traversal.
+				$c = array($ret);
+				$ret = $this->_getVariable($next, $c);
+			}
+			return $ret;
+		} else {
+			return $this->_getVariable($tag_name, $context);
 		}
-
-		return $ret;
 	}
 
 	/**
