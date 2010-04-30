@@ -170,7 +170,8 @@ class Mustache {
 						}
 					} else if ($val) {
 						if (is_array($val) || is_object($val)) {
-							$replace .= $this->_render($content, $this->getContext($context, $val));
+							$c = $this->getContext($context, $val);
+							$replace .= $this->_render($content, $c);
 						} else {
 							$replace .= $content;
 						}
