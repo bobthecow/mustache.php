@@ -144,7 +144,8 @@ class Mustache {
 				case '#':
 					if ($this->varIsIterable($val)) {
 						foreach ($val as $local_context) {
-							$replace .= $this->_render($content, $this->getContext($context, $local_context));
+							$c = $this->getContext($context, $local_context);
+							$replace .= $this->_render($content, $c);
 						}
 					} else if ($val) {
 						if (is_array($val) || is_object($val)) {
