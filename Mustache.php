@@ -199,7 +199,7 @@ class Mustache {
 
 		$otag = $this->prepareRegEx($this->otag);
 		$ctag = $this->prepareRegEx($this->ctag);
-		$regex = '/' . $otag . '%([\\w_-]+)((?: [\\w]+=[\\w]+)*)' . $ctag . '\\n?/';
+		$regex = '/' . $otag . '%\\s*([\\w_-]+)((?: [\\w]+=[\\w]+)*)\\s*' . $ctag . '\\n?/';
 		return preg_replace_callback($regex, array($this, 'renderPragma'), $template);
 	}
 
