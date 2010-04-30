@@ -34,6 +34,40 @@ require_once 'PHPUnit/Framework.php';
  */
 class MustacheTest extends PHPUnit_Framework_TestCase {
 
+
+	/**
+	 * Test Mustache constructor.
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function test__construct() {
+		$template = '{{#mustaches}}{{#last}}and {{/last}}{{type}}{{^last}}, {{/last}}{{/mustaches}}';
+		$data     = array(
+			'mustaches' => array(
+				array('type' => 'Natural'),
+				array('type' => 'Hungarian'),
+				array('type' => 'Dali'),
+				array('type' => 'English'),
+				array('type' => 'Imperial'),
+				array('type' => 'Freestyle', 'last' => 'true'),
+			)
+		);
+		$output = 'Natural, Hungarian, Dali, English, Imperial, and Freestyle';
+
+		$m1 = new Mustache();
+		$this->assertEquals($output, $m1->render($template, $data));
+
+		$m2 = new Mustache($template);
+		$this->assertEquals($output, $m2->render(null, $data));
+
+		$m3 = new Mustache($template, $data);
+		$this->assertEquals($output, $m3->render());
+
+		$m4 = new Mustache(null, $data);
+		$this->assertEquals($output, $m4->render($template));
+	}
+
 	/**
 	 * Test everything in the `examples` directory.
 	 *
@@ -49,6 +83,41 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($output, $m->render($template));
 	}
 
+
+	/**
+	 * Test render().
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function testRender() {
+		$m = new Mustache();
+
+		$this->assertEquals('', $m->render(''));
+		$this->assertEquals('foo', $m->render('foo'));
+		$this->assertEquals('', $m->render(null));
+
+		$m2 = new Mustache('foo');
+		$this->assertEquals('foo', $m2->render());
+
+		$m3 = new Mustache('');
+		$this->assertEquals('', $m3->render());
+
+		$m3 = new Mustache();
+		$this->assertEquals('', $m3->render(null));
+	}
+
+	/**
+	 * Test render() with data.
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function testRenderWithData() {
+		$m = new Mustache('{{first_name}} {{last_name}}');
+		$this->assertEquals('Charlie Chaplin', $m->render(null, array('first_name' => 'Charlie', 'last_name' => 'Chaplin')));
+		$this->assertEquals('Zappa, Frank', $m->render('{{last_name}}, {{first_name}}', array('first_name' => 'Frank', 'last_name' => 'Zappa')));
+	}
 
 	/**
 	 * Data provider for testExamples method.
