@@ -14,8 +14,8 @@
  */
 class Mustache {
 
-	public $otag = '{{';
-	public $ctag = '}}';
+	public $_otag = '{{';
+	public $_ctag = '}}';
 
 	// Should this Mustache throw exceptions when it finds unexpected tags?
 	protected $throwSectionExceptions  = true;
@@ -23,18 +23,18 @@ class Mustache {
 	protected $throwVariableExceptions = false;
 
 	// Override charset passed to htmlentities() and htmlspecialchars(). Defaults to UTF-8.
-	protected $charset = 'UTF-8';
+	protected $_charset = 'UTF-8';
 
 	const PRAGMA_DOT_NOTATION = 'DOT-NOTATION';
 
-	protected $tagRegEx;
+	protected $_tagRegEx;
 
-	protected $template = '';
-	protected $context  = array();
-	protected $partials = array();
-	protected $pragmas  = array();
+	protected $_template = '';
+	protected $_context  = array();
+	protected $_partials = array();
+	protected $_pragmas  = array();
 
-	protected $pragmasImplemented = array(
+	protected $_pragmasImplemented = array(
 		self::PRAGMA_DOT_NOTATION
 	);
 
@@ -51,9 +51,9 @@ class Mustache {
 	 * @return void
 	 */
 	public function __construct($template = null, $view = null, $partials = null) {
-		if ($template !== null) $this->template = $template;
-		if ($partials !== null) $this->partials = $partials;
-		if ($view !== null)     $this->context = array($view);
+		if ($template !== null) $this->_template = $template;
+		if ($partials !== null) $this->_partials = $partials;
+		if ($view !== null)     $this->_context = array($view);
 	}
 
 	/**
@@ -69,16 +69,16 @@ class Mustache {
 	 * @return string Rendered Mustache template.
 	 */
 	public function render($template = null, $view = null, $partials = null) {
-		if ($template === null) $template = $this->template;
-		if ($partials !== null) $this->partials = $partials;
+		if ($template === null) $template = $this->_template;
+		if ($partials !== null) $this->_partials = $partials;
 
 		if ($view) {
-			$this->context = array($view);
-		} else if (empty($this->context)) {
-			$this->context = array($this);
+			$this->_context = array($view);
+		} else if (empty($this->_context)) {
+			$this->_context = array($this);
 		}
 
-		return $this->_render($template, $this->context);
+		return $this->_render($template, $this->_context);
 	}
 
 	/**
@@ -121,8 +121,8 @@ class Mustache {
 	 * @return string
 	 */
 	protected function renderSection($template, &$context) {
-		$otag  = $this->prepareRegEx($this->otag);
-		$ctag  = $this->prepareRegEx($this->ctag);
+		$otag  = $this->prepareRegEx($this->_otag);
+		$ctag  = $this->prepareRegEx($this->_ctag);
 		$regex = '/' . $otag . '(\\^|\\#)(.+?)' . $ctag . '\\s*([\\s\\S]+?)' . $otag . '\\/\\2' . $ctag . '\\s*/m';
 
 		$matches = array();
@@ -175,12 +175,12 @@ class Mustache {
 	 */
 	protected function renderPragmas($template, &$context) {
 		// no pragmas
-		if (strpos($template, $this->otag . '%') === false) {
+		if (strpos($template, $this->_otag . '%') === false) {
 			return $template;
 		}
 
-		$otag = $this->prepareRegEx($this->otag);
-		$ctag = $this->prepareRegEx($this->ctag);
+		$otag = $this->prepareRegEx($this->_otag);
+		$ctag = $this->prepareRegEx($this->_ctag);
 		$regex = '/' . $otag . '%([\\w_-]+)((?: [\\w]+=[\\w]+)*)' . $ctag . '\\n?/';
 		return preg_replace_callback($regex, array($this, 'renderPragma'), $template);
 	}
@@ -198,7 +198,7 @@ class Mustache {
 		$pragma_name    = $matches[1];
 		$options_string = $matches[2];
 
-		if (!in_array($pragma_name, $this->pragmasImplemented)) {
+		if (!in_array($pragma_name, $this->_pragmasImplemented)) {
 			throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
 		}
 
@@ -211,9 +211,9 @@ class Mustache {
 		}
 
 		if (empty($options)) {
-			$this->pragmas[$pragma_name] = true;
+			$this->_pragmas[$pragma_name] = true;
 		} else {
-			$this->pragmas[$pragma_name] = $options;
+			$this->_pragmas[$pragma_name] = $options;
 		}
 
 		return '';
@@ -227,7 +227,7 @@ class Mustache {
 	 * @return bool
 	 */
 	protected function hasPragma($pragma_name) {
-		if (array_key_exists($pragma_name, $this->pragmas) && $this->pragmas[$pragma_name]) {
+		if (array_key_exists($pragma_name, $this->_pragmas) && $this->_pragmas[$pragma_name]) {
 			return true;
 		} else {
 			return false;
@@ -247,7 +247,7 @@ class Mustache {
 			throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
 		}
 
-		return $this->pragmas[$pragma_name];
+		return $this->_pragmas[$pragma_name];
 	}
 
 	/**
@@ -259,18 +259,18 @@ class Mustache {
 	 * @return void
 	 */
 	protected function renderTags($template, &$context) {
-		if (strpos($template, $this->otag) === false) {
+		if (strpos($template, $this->_otag) === false) {
 			return $template;
 		}
 
-		$otag = $this->prepareRegEx($this->otag);
-		$ctag = $this->prepareRegEx($this->ctag);
+		$otag = $this->prepareRegEx($this->_otag);
+		$ctag = $this->prepareRegEx($this->_ctag);
 
-		$this->tagRegEx = '/' . $otag . "([#\^\/=!>\\{&])?(.+?)\\1?" . $ctag . "+/";
+		$this->_tagRegEx = '/' . $otag . "([#\^\/=!>\\{&])?(.+?)\\1?" . $ctag . "+/";
 
 		$html = '';
 		$matches = array();
-		while (preg_match($this->tagRegEx, $template, $matches, PREG_OFFSET_CAPTURE)) {
+		while (preg_match($this->_tagRegEx, $template, $matches, PREG_OFFSET_CAPTURE)) {
 			$tag      = $matches[0][0];
 			$offset   = $matches[0][1];
 			$modifier = $matches[1][0];
@@ -343,7 +343,7 @@ class Mustache {
 	 * @return string
 	 */
 	protected function renderEscaped($tag_name, &$context) {
-		return htmlentities($this->getVariable($tag_name, $context), null, $this->charset);
+		return htmlentities($this->getVariable($tag_name, $context), null, $this->_charset);
 	}
 
 	/**
@@ -379,9 +379,9 @@ class Mustache {
 	 * @return string
 	 */
 	protected function renderPartial($tag_name, &$context) {
-		$view = new self($this->getPartial($tag_name), $context, $this->partials);
-		$view->otag = $this->otag;
-		$view->ctag = $this->ctag;
+		$view = new self($this->getPartial($tag_name), $context, $this->_partials);
+		$view->_otag = $this->_otag;
+		$view->_ctag = $this->_ctag;
 		return $view->render();
 	}
 
@@ -396,12 +396,12 @@ class Mustache {
 	 */
 	protected function changeDelimiter($tag_name, &$context) {
 		$tags = explode(' ', $tag_name);
-		$this->otag = $tags[0];
-		$this->ctag = $tags[1];
+		$this->_otag = $tags[0];
+		$this->_ctag = $tags[1];
 
-		$otag  = $this->prepareRegEx($this->otag);
-		$ctag  = $this->prepareRegEx($this->ctag);
-		$this->tagRegEx = '/' . $otag . "([#\^\/=!>\\{&])?(.+?)\\1?" . $ctag . "+/";
+		$otag  = $this->prepareRegEx($this->_otag);
+		$ctag  = $this->prepareRegEx($this->_ctag);
+		$this->_tagRegEx = '/' . $otag . "([#\^\/=!>\\{&])?(.+?)\\1?" . $ctag . "+/";
 		return '';
 	}
 
@@ -498,8 +498,8 @@ class Mustache {
 	 * @return string
 	 */
 	protected function getPartial($tag_name) {
-		if (is_array($this->partials) && isset($this->partials[$tag_name])) {
-			return $this->partials[$tag_name];
+		if (is_array($this->_partials) && isset($this->_partials[$tag_name])) {
+			return $this->_partials[$tag_name];
 		}
 
 		if ($this->throwPartialExceptions) {
