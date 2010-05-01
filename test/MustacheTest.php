@@ -34,6 +34,7 @@ require_once 'PHPUnit/Framework.php';
  */
 class MustacheTest extends PHPUnit_Framework_TestCase {
 
+	const TEST_CLASS = 'Mustache';
 
 	/**
 	 * Test Mustache constructor.
@@ -68,7 +69,6 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($output, $m4->render($template));
 	}
 
-
 	/**
 	 * Test __toString() function.
 	 *
@@ -80,6 +80,26 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('Karl Marx', $m->__toString());
 		$this->assertEquals('Karl Marx', (string) $m);
+
+		$m2 = $this->getMock(self::TEST_CLASS, array('render'), array());
+		$m2->expects($this->once())
+			->method('render')
+			->will($this->returnValue('foo'));
+
+		$this->assertEquals('foo', $m2->render());
+	}
+
+	public function test__toStringException() {
+		$m = $this->getMock(self::TEST_CLASS, array('render'), array());
+		$m->expects($this->once())
+			->method('render')
+			->will($this->throwException(new Exception));
+
+		try {
+			$out = (string) $m;
+		} catch (Exception $e) {
+			$this->fail('__toString should catch all exceptions');
+		}
 	}
 
 	/**
