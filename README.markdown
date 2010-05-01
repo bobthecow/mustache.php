@@ -81,8 +81,8 @@ And render it:
 Known Issues
 ------------
 
- * There's no way to toggle a pragma other than checking out the feature branch for each pragma...
-   Need a clean way to do this.
+ * Pragmas don't un-apply... Instead of applying only to a specific template, pragmas are applied
+   to all subsequent templates and partials rendered by this Mustache instance.
  * Sections don't respect delimiter changes -- `delimiters` example currently fails with an
    "unclosed section" exception.
  * Test coverage is incomplete.
