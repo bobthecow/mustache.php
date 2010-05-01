@@ -598,7 +598,7 @@ class MustacheException extends Exception {
 	const UNCLOSED_SECTION         = 1;
 
 	// An UNEXPECTED_CLOSE_SECTION exception is thrown when {{/section}} appears
-	// without a corresponding {{#section}}.
+	// without a corresponding {{#section}} or {{^section}}.
 	const UNEXPECTED_CLOSE_SECTION = 2;
 
 	// An UNKNOWN_PARTIAL exception is thrown whenever a {{>partial}} tag appears
