@@ -17,10 +17,18 @@ class Mustache {
 	public $_otag = '{{';
 	public $_ctag = '}}';
 
-	// Should this Mustache throw exceptions when it finds unexpected tags?
-	protected $throwSectionExceptions  = true;
-	protected $throwPartialExceptions  = false;
-	protected $throwVariableExceptions = false;
+	/**
+	 * Should this Mustache throw exceptions when it finds unexpected tags?
+	 *
+	 * @see self::_throwsException()
+	 */
+	protected $_throwsExceptions = array(
+		MustacheException::UNKNOWN_VARIABLE         => false,
+		MustacheException::UNCLOSED_SECTION         => true,
+		MustacheException::UNEXPECTED_CLOSE_SECTION => true,
+		MustacheException::UNKNOWN_PARTIAL          => false,
+		MustacheException::UNKNOWN_PRAGMA           => true,
+	);
 
 	// Override charset passed to htmlentities() and htmlspecialchars(). Defaults to UTF-8.
 	protected $_charset = 'UTF-8';
@@ -265,6 +273,20 @@ class Mustache {
 		return $this->_pragmas[$pragma_name];
 	}
 
+
+	/**
+	 * Check whether this Mustache instance throws a given exception.
+	 *
+	 * Expects exceptions to be MustacheException error codes (i.e. class constants).
+	 *
+	 * @access protected
+	 * @param mixed $exception
+	 * @return void
+	 */
+	protected function _throwsException($exception) {
+		return (isset($this->_throwsExceptions[$exception]) && $this->_throwsExceptions[$exception]);
+	}
+
 	/**
 	 * Loop through and render individual Mustache tags.
 	 *
@@ -316,14 +338,14 @@ class Mustache {
 		switch ($modifier) {
 			case '#':
 			case '^':
-				if ($this->throwSectionExceptions) {
+				if ($this->_throwsException(MustacheException::UNCLOSED_SECTION)) {
 					throw new MustacheException('Unclosed section: ' . $tag_name, MustacheException::UNCLOSED_SECTION);
 				} else {
 					return '';
 				}
 				break;
 			case '/':
-				if ($this->throwSectionExceptions) {
+				if ($this->_throwsException(MustacheException::UNEXPECTED_CLOSE_SECTION)) {
 					throw new MustacheException('Unexpected close section: ' . $tag_name, MustacheException::UNEXPECTED_CLOSE_SECTION);
 				} else {
 					return '';
@@ -503,7 +525,7 @@ class Mustache {
 			}
 		}
 
-		if ($this->throwVariableExceptions) {
+		if ($this->_throwsException(MustacheException::UNKNOWN_VARIABLE)) {
 			throw new MustacheException("Unknown variable: " . $tag_name, MustacheException::UNKNOWN_VARIABLE);
 		} else {
 			return '';
@@ -525,7 +547,7 @@ class Mustache {
 			return $this->_partials[$tag_name];
 		}
 
-		if ($this->throwPartialExceptions) {
+		if ($this->_throwsException(MustacheException::UNKNOWN_PARTIAL)) {
 			throw new MustacheException('Unknown partial: ' . $tag_name, MustacheException::UNKNOWN_PARTIAL);
 		} else {
 			return '';
