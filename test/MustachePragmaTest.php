@@ -25,6 +25,9 @@ class MustachePragmaTest extends PHPUnit_Framework_TestCase {
 
 	public function testPragmaReplaceMultiple() {
 		$m = new Mustache();
+
+		$this->assertEquals('', $m->render('{{%  DOT-NOTATION  }}'), 'Pragmas should allow whitespace');
+		$this->assertEquals('', $m->render('{{% 	DOT-NOTATION 	foo=bar  }}'), 'Pragmas should allow whitespace');
 		$this->assertEquals('', $m->render("{{%DOT-NOTATION}}\n{{%DOT-NOTATION}}"), 'Multiple pragma tags not removed');
 		$this->assertEquals(' ', $m->render('{{%DOT-NOTATION}} {{%DOT-NOTATION}}'), 'Multiple pragma tags not removed');
 	}
