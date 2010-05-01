@@ -99,7 +99,7 @@ class Mustache {
 			$this->_context = array($this);
 		}
 
-		return $this->_render($template, $this->_context);
+		return $this->_renderTemplate($template, $this->_context);
 	}
 
 	/**
@@ -127,7 +127,7 @@ class Mustache {
 	 * @param array &$context
 	 * @return string Rendered Mustache template.
 	 */
-	protected function _render($template, &$context) {
+	protected function _renderTemplate($template, &$context) {
 		$template = $this->_renderPragmas($template, $context);
 		$template = $this->_renderSection($template, $context);
 		return $this->_renderTags($template, $context);
@@ -169,12 +169,12 @@ class Mustache {
 					if ($this->_varIsIterable($val)) {
 						foreach ($val as $local_context) {
 							$c = $this->_getContext($context, $local_context);
-							$replace .= $this->_render($content, $c);
+							$replace .= $this->_renderTemplate($content, $c);
 						}
 					} else if ($val) {
 						if (is_array($val) || is_object($val)) {
 							$c = $this->_getContext($context, $val);
-							$replace .= $this->_render($content, $c);
+							$replace .= $this->_renderTemplate($content, $c);
 						} else {
 							$replace .= $content;
 						}
