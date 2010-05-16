@@ -138,6 +138,36 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Mustache should return the same thing when invoked multiple times.
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function testMultipleInvocations() {
+		$m = new Mustache('x');
+		$first = $m->render();
+		$second = $m->render();
+
+		$this->assertEquals('x', $first);
+		$this->assertEquals($first, $second);
+	}
+
+	/**
+	 * Mustache should return the same thing when invoked multiple times.
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function testMultipleInvocationsWithTags() {
+		$m = new Mustache('{{one}} {{two}}', array('one' => 'foo', 'two' => 'bar'));
+		$first = $m->render();
+		$second = $m->render();
+
+		$this->assertEquals('foo bar', $first);
+		$this->assertEquals($first, $second);
+	}
+
+	/**
 	 * Test everything in the `examples` directory.
 	 *
 	 * @dataProvider getExamples
