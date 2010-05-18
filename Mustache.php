@@ -144,7 +144,7 @@ class Mustache {
 	protected function _renderSection($template, &$context) {
 		$otag  = $this->_prepareRegEx($this->_otag);
 		$ctag  = $this->_prepareRegEx($this->_ctag);
-		$regex = '/' . $otag . '(\\^|\\#)(.+?)' . $ctag . '\\s*([\\s\\S]+?)' . $otag . '\\/\\2' . $ctag . '\\s*/m';
+		$regex = '/' . $otag . '(\\^|\\#)\\s*(.+?)\\s*' . $ctag . '\\s*([\\s\\S]+?)' . $otag . '\\/\\s*\\2\\s*' . $ctag . '\\s*/m';
 
 		$matches = array();
 		while (preg_match($regex, $template, $matches, PREG_OFFSET_CAPTURE)) {
