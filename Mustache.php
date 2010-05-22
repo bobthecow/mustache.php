@@ -424,10 +424,10 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _renderPartial($tag_name, &$context) {
-		$view = new self($this->_getPartial($tag_name), $this->_flattenContext($context), $this->_partials);
-		$view->_otag = $this->_otag;
-		$view->_ctag = $this->_ctag;
-		return $view->render();
+		$view = clone($this);
+		$view->_otag = '{{';
+		$view->_ctag = '}}';
+		return $view->render($this->_getPartial($tag_name));
 	}
 
 	/**
@@ -450,7 +450,6 @@ class Mustache {
 		return '';
 	}
 
-
 	/**
 	 * Prepare a new context reference array.
 	 *
@@ -467,45 +466,6 @@ class Mustache {
 		foreach ($context as $view) {
 			$ret[] =& $view;
 		}
-		return $ret;
-	}
-
-
-	/**
-	 * Prepare a new (flattened) context.
-	 *
-	 * This is used to create a view object or array for rendering partials.
-	 *
-	 * @access protected
-	 * @param array &$context
-	 * @return array
-	 * @throws MustacheException
-	 */
-	protected function _flattenContext(&$context) {
-		$keys = array_keys($context);
-		$first = $context[$keys[0]];
-
-		if ($first instanceof Mustache) {
-			$ret = clone $first;
-			unset($keys[0]);
-
-			foreach ($keys as $name) {
-				foreach ($context[$name] as $key => $val) {
-					$ret->$key =& $val;
-				}
-			}
-		} else if (is_array($first)) {
-			$ret = array();
-
-			foreach ($keys as $name) {
-				foreach ($context[$name] as $key => $val) {
-					$ret[$key] =& $val;
-				}
-			}
-		} else {
-			throw new MustacheException('Unknown root context type.');
-		}
-
 		return $ret;
 	}
 
