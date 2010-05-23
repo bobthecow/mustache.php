@@ -92,9 +92,11 @@ class Mustache {
 		$this->_otag = '{{';
 		$this->_ctag = '}}';
 		$this->_localPragmas = null;
+
 		if ($keys = array_keys($this->_context)) {
-			if ($this->_context[$keys[0]] instanceof Mustache) {
-				$this->_context[$keys[0]] =& $this;
+			$last = array_pop($keys);
+			if ($this->_context[$last] instanceof Mustache) {
+				$this->_context[$last] =& $this;
 			}
 		}
 	}
