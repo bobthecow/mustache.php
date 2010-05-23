@@ -6,9 +6,9 @@ require_once 'PHPUnit/Framework.php';
 class MustachePragmaImplicitIteratorTest extends PHPUnit_Framework_TestCase {
 
 	public function testEnablePragma() {
-		$m = $this->getMock('Mustache', array('renderPragma'), array('{{%IMPLICIT-ITERATOR}}'));
+		$m = $this->getMock('Mustache', array('_renderPragma'), array('{{%IMPLICIT-ITERATOR}}'));
 		$m->expects($this->exactly(1))
-			->method('renderPragma')
+			->method('_renderPragma')
 			->with(array('{{%IMPLICIT-ITERATOR}}', 'IMPLICIT-ITERATOR', null));
 		$m->render();
 	}
@@ -31,7 +31,8 @@ class MustachePragmaImplicitIteratorTest extends PHPUnit_Framework_TestCase {
 	public function testCustomIterator() {
 		$m = new Mustache(null, array('items' => array('foo', 'bar', 'baz')));
 
-		$this->assertEquals('foobarbaz', $m->render('{{%IMPLICIT-ITERATOR iterator=item}}{{#items}}{{item}}{{/items}}'));
+		$this->assertEquals('foobarbaz', $m->render('{{%IMPLICIT-ITERATOR}}{{#items}}{{.}}{{/items}}'));
+		$this->assertEquals('foobarbaz', $m->render('{{%IMPLICIT-ITERATOR iterator=i}}{{#items}}{{i}}{{/items}}'));
 		$this->assertEquals('foobarbaz', $m->render('{{%IMPLICIT-ITERATOR iterator=items}}{{#items}}{{items}}{{/items}}'));
 	}
 
