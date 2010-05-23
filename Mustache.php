@@ -43,7 +43,7 @@ class Mustache {
 	 * Pragmas apply only to the current template. Partials, even those included after the
 	 * {{%UNESCAPED}} call, will need their own pragma declaration.
 	 *
-	 * his may be useful in non-HTML Mustache situations.
+	 * This may be useful in non-HTML Mustache situations.
 	 */
 	const PRAGMA_UNESCAPED    = 'UNESCAPED';
 
