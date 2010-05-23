@@ -92,7 +92,6 @@ class Mustache {
 		$this->_otag = '{{';
 		$this->_ctag = '}}';
 		$this->_localPragmas = null;
-
 		if ($keys = array_keys($this->_context)) {
 			if ($this->_context[$keys[0]] instanceof Mustache) {
 				$this->_context[$keys[0]] =& $this;
@@ -475,8 +474,8 @@ class Mustache {
 	protected function _pushContext(&$local_context) {
 		$new = array();
 		$new[] =& $local_context;
-		foreach ($this->_context as $view) {
-			$new[] =& $view;
+		foreach (array_keys($this->_context) as $key) {
+			$new[] =& $this->_context[$key];
 		}
 		$this->_context = $new;
 	}
@@ -491,9 +490,10 @@ class Mustache {
 	protected function _popContext() {
 		$new = array();
 
-		array_shift($this->_context);
-		foreach ($this->_context as $view) {
-			$new[] =& $view;
+		$keys = array_keys($this->_context);
+		array_shift($keys);
+		foreach ($keys as $key) {
+			$new[] =& $this->_context[$key];
 		}
 		$this->_context = $new;
 	}
