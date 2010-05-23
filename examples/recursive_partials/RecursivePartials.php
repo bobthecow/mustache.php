@@ -2,7 +2,7 @@
 
 class RecursivePartials extends Mustache {
 	protected $_partials = array(
-		'child' => "* {{ name }}\n{{#child}}{{>child}}\n{{/child}}",
+		'child' => " > {{ name }}{{#child}}{{>child}}{{/child}}",
 	);
 
 	public $name  = 'George';
