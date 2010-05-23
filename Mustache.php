@@ -122,6 +122,7 @@ class Mustache {
 			$this->_context = array($this);
 		}
 
+		$template = $this->_renderPragmas($template);
 		return $this->_renderTemplate($template, $this->_context);
 	}
 
@@ -150,7 +151,6 @@ class Mustache {
 	 * @return string Rendered Mustache template.
 	 */
 	protected function _renderTemplate($template) {
-		$template = $this->_renderPragmas($template);
 		$template = $this->_renderSection($template);
 		return $this->_renderTags($template);
 	}
