@@ -39,4 +39,10 @@ class MustachePragmaTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals("1\n23", $m->render("1\n2{{%DOT-NOTATION}}\n3"), 'Wrong newline removed with pragma tag');
 	}
 
+	public function testPragmaReset() {
+		$m = new Mustache('', array('symbol' => '>>>'));
+		$this->assertEquals('>>>', $m->render('{{{symbol}}}'));
+		$this->assertEquals('>>>', $m->render('{{%UNESCAPED}}{{symbol}}'));
+		$this->assertEquals('>>>', $m->render('{{{symbol}}}'));
+	}
 }

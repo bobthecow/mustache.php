@@ -185,6 +185,29 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * testClone function.
+	 *
+	 * @dataProvider getExamples
+	 * @access public
+	 * @return void
+	 */
+	public function test__clone($class, $template, $output) {
+		$m = new $class;
+		$n = clone $m;
+
+		$n_output = $n->render($template);
+
+		$o = clone $n;
+
+		$this->assertEquals($m->render($template), $n_output);
+		$this->assertEquals($n_output, $o->render($template));
+
+		$this->assertNotSame($m, $n);
+		$this->assertNotSame($n, $o);
+		$this->assertNotSame($m, $o);
+	}
+
+	/**
 	 * Test everything in the `examples` directory.
 	 *
 	 * @dataProvider getExamples
