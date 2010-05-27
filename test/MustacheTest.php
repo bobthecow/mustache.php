@@ -193,7 +193,7 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function test__clone($class, $template, $output) {
 		if ($class == 'Delimiters') {
-			$this->markTestSkipped("Known issue: sections don't respect delimeter changes");
+			$this->markTestSkipped("Known issue: sections don't respect delimiter changes");
 			return;
 		}
 
@@ -224,7 +224,7 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testExamples($class, $template, $output) {
 		if ($class == 'Delimiters') {
-			$this->markTestSkipped("Known issue: sections don't respect delimeter changes");
+			$this->markTestSkipped("Known issue: sections don't respect delimiter changes");
 			return;
 		}
 
