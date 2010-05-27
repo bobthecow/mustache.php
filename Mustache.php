@@ -470,8 +470,8 @@ class Mustache {
 	 * Push a local context onto the stack.
 	 *
 	 * @access protected
-	 * @param array $local_context
-	 * @return array
+	 * @param array &$local_context
+	 * @return void
 	 */
 	protected function _pushContext(&$local_context) {
 		$new = array();
@@ -537,11 +537,11 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
-	 * @param array &$context
+	 * @param array $context
 	 * @throws MustacheException Unknown variable name.
 	 * @return string
 	 */
-	protected function _findVariableInContext($tag_name, &$context) {
+	protected function _findVariableInContext($tag_name, $context) {
 		foreach ($context as $view) {
 			if (is_object($view)) {
 				if (isset($view->$tag_name)) {
