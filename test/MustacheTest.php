@@ -176,11 +176,11 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testResetTemplateForMultipleInvocations() {
 		$m = new Mustache('Sirve.');
-		$m->render('No sirve.');
+		$this->assertEquals('No sirve.', $m->render('No sirve.'));
 		$this->assertEquals('Sirve.', $m->render());
 		
 		$m2 = new Mustache();
-		$m2->render('No sirve.');
+		$this->assertEquals('No sirve.', $m2->render('No sirve.'));
 		$this->assertEquals('', $m2->render());
 	}
 
