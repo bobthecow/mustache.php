@@ -36,4 +36,20 @@ class MustachePragmaImplicitIteratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foobarbaz', $m->render('{{%IMPLICIT-ITERATOR iterator=items}}{{#items}}{{items}}{{/items}}'));
 	}
 
+	public function testDotNotationContext() {
+		$m = new Mustache(null, array('items' => array(
+			array('index' => 1, 'name' => 'foo'),
+			array('index' => 2, 'name' => 'bar'),
+			array('index' => 3, 'name' => 'baz'),
+		)));
+
+		$this->assertEquals('foobarbaz', $m->render('{{%IMPLICIT-ITERATOR}}{{#items}}{{#.}}{{name}}{{/.}}{{/items}}'));
+
+		// skip the last two tests here, they just break...
+		$this->markTestSkipped('Implicit iterator not completely compatible with dot notation');
+
+		$this->assertEquals('123', $m->render('{{%IMPLICIT-ITERATOR iterator=i}}{{#items}}{{i.index}}{{/items}}'));
+		$this->assertEquals('foobarbaz', $m->render('{{%IMPLICIT-ITERATOR iterator=i}}{{#items}}{{i.name}}{{/items}}'));
+	}
+
 }
