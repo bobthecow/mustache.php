@@ -164,8 +164,8 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _renderSection($template) {
-		$otag  = preg_quote($this->_otag);
-		$ctag  = preg_quote($this->_ctag);
+		$otag  = preg_quote($this->_otag, '/');
+		$ctag  = preg_quote($this->_ctag, '/');
 		$regex = '/' . $otag . '(\\^|\\#)\\s*(.+?)\\s*' . $ctag . '\\s*([\\s\\S]+?)' . $otag . '\\/\\s*\\2\\s*' . $ctag . '\\s*/m';
 
 		$matches = array();
@@ -227,8 +227,8 @@ class Mustache {
 			return $template;
 		}
 
-		$otag = preg_quote($this->_otag);
-		$ctag = preg_quote($this->_ctag);
+		$otag = preg_quote($this->_otag, '/');
+		$ctag = preg_quote($this->_ctag, '/');
 		$regex = '/' . $otag . '%\\s*([\\w_-]+)((?: [\\w]+=[\\w]+)*)\\s*' . $ctag . '\\n?/';
 		return preg_replace_callback($regex, array($this, '_renderPragma'), $template);
 	}
@@ -327,8 +327,8 @@ class Mustache {
 		$otag_orig = $this->_otag;
 		$ctag_orig = $this->_ctag;
 
-		$otag = preg_quote($this->_otag);
-		$ctag = preg_quote($this->_ctag);
+		$otag = preg_quote($this->_otag, '/');
+		$ctag = preg_quote($this->_ctag, '/');
 
 		$this->_tagRegEx = '/' . $otag . "([#\^\/=!>\\{&])?(.+?)\\1?" . $ctag . "+/";
 
@@ -466,8 +466,8 @@ class Mustache {
 		$this->_otag = $tags[0];
 		$this->_ctag = $tags[1];
 
-		$otag  = preg_quote($this->_otag);
-		$ctag  = preg_quote($this->_ctag);
+		$otag  = preg_quote($this->_otag, '/');
+		$ctag  = preg_quote($this->_ctag, '/');
 		$this->_tagRegEx = '/' . $otag . "([#\^\/=!>\\{&])?(.+?)\\1?" . $ctag . "+/";
 		return '';
 	}
