@@ -324,6 +324,9 @@ class Mustache {
 			return $template;
 		}
 
+		$otag_orig = $this->_otag;
+		$ctag_orig = $this->_ctag;
+
 		$otag = preg_quote($this->_otag);
 		$ctag = preg_quote($this->_ctag);
 
@@ -341,6 +344,9 @@ class Mustache {
 			$html .= $this->_renderTag($modifier, $tag_name);
 			$template = substr($template, $offset + strlen($tag));
 		}
+
+		$this->_otag = $otag_orig;
+		$this->_ctag = $ctag_orig;
 
 		return $html . $template;
 	}
