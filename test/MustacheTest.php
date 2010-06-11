@@ -289,4 +289,25 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		}
 		return $ret;
 	}
+
+	public function testCrazyDelimiters() {
+		$m = new Mustache(null, array('result' => 'success'));
+		$this->assertEquals('success', $m->render('{{=[[ ]]=}}[[ result ]]'));
+
+		$m = new Mustache(null, array('result' => 'success'));
+		$this->assertEquals('success', $m->render('{{=(( ))=}}(( result ))'));
+
+		$m = new Mustache(null, array('result' => 'success'));
+		$this->assertEquals('success', $m->render('{{={$ $}=}}{$ result $}'));
+
+		$m = new Mustache(null, array('result' => 'success'));
+		$this->assertEquals('success', $m->render('{{=<.. ..>=}}<.. result ..>'));
+	}
+
+	public function testResetDelimiters() {
+		$m = new Mustache(null, array('result' => 'success'));
+		$this->assertEquals('success', $m->render('{{=[[ ]]=}}[[ result ]]'));
+		$this->assertEquals('success', $m->render('{{=<< >>=}}<< result >>'));
+		$this->assertEquals('success', $m->render('{{=<% %>=}}<% result %>'));
+	}
 }
