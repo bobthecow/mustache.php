@@ -1,5 +1,5 @@
 <?php
 
 class PragmaUnescaped extends Mustache {
-	protected $vs = 'Bear > Shark';
+	public $vs = 'Bear > Shark';
 }
