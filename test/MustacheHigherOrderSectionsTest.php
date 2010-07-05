@@ -83,6 +83,18 @@ class MustacheHigherOrderSectionsTest extends PHPUnit_Framework_TestCase {
 			$this->foo->render('{{#wrap}}{{name}}{{/wrap}}', $data)
 		);
 	}
+
+	public function testMonsters() {
+		$frank = new Monster();
+		$frank->title = 'Dr.';
+		$frank->name  = 'Frankenstein';
+		$this->assertEquals('Dr. Frankenstein', $frank->render());
+
+		$dracula = new Monster();
+		$dracula->title = 'Count';
+		$dracula->name  = 'Dracula';
+		$this->assertEquals('Count Dracula', $dracula->render());
+	}
 }
 
 class Foo extends Mustache {
@@ -106,7 +118,7 @@ class Foo extends Mustache {
 	public function wrapWithBoth($text) {
 		return self::wrapWithStrong(self::wrapWithEm($text));
 	}
-	
+
 	public static function staticTrim($text) {
 		return trim($text);
 	}
@@ -114,4 +126,10 @@ class Foo extends Mustache {
 
 function make_my_logo_bigger($text) {
 	return sprintf('<h1>%s</h1>', $text);
+}
+
+class Monster extends Mustache {
+	public $_template = '{{#title}}{{title}} {{/title}}{{name}}';
+	public $title;
+	public $name;
 }
