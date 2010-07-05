@@ -81,8 +81,6 @@ And render it:
 Known Issues
 ------------
 
- * Pragmas don't un-apply... Instead of applying only to a specific template, pragmas are applied
-   to all subsequent templates and partials rendered by this Mustache instance.
  * Sections don't respect delimiter changes -- `delimiters` example currently fails with an
    "unclosed section" exception.
  * Dot notation and implicit iterators don't really play nice. A non-traversible local context is

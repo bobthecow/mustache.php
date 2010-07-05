@@ -1,7 +1,6 @@
 <?php
 
 require_once '../Mustache.php';
-require_once 'PHPUnit/Framework.php';
 
 class MustachePragmaDotNotationTest extends PHPUnit_Framework_TestCase {
 
@@ -31,4 +30,31 @@ class MustachePragmaDotNotationTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($m->render('{{%DOT-NOTATION}}{{one.one}}|{{one.two}}|{{one.three}}'), 'one-one|one-two|one-three');
 	}
 
+	public function testDotNotationContext() {
+		$data = array('parent' => array('items' => array(
+			array('item' => array('index' => 1)),
+			array('item' => array('index' => 2)),
+			array('item' => array('index' => 3)),
+			array('item' => array('index' => 4)),
+			array('item' => array('index' => 5)),
+		)));
+
+		$m = new Mustache('', $data);
+		$this->assertEquals('12345', $m->render('{{%DOT-NOTATION}}{{#parent}}{{#items}}{{item.index}}{{/items}}{{/parent}}'));
+	}
+
+	public function testDotNotationSectionNames() {
+		$data = array('parent' => array('items' => array(
+			array('item' => array('index' => 1)),
+			array('item' => array('index' => 2)),
+			array('item' => array('index' => 3)),
+			array('item' => array('index' => 4)),
+			array('item' => array('index' => 5)),
+		)));
+
+		$m = new Mustache('', $data);
+		$this->assertEquals('.....', $m->render('{{%DOT-NOTATION}}{{#parent.items}}.{{/parent.items}}'));
+		$this->assertEquals('12345', $m->render('{{%DOT-NOTATION}}{{#parent.items}}{{item.index}}{{/parent.items}}'));
+		$this->assertEquals('12345', $m->render('{{%DOT-NOTATION}}{{#parent.items}}{{#item}}{{index}}{{/item}}{{/parent.items}}'));
+	}
 }
