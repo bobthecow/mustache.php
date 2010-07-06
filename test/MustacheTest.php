@@ -1,7 +1,6 @@
 <?php
 
 require_once '../Mustache.php';
-require_once 'PHPUnit/Framework.php';
 
 /**
  * A PHPUnit test case for Mustache.php.
@@ -263,26 +262,30 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 				foreach ($children as $file) {
 					if (!$file->isFile()) continue;
 
-					$filename = $file->getPathInfo();
+					$filename = $file->getPathname();
 					$info = pathinfo($filename);
 
-					switch($info['extension']) {
-						case 'php':
-							$class = $info['filename'];
-							include_once($filename);
-							break;
+					if (isset($info['extension'])) {
+						switch($info['extension']) {
+							case 'php':
+								$class = $info['filename'];
+								include_once($filename);
+								break;
 
-						case 'mustache':
-							$template = file_get_contents($filename);
-							break;
+							case 'mustache':
+								$template = file_get_contents($filename);
+								break;
 
-						case 'txt':
-							$output = file_get_contents($filename);
-							break;
+							case 'txt':
+								$output = file_get_contents($filename);
+								break;
+						}
 					}
 				}
 
-				$ret[$example] = array($class, $template, $output);
+				if (!empty($class)) {
+					$ret[$example] = array($class, $template, $output);
+				}
 			}
 
 			$files->next();

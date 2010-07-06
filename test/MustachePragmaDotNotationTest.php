@@ -1,7 +1,6 @@
 <?php
 
 require_once '../Mustache.php';
-require_once 'PHPUnit/Framework.php';
 
 class MustachePragmaDotNotationTest extends PHPUnit_Framework_TestCase {
 
