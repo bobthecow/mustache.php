@@ -283,7 +283,9 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 					}
 				}
 
-				$ret[$example] = array($class, $template, $output);
+				if (!empty($class)) {
+					$ret[$example] = array($class, $template, $output);
+				}
 			}
 
 			$files->next();
