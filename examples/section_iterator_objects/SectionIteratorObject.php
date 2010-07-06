@@ -1,17 +1,16 @@
 <?php
 
-class Sections_Iterator_Object extends Mustache {
+class SectionIteratorObject extends Mustache {
 	public $start = "It worked the first time.";
 
 	public function middle() {
-		return new Iterator_Object;
+		return new IteratorObject();
 	}
 
 	public $final = "Then, surprisingly, it worked the final time.";
 }
 
-class Iterator_Object implements Iterator
-{
+class IteratorObject implements Iterator {
 	protected $_position = 0;
 
 	protected $_data = array(
