@@ -597,7 +597,7 @@ class Mustache {
 	 * @return bool
 	 */
 	protected function _varIsIterable($var) {
-		return is_object($var) || (is_array($var) && !array_diff_key($var, array_keys(array_keys($var))));
+		return $var instanceof Traversable || (is_array($var) && !array_diff_key($var, array_keys(array_keys($var))));
 	}
 }
 
