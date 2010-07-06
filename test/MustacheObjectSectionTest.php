@@ -21,7 +21,7 @@ class MustacheObjectSectionTest extends PHPUnit_Framework_TestCase {
 
 class Alpha extends Mustache {
 	public $foo;
-	
+
 	public function __construct() {
 		$this->foo = new StdClass();
 		$this->foo->name = 'Foo';
@@ -31,17 +31,17 @@ class Alpha extends Mustache {
 
 class Beta extends Mustache {
 	protected $_data = array();
-	
+
 	public function __construct() {
 		$this->_data['foo'] = new StdClass();
 		$this->_data['foo']->name = 'Foo';
 		$this->_data['foo']->number = 1;
 	}
-	
+
 	public function __isset($name) {
 		return array_key_exists($name, $this->_data);
 	}
-	
+
 	public function __get($name) {
 		return $this->_data[$name];
 	}
