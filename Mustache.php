@@ -33,7 +33,44 @@ class Mustache {
 	// Override charset passed to htmlentities() and htmlspecialchars(). Defaults to UTF-8.
 	protected $_charset = 'UTF-8';
 
+	/**
+	 * Pragmas are macro-like directives that, when invoked, change the behavior or
+	 * syntax of Mustache.
+	 *
+	 * They should be considered extremely experimental. Most likely their implementation
+	 * will change in the future.
+	 */
+
+	/**
+	 * The {{%DOT-NOTATION}} pragma allows context traversal via dots. Given the following context:
+	 *
+	 *     $context = array('foo' => array('bar' => array('baz' => 'qux')));
+	 *
+	 * One could access nested properties using dot notation:
+	 *
+	 *      {{%DOT-NOTATION}}{{foo.bar.baz}}
+	 *
+	 * Which would render as `qux`.
+	 */
 	const PRAGMA_DOT_NOTATION      = 'DOT-NOTATION';
+
+	/**
+	 * The {{%IMPLICIT-ITERATOR}} pragma allows access to non-associative array data in an
+	 * iterable section:
+	 *
+	 *     $context = array('items' => array('foo', 'bar', 'baz'));
+	 *
+	 * With this template:
+	 *
+	 *     {{%IMPLICIT-ITERATOR}}{{#items}}{{.}}{{/items}}
+	 *
+	 * Would render as `foobarbaz`.
+	 *
+	 * {{%IMPLICIT-ITERATOR}} accepts an optional 'iterator' argument which allows implicit
+	 * iterator tags other than {{.}} ...
+	 *
+	 *     {{%IMPLICIT-ITERATOR iterator=i}}{{#items}}{{i}}{{/items}}
+	 */
 	const PRAGMA_IMPLICIT_ITERATOR = 'IMPLICIT-ITERATOR';
 
 	/**
