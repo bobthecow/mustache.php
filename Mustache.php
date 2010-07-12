@@ -33,7 +33,8 @@ class Mustache {
 	// Override charset passed to htmlentities() and htmlspecialchars(). Defaults to UTF-8.
 	protected $_charset = 'UTF-8';
 
-	const PRAGMA_DOT_NOTATION = 'DOT-NOTATION';
+	const PRAGMA_DOT_NOTATION      = 'DOT-NOTATION';
+	const PRAGMA_IMPLICIT_ITERATOR = 'IMPLICIT-ITERATOR';
 
 	/**
 	 * The {{%UNESCAPED}} pragma swaps the meaning of the {{normal}} and {{{unescaped}}}
@@ -56,6 +57,7 @@ class Mustache {
 
 	protected $_pragmasImplemented = array(
 		self::PRAGMA_DOT_NOTATION,
+		self::PRAGMA_IMPLICIT_ITERATOR,
 		self::PRAGMA_UNESCAPED
 	);
 
@@ -189,8 +191,24 @@ class Mustache {
 				// regular section
 				case '#':
 					if ($this->_varIsIterable($val)) {
+						if ($this->_hasPragma(self::PRAGMA_IMPLICIT_ITERATOR)) {
+							if ($opt = $this->_getPragmaOptions(self::PRAGMA_IMPLICIT_ITERATOR)) {
+								$iterator = $opt['iterator'];
+							} else {
+								$iterator = '.';
+							}
+						} else {
+							$iterator = false;
+						}
+
 						foreach ($val as $local_context) {
-							$this->_pushContext($local_context);
+
+							if ($iterator) {
+								$iterator_context = array($iterator => $local_context);
+								$this->_pushContext($iterator_context);
+							} else {
+								$this->_pushContext($local_context);
+							}
 							$replace .= $this->_renderTemplate($content);
 							$this->_popContext();
 						}
@@ -291,11 +309,11 @@ class Mustache {
 	 * @throws MustacheException Unknown pragma
 	 */
 	protected function _getPragmaOptions($pragma_name) {
-		if (!$this->_hasPragma()) {
+		if (!$this->_hasPragma($pragma_name)) {
 			throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
 		}
 
-		return $this->_localPragmas[$pragma_name];
+		return (is_array($this->_localPragmas[$pragma_name])) ? $this->_localPragmas[$pragma_name] : array();
 	}
 
 
@@ -521,7 +539,7 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _getVariable($tag_name) {
-		if ($this->_hasPragma(self::PRAGMA_DOT_NOTATION)) {
+		if ($this->_hasPragma(self::PRAGMA_DOT_NOTATION) && $tag_name != '.') {
 			$chunks = explode('.', $tag_name);
 			$first = array_shift($chunks);
 
