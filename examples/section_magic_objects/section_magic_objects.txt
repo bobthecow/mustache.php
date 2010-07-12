@@ -1,0 +1,4 @@
+* It worked the first time.
+* And it worked the second time.
+* As well as the third.
+* Then, surprisingly, it worked the final time.
