@@ -33,7 +33,45 @@ class Mustache {
 	// Override charset passed to htmlentities() and htmlspecialchars(). Defaults to UTF-8.
 	protected $_charset = 'UTF-8';
 
-	const PRAGMA_DOT_NOTATION = 'DOT-NOTATION';
+	/**
+	 * Pragmas are macro-like directives that, when invoked, change the behavior or
+	 * syntax of Mustache.
+	 *
+	 * They should be considered extremely experimental. Most likely their implementation
+	 * will change in the future.
+	 */
+
+	/**
+	 * The {{%DOT-NOTATION}} pragma allows context traversal via dots. Given the following context:
+	 *
+	 *     $context = array('foo' => array('bar' => array('baz' => 'qux')));
+	 *
+	 * One could access nested properties using dot notation:
+	 *
+	 *      {{%DOT-NOTATION}}{{foo.bar.baz}}
+	 *
+	 * Which would render as `qux`.
+	 */
+	const PRAGMA_DOT_NOTATION      = 'DOT-NOTATION';
+
+	/**
+	 * The {{%IMPLICIT-ITERATOR}} pragma allows access to non-associative array data in an
+	 * iterable section:
+	 *
+	 *     $context = array('items' => array('foo', 'bar', 'baz'));
+	 *
+	 * With this template:
+	 *
+	 *     {{%IMPLICIT-ITERATOR}}{{#items}}{{.}}{{/items}}
+	 *
+	 * Would render as `foobarbaz`.
+	 *
+	 * {{%IMPLICIT-ITERATOR}} accepts an optional 'iterator' argument which allows implicit
+	 * iterator tags other than {{.}} ...
+	 *
+	 *     {{%IMPLICIT-ITERATOR iterator=i}}{{#items}}{{i}}{{/items}}
+	 */
+	const PRAGMA_IMPLICIT_ITERATOR = 'IMPLICIT-ITERATOR';
 
 	/**
 	 * The {{%UNESCAPED}} pragma swaps the meaning of the {{normal}} and {{{unescaped}}}
@@ -56,6 +94,7 @@ class Mustache {
 
 	protected $_pragmasImplemented = array(
 		self::PRAGMA_DOT_NOTATION,
+		self::PRAGMA_IMPLICIT_ITERATOR,
 		self::PRAGMA_UNESCAPED
 	);
 
@@ -189,8 +228,24 @@ class Mustache {
 				// regular section
 				case '#':
 					if ($this->_varIsIterable($val)) {
+						if ($this->_hasPragma(self::PRAGMA_IMPLICIT_ITERATOR)) {
+							if ($opt = $this->_getPragmaOptions(self::PRAGMA_IMPLICIT_ITERATOR)) {
+								$iterator = $opt['iterator'];
+							} else {
+								$iterator = '.';
+							}
+						} else {
+							$iterator = false;
+						}
+
 						foreach ($val as $local_context) {
-							$this->_pushContext($local_context);
+
+							if ($iterator) {
+								$iterator_context = array($iterator => $local_context);
+								$this->_pushContext($iterator_context);
+							} else {
+								$this->_pushContext($local_context);
+							}
 							$replace .= $this->_renderTemplate($content);
 							$this->_popContext();
 						}
@@ -291,11 +346,11 @@ class Mustache {
 	 * @throws MustacheException Unknown pragma
 	 */
 	protected function _getPragmaOptions($pragma_name) {
-		if (!$this->_hasPragma()) {
+		if (!$this->_hasPragma($pragma_name)) {
 			throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
 		}
 
-		return $this->_localPragmas[$pragma_name];
+		return (is_array($this->_localPragmas[$pragma_name])) ? $this->_localPragmas[$pragma_name] : array();
 	}
 
 
@@ -521,7 +576,7 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _getVariable($tag_name) {
-		if ($this->_hasPragma(self::PRAGMA_DOT_NOTATION)) {
+		if ($this->_hasPragma(self::PRAGMA_DOT_NOTATION) && $tag_name != '.') {
 			$chunks = explode('.', $tag_name);
 			$first = array_shift($chunks);
 
