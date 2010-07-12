@@ -83,8 +83,6 @@ Known Issues
 
  * Sections don't respect delimiter changes -- `delimiters` example currently fails with an
    "unclosed section" exception.
- * Dot notation and implicit iterators don't really play nice. A non-traversible local context is
-   passed to the section.
  * Test coverage is incomplete.
 
 
