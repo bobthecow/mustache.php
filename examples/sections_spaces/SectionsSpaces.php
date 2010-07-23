@@ -1,6 +1,6 @@
 <?php
 
-class Sections_Spaces extends Mustache {
+class SectionsSpaces extends Mustache {
 	public $start = "It worked the first time.";
 
 	public function middle() {
