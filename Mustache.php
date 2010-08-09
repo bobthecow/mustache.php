@@ -229,7 +229,7 @@ class Mustache {
 				case '#':
 
 					// higher order sections
-					if (is_callable($val)) {
+					if ($this->_sectionIsCallable($val)) {
 						$content = call_user_func($val, $content);
 						$replace .= $this->_renderTemplate($content);
 					} else if ($this->_varIsIterable($val)) {
@@ -357,7 +357,6 @@ class Mustache {
 
 		return (is_array($this->_localPragmas[$pragma_name])) ? $this->_localPragmas[$pragma_name] : array();
 	}
-
 
 	/**
 	 * Check whether this Mustache instance throws a given exception.
@@ -548,7 +547,6 @@ class Mustache {
 		$this->_context = $new;
 	}
 
-
 	/**
 	 * Remove the latest context from the stack.
 	 *
@@ -658,6 +656,27 @@ class Mustache {
 	 */
 	protected function _varIsIterable($var) {
 		return $var instanceof Traversable || (is_array($var) && !array_diff_key($var, array_keys(array_keys($var))));
+	}
+
+	/**
+	 * Higher order sections helper: tests whether the section $var is a valid callback.
+	 *
+	 * In Mustache.php, a variable is considered 'callable' if the variable is:
+	 *
+	 *  1. an anonymous function.
+	 *  2. an object and the name of a public function, i.e. `array($SomeObject, 'methodName')`
+	 *  3. a class name and the name of a public static function, i.e. `array('SomeClass', 'methodName')`
+	 *  4. a static function name in the form `'SomeClass::methodName'`
+	 *
+	 * @access protected
+	 * @param mixed $var
+	 * @return bool
+	 */
+	protected function _sectionIsCallable($var) {
+		if (is_string($var) && (strpos($var, '::') == false)) {
+			return false;
+		}
+		return is_callable($var);
 	}
 }
 

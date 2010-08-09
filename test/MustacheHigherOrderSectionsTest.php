@@ -37,14 +37,6 @@ class MustacheHigherOrderSectionsTest extends PHPUnit_Framework_TestCase {
 		);
 	}
 
-	public function testFunctionSectionCallback() {
-		$this->foo->wrapper = 'make_my_logo_bigger';
-		$this->assertEquals(
-			sprintf('<h1>%s</h1>', $this->foo->name),
-			$this->foo->render('{{#wrapper}}{{name}}{{/wrapper}}')
-		);
-	}
-
 	public function testStaticSectionCallback() {
 		$this->foo->trimmer = array(get_class($this->foo), 'staticTrim');
 		$this->assertEquals($this->foo->name, $this->foo->render('{{#trimmer}}    {{name}}    {{/trimmer}}'));
@@ -56,12 +48,7 @@ class MustacheHigherOrderSectionsTest extends PHPUnit_Framework_TestCase {
 	public function testViewArraySectionCallback() {
 		$data = array(
 			'name' => 'Bob',
-			'wrap' => 'make_my_logo_bigger',
 			'trim' => array(get_class($this->foo), 'staticTrim'),
-		);
-		$this->assertEquals(
-			sprintf('<h1>%s</h1>', $data['name']),
-			$this->foo->render('{{#wrap}}{{name}}{{/wrap}}', $data)
 		);
 		$this->assertEquals($data['name'], $this->foo->render('{{#trim}}    {{name}}    {{/trim}}', $data));
 	}
@@ -73,13 +60,12 @@ class MustacheHigherOrderSectionsTest extends PHPUnit_Framework_TestCase {
 		}
 		$data = array(
 			'name' => 'Bob',
-			'wrap' => 'make_my_logo_bigger',
-			'anonywrap' => function($text) {
-				return array('[[%s]]', $text);
+			'wrap' => function($text) {
+				return sprintf('[[%s]]', $text);
 			}
 		);
 		$this->assertEquals(
-			sprintf('<h1>%s</h1>', $data['name']),
+			sprintf('[[%s]]', $data['name']),
 			$this->foo->render('{{#wrap}}{{name}}{{/wrap}}', $data)
 		);
 	}
@@ -122,10 +108,6 @@ class Foo extends Mustache {
 	public static function staticTrim($text) {
 		return trim($text);
 	}
-}
-
-function make_my_logo_bigger($text) {
-	return sprintf('<h1>%s</h1>', $text);
 }
 
 class Monster extends Mustache {
