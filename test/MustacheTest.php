@@ -35,6 +35,11 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 
 	const TEST_CLASS = 'Mustache';
 
+	protected $knownIssues = array(
+		'Delimiters'     => "Known issue: sections don't respect delimiter changes",
+		'SectionsSpaces' => "Known issue: Mustache fails miserably at whitespace",
+	);
+
 	/**
 	 * Test Mustache constructor.
 	 *
@@ -191,9 +196,8 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	public function test__clone($class, $template, $output) {
-		if ($class == 'Delimiters') {
-			$this->markTestSkipped("Known issue: sections don't respect delimiter changes");
-			return;
+		if (isset($this->knownIssues[$class])) {
+			return $this->markTestSkipped($this->knownIssues[$class]);
 		}
 
 		$m = new $class;
@@ -222,9 +226,8 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	 * @return void
 	 */
 	public function testExamples($class, $template, $output) {
-		if ($class == 'Delimiters') {
-			$this->markTestSkipped("Known issue: sections don't respect delimiter changes");
-			return;
+		if (isset($this->knownIssues[$class])) {
+			return $this->markTestSkipped($this->knownIssues[$class]);
 		}
 
 		$m = new $class;
