@@ -452,14 +452,12 @@ class Mustache {
 					return $this->_renderUnescaped($tag_name);
 				}
 				break;
-			case '':
-			default:
-				if ($this->_hasPragma(self::PRAGMA_UNESCAPED)) {
-					return $this->_renderUnescaped($tag_name);
-				} else {
-					return $this->_renderEscaped($tag_name);
-				}
-				break;
+		}
+
+		if ($this->_hasPragma(self::PRAGMA_UNESCAPED)) {
+			return $this->_renderUnescaped($modifier . $tag_name);
+		} else {
+			return $this->_renderEscaped($modifier . $tag_name);
 		}
 	}
 
