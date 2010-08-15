@@ -141,6 +141,23 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Zappa, Frank', $m->render('{{last_name}}, {{first_name}}', array('first_name' => 'Frank', 'last_name' => 'Zappa')));
 	}
 
+	public function testRenderWithPartials() {
+		$m = new Mustache('{{>stache}}', null, array('stache' => '{{first_name}} {{last_name}}'));
+		$this->assertEquals('Charlie Chaplin', $m->render(null, array('first_name' => 'Charlie', 'last_name' => 'Chaplin')));
+		$this->assertEquals('Zappa, Frank', $m->render('{{last_name}}, {{first_name}}', array('first_name' => 'Frank', 'last_name' => 'Zappa')));
+	}
+
+	/**
+	 * Mustache should allow newlines (and other whitespace) in comments and all other tags.
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function testNewlinesInComments() {
+		$m = new Mustache("{{! comment \n \t still a comment... }}");
+		$this->assertEquals('', $m->render());
+	}
+
 	/**
 	 * Mustache should return the same thing when invoked multiple times.
 	 *
