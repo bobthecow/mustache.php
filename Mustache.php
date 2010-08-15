@@ -98,7 +98,7 @@ class Mustache {
 		self::PRAGMA_UNESCAPED
 	);
 
-	protected $_localPragmas;
+	protected $_localPragmas = array();
 
 	/**
 	 * Mustache class constructor.
@@ -130,7 +130,7 @@ class Mustache {
 	public function __clone() {
 		$this->_otag = '{{';
 		$this->_ctag = '}}';
-		$this->_localPragmas = null;
+		$this->_localPragmas = array();
 
 		if ($keys = array_keys($this->_context)) {
 			$last = array_pop($keys);
@@ -452,14 +452,12 @@ class Mustache {
 					return $this->_renderUnescaped($tag_name);
 				}
 				break;
-			case '':
-			default:
-				if ($this->_hasPragma(self::PRAGMA_UNESCAPED)) {
-					return $this->_renderUnescaped($tag_name);
-				} else {
-					return $this->_renderEscaped($tag_name);
-				}
-				break;
+		}
+
+		if ($this->_hasPragma(self::PRAGMA_UNESCAPED)) {
+			return $this->_renderUnescaped($modifier . $tag_name);
+		} else {
+			return $this->_renderEscaped($modifier . $tag_name);
 		}
 	}
 
