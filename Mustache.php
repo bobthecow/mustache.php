@@ -98,7 +98,7 @@ class Mustache {
 		self::PRAGMA_UNESCAPED
 	);
 
-	protected $_localPragmas;
+	protected $_localPragmas = array();
 
 	/**
 	 * Mustache class constructor.
@@ -130,7 +130,7 @@ class Mustache {
 	public function __clone() {
 		$this->_otag = '{{';
 		$this->_ctag = '}}';
-		$this->_localPragmas = null;
+		$this->_localPragmas = array();
 
 		if ($keys = array_keys($this->_context)) {
 			$last = array_pop($keys);
