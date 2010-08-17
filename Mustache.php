@@ -469,7 +469,7 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _renderEscaped($tag_name) {
-		return htmlentities($this->_getVariable($tag_name), null, $this->_charset);
+		return htmlentities($this->_getVariable($tag_name), ENT_COMPAT, $this->_charset);
 	}
 
 	/**
