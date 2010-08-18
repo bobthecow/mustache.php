@@ -98,7 +98,7 @@ class Mustache {
 		self::PRAGMA_UNESCAPED
 	);
 
-	protected $_localPragmas;
+	protected $_localPragmas = array();
 
 	/**
 	 * Mustache class constructor.
@@ -130,7 +130,7 @@ class Mustache {
 	public function __clone() {
 		$this->_otag = '{{';
 		$this->_ctag = '}}';
-		$this->_localPragmas = null;
+		$this->_localPragmas = array();
 
 		if ($keys = array_keys($this->_context)) {
 			$last = array_pop($keys);
@@ -205,7 +205,7 @@ class Mustache {
 	protected function _renderSection($template) {
 		$otag  = preg_quote($this->_otag, '/');
 		$ctag  = preg_quote($this->_ctag, '/');
-		$regex = '/' . $otag . '(\\^|\\#)\\s*(.+?)\\s*' . $ctag . '\\s*([\\s\\S]+?)' . $otag . '\\/\\s*\\2\\s*' . $ctag . '\\s*/m';
+		$regex = '/' . $otag . '(\\^|\\#)\\s*(.+?)\\s*' . $ctag . '\\s*([\\s\\S]+?)' . $otag . '\\/\\s*\\2\\s*' . $ctag . '\\s*/ms';
 
 		$matches = array();
 		while (preg_match($regex, $template, $matches, PREG_OFFSET_CAPTURE)) {
@@ -289,7 +289,7 @@ class Mustache {
 
 		$otag = preg_quote($this->_otag, '/');
 		$ctag = preg_quote($this->_ctag, '/');
-		$regex = '/' . $otag . '%\\s*([\\w_-]+)((?: [\\w]+=[\\w]+)*)\\s*' . $ctag . '\\n?/';
+		$regex = '/' . $otag . '%\\s*([\\w_-]+)((?: [\\w]+=[\\w]+)*)\\s*' . $ctag . '\\n?/s';
 		return preg_replace_callback($regex, array($this, '_renderPragma'), $template);
 	}
 
@@ -389,7 +389,7 @@ class Mustache {
 		$otag = preg_quote($this->_otag, '/');
 		$ctag = preg_quote($this->_ctag, '/');
 
-		$this->_tagRegEx = '/' . $otag . "([#\^\/=!>\\{&])?(.+?)\\1?" . $ctag . "+/";
+		$this->_tagRegEx = '/' . $otag . "([#\^\/=!>\\{&])?(.+?)\\1?" . $ctag . "+/s";
 
 		$html = '';
 		$matches = array();
@@ -456,14 +456,12 @@ class Mustache {
 					return $this->_renderUnescaped($tag_name);
 				}
 				break;
-			case '':
-			default:
-				if ($this->_hasPragma(self::PRAGMA_UNESCAPED)) {
-					return $this->_renderUnescaped($tag_name);
-				} else {
-					return $this->_renderEscaped($tag_name);
-				}
-				break;
+		}
+
+		if ($this->_hasPragma(self::PRAGMA_UNESCAPED)) {
+			return $this->_renderUnescaped($modifier . $tag_name);
+		} else {
+			return $this->_renderEscaped($modifier . $tag_name);
 		}
 	}
 
@@ -475,7 +473,7 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _renderEscaped($tag_name) {
-		return htmlentities($this->_getVariable($tag_name), null, $this->_charset);
+		return htmlentities($this->_getVariable($tag_name), ENT_COMPAT, $this->_charset);
 	}
 
 	/**
@@ -527,7 +525,7 @@ class Mustache {
 
 		$otag  = preg_quote($this->_otag, '/');
 		$ctag  = preg_quote($this->_ctag, '/');
-		$this->_tagRegEx = '/' . $otag . "([#\^\/=!>\\{&])?(.+?)\\1?" . $ctag . "+/";
+		$this->_tagRegEx = '/' . $otag . "([#\^\/=!>\\{&])?(.+?)\\1?" . $ctag . "+/s";
 		return '';
 	}
 
@@ -608,10 +606,10 @@ class Mustache {
 	protected function _findVariableInContext($tag_name, $context) {
 		foreach ($context as $view) {
 			if (is_object($view)) {
-				if (isset($view->$tag_name)) {
-					return $view->$tag_name;
-				} else if (method_exists($view, $tag_name)) {
+				if (method_exists($view, $tag_name)) {
 					return $view->$tag_name();
+				} else if (isset($view->$tag_name)) {
+					return $view->$tag_name;
 				}
 			} else if (isset($view[$tag_name])) {
 				return $view[$tag_name];
