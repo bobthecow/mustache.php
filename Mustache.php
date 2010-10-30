@@ -385,7 +385,7 @@ class Mustache {
 		$otag = preg_quote($this->_otag, '/');
 		$ctag = preg_quote($this->_ctag, '/');
 
-		$this->_tagRegEx = '/' . $otag . "([#\^\/=!>\\{&])?(.+?)\\1?" . $ctag . "+/s";
+		$this->_tagRegEx = '/' . $otag . "([#\^\/=!<>\\{&])?(.+?)\\1?" . $ctag . "+/s";
 
 		$html = '';
 		$matches = array();
@@ -442,6 +442,7 @@ class Mustache {
 				return $this->_renderComment($tag_name);
 				break;
 			case '>':
+			case '<':
 				return $this->_renderPartial($tag_name);
 				break;
 			case '{':
@@ -469,7 +470,7 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _renderEscaped($tag_name) {
-		return htmlentities($this->_getVariable($tag_name), null, $this->_charset);
+		return htmlentities($this->_getVariable($tag_name), ENT_COMPAT, $this->_charset);
 	}
 
 	/**
@@ -521,7 +522,7 @@ class Mustache {
 
 		$otag  = preg_quote($this->_otag, '/');
 		$ctag  = preg_quote($this->_ctag, '/');
-		$this->_tagRegEx = '/' . $otag . "([#\^\/=!>\\{&])?(.+?)\\1?" . $ctag . "+/s";
+		$this->_tagRegEx = '/' . $otag . "([#\^\/=!<>\\{&])?(.+?)\\1?" . $ctag . "+/s";
 		return '';
 	}
 
@@ -608,7 +609,7 @@ class Mustache {
 				} else if (isset($view->$tag_name)) {
 					return $view->$tag_name;
 				}
-			} else if (isset($view[$tag_name])) {
+			} else if (array_key_exists($tag_name, $view)) {
 				return $view[$tag_name];
 			}
 		}
