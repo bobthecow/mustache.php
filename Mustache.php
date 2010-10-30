@@ -385,7 +385,7 @@ class Mustache {
 		$otag = preg_quote($this->_otag, '/');
 		$ctag = preg_quote($this->_ctag, '/');
 
-		$this->_tagRegEx = '/' . $otag . "([#\^\/=!>\\{&])?(.+?)\\1?" . $ctag . "+/s";
+		$this->_tagRegEx = '/' . $otag . "([#\^\/=!<>\\{&])?(.+?)\\1?" . $ctag . "+/s";
 
 		$html = '';
 		$matches = array();
@@ -442,6 +442,7 @@ class Mustache {
 				return $this->_renderComment($tag_name);
 				break;
 			case '>':
+			case '<':
 				return $this->_renderPartial($tag_name);
 				break;
 			case '{':
@@ -521,7 +522,7 @@ class Mustache {
 
 		$otag  = preg_quote($this->_otag, '/');
 		$ctag  = preg_quote($this->_ctag, '/');
-		$this->_tagRegEx = '/' . $otag . "([#\^\/=!>\\{&])?(.+?)\\1?" . $ctag . "+/s";
+		$this->_tagRegEx = '/' . $otag . "([#\^\/=!<>\\{&])?(.+?)\\1?" . $ctag . "+/s";
 		return '';
 	}
 
