@@ -608,7 +608,7 @@ class Mustache {
 				} else if (isset($view->$tag_name)) {
 					return $view->$tag_name;
 				}
-			} else if (array_key_exists ($tag_name, $view)) {
+			} else if (array_key_exists($tag_name, $view)) {
 				return $view[$tag_name];
 			}
 		}
