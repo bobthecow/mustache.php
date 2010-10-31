@@ -205,16 +205,16 @@ class Mustache {
 	protected function _renderSection($template) {
 		$otag  = preg_quote($this->_otag, '/');
 		$ctag  = preg_quote($this->_ctag, '/');
-		$regex = '/' . $otag . '(\\^|\\#)\\s*(.+?)\\s*' . $ctag . '\\s*([\\s\\S]+?)' . $otag . '\\/\\s*\\2\\s*' . $ctag . '\\s*/ms';
-
+		$regex = '/'.$otag.'(\^|\#)\s*([a-zA-Z_. ]+?)\s*'.$ctag.'(?:( *(?![\n\r])[\s\S]+?)|\s*([\s\S]+?))'.$otag.'\/\s*\2\s*'.$ctag.'\s*/';
 		$matches = array();
 		while (preg_match($regex, $template, $matches, PREG_OFFSET_CAPTURE)) {
+		 
 			$section  = $matches[0][0];
 			$offset   = $matches[0][1];
 			$type     = $matches[1][0];
 			$tag_name = trim($matches[2][0]);
-			$content  = $matches[3][0];
-
+			$content  = isset($matches[4][0]) ? $matches[4][0] : $matches[3][0];
+			
 			$replace = '';
 			$val = $this->_getVariable($tag_name);
 			switch($type) {
