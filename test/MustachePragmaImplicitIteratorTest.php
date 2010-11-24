@@ -50,11 +50,34 @@ class MustachePragmaImplicitIteratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foobarbaz', $m->render('{{%IMPLICIT-ITERATOR iterator=i}}{{%DOT-NOTATION}}{{#items}}{{i.name}}{{/items}}'));
 	}
 
-	public function testRecursiveSections() {
-		$m = new Mustache(
-			'{{%IMPLICIT-ITERATOR}}{{#items}}{{#.}}{{.}}{{/.}}{{/items}}',
-			array('items' => array(array('a', 'b', 'c'), array('d', 'e', 'f')))
+	/**
+	 * @dataProvider recursiveSectionData
+	 */
+	public function testRecursiveSections($template, $view, $result) {
+		$m = new Mustache();
+		$this->assertEquals($result, $m->render($template, $view));
+	}
+
+	public function recursiveSectionData() {
+		return array(
+			array(
+				'{{%IMPLICIT-ITERATOR}}{{#items}}{{#.}}{{.}}{{/.}}{{/items}}',
+				array('items' => array(array('a', 'b', 'c'), array('d', 'e', 'f'))),
+				'abcdef'
+			),
+			array(
+				'{{%IMPLICIT-ITERATOR}}{{#items}}{{#.}}{{#.}}{{.}}{{/.}}{{/.}}{{/items}}',
+				array('items' => array(array(array('a', 'b'), array('c')), array(array('d'), array('e', 'f')))),
+				'abcdef'
+			),
+			array(
+				'{{%IMPLICIT-ITERATOR}}{{#items}}{{#.}}{{#items}}{{.}}{{/items}}{{/.}}{{/items}}',
+				array('items' => array(
+					array('items' => array('a', 'b', 'c')),
+					array('items' => array('d', 'e', 'f')),
+				)),
+				'abcdef'
+			),
 		);
-		$this->assertEquals('abcdef', $m->render());
 	}
 }
