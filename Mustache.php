@@ -191,7 +191,7 @@ class Mustache {
 	 * @return string Rendered Mustache template.
 	 */
 	protected function _renderTemplate($template) {
-		$template = $this->_renderSection($template);
+		$template = $this->_renderSections($template);
 		return $this->_renderTags($template);
 	}
 
@@ -202,18 +202,9 @@ class Mustache {
 	 * @param string $template
 	 * @return string
 	 */
-	protected function _renderSection($template) {
-		$otag  = preg_quote($this->_otag, '/');
-		$ctag  = preg_quote($this->_ctag, '/');
-		$regex = '/' . $otag . '(\\^|\\#)\\s*(.+?)\\s*' . $ctag . '\\s*([\\s\\S]+?)' . $otag . '\\/\\s*\\2\\s*' . $ctag . '\\s*/ms';
-
-		$matches = array();
-		while (preg_match($regex, $template, $matches, PREG_OFFSET_CAPTURE)) {
-			$section  = $matches[0][0];
-			$offset   = $matches[0][1];
-			$type     = $matches[1][0];
-			$tag_name = trim($matches[2][0]);
-			$content  = $matches[3][0];
+	protected function _renderSections($template) {
+		while ($section_data = $this->_findSection($template)) {
+			list($section, $offset, $type, $tag_name, $content) = $section_data;
 
 			$replace = '';
 			$val = $this->_getVariable($tag_name);
@@ -265,6 +256,71 @@ class Mustache {
 		}
 
 		return $template;
+	}
+
+	/**
+	 * Extract a section from $template.
+	 *
+	 * This is a helper function to find sections needed by _renderSections.
+	 *
+	 * @access protected
+	 * @param string $template
+	 * @return array $section, $offset, $type, $tag_name and $content
+	 */
+	protected function _findSection($template) {
+		$otag  = preg_quote($this->_otag, '/');
+		$ctag  = preg_quote($this->_ctag, '/');
+		$regex = '/' . $otag . '([\\^\\#\\/])\\s*(.+?)\\s*' . $ctag . '\\s*/ms';
+
+		$section_start = null;
+		$section_type  = null;
+		$content_start = null;
+
+		$search_offset = 0;
+
+		$section_stack = array();
+		$matches = array();
+		while (preg_match($regex, $template, $matches, PREG_OFFSET_CAPTURE, $search_offset)) {
+
+			$match    = $matches[0][0];
+			$offset   = $matches[0][1];
+			$type     = $matches[1][0];
+			$tag_name = trim($matches[2][0]);
+
+			$search_offset = $offset + strlen($match);
+
+			switch ($type) {
+				case '^':
+				case '#':
+					if (empty($section_stack)) {
+						$section_start = $offset;
+						$section_type  = $type;
+						$content_start = $search_offset;
+					}
+					array_push($section_stack, $tag_name);
+					break;
+				case '/':
+					if (empty($section_stack) || ($tag_name !== array_pop($section_stack))) {
+						if ($this->_throwsException(MustacheException::UNEXPECTED_CLOSE_SECTION)) {
+							throw new MustacheException('Unexpected close section: ' . $tag_name, MustacheException::UNEXPECTED_CLOSE_SECTION);
+						}
+					}
+
+					if (empty($section_stack)) {
+						$section = substr($template, $section_start, $search_offset - $section_start);
+						$content = substr($template, $content_start, $offset - $content_start);
+
+						return array($section, $section_start, $section_type, $tag_name, $content);
+					}
+					break;
+			}
+		}
+
+		if (!empty($section_stack)) {
+			if ($this->_throwsException(MustacheException::UNCLOSED_SECTION)) {
+				throw new MustacheException('Unclosed section: ' . $section_stack[0], MustacheException::UNCLOSED_SECTION);
+			}
+		}
 	}
 
 	/**
@@ -352,7 +408,6 @@ class Mustache {
 
 		return (is_array($this->_localPragmas[$pragma_name])) ? $this->_localPragmas[$pragma_name] : array();
 	}
-
 
 	/**
 	 * Check whether this Mustache instance throws a given exception.
@@ -609,7 +664,7 @@ class Mustache {
 				} else if (isset($view->$tag_name)) {
 					return $view->$tag_name;
 				}
-			} else if (isset($view[$tag_name])) {
+			} else if (array_key_exists($tag_name, $view)) {
 				return $view[$tag_name];
 			}
 		}

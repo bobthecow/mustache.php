@@ -2,6 +2,9 @@
 
 require_once '../Mustache.php';
 
+/**
+ * @group pragmas
+ */
 class MustachePragmaTest extends PHPUnit_Framework_TestCase {
 
 	public function testUnknownPragmaException() {

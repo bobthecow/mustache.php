@@ -2,6 +2,9 @@
 
 require_once '../Mustache.php';
 
+/**
+ * @group pragmas
+ */
 class MustachePragmaUnescapedTest extends PHPUnit_Framework_TestCase {
 
 	public function testPragmaUnescaped() {
