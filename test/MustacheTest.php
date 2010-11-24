@@ -330,4 +330,24 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('success', $m->render('{{=<< >>=}}<< result >>'));
 		$this->assertEquals('success', $m->render('{{=<% %>=}}<% result %>'));
 	}
+
+	/**
+	 * @group sections
+	 * @dataProvider poorlyNestedSections
+	 * @expectedException MustacheException
+	 */
+	public function testPoorlyNestedSections($template) {
+		$m = new Mustache($template);
+		$m->render();
+	}
+
+	public function poorlyNestedSections() {
+		return array(
+			array('{{#foo}}'),
+			array('{{#foo}}{{/bar}}'),
+			array('{{#foo}}{{#bar}}{{/foo}}'),
+			array('{{#foo}}{{#bar}}{{/foo}}{{/bar}}'),
+			array('{{#foo}}{{/bar}}{{/foo}}'),
+		);
+	}
 }
