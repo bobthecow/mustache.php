@@ -441,7 +441,7 @@ class Mustache {
 
 	protected function _prepareTagRegex($otag, $ctag) {
 		return sprintf(
-			'/(?:(?<=\\n)[ \\t]*)?%s(?<type>[%s]?)(?<tag_name>.+?)(?:\\1|})?%s(?:\\s*(?=\\n))?/s',
+			'/(?<whitespace>(?<=\\n)[ \\t]*)?%s(?<type>[%s]?)(?<tag_name>.+?)(?:\\2|})?%s(?:\\s*(?=\\n))?/s',
 			preg_quote($otag, '/'),
 			preg_quote(self::TAG_TYPES, '/'),
 			preg_quote($ctag, '/')
@@ -473,6 +473,12 @@ class Mustache {
 			$modifier = $matches['type'][0];
 			$tag_name = trim($matches['tag_name'][0]);
 
+			if (isset($matches['whitespace']) && $matches['whitespace'][1] > -1) {
+				$whitespace = $matches['whitespace'][0];
+			} else {
+				$whitespace = null;
+			}
+
 			$html .= substr($template, 0, $offset);
 
 			$next_offset = $offset + strlen($tag);
@@ -481,7 +487,7 @@ class Mustache {
 			}
 			$template = substr($template, $next_offset);
 
-			$html .= $this->_renderTag($modifier, $tag_name);
+			$html .= $this->_renderTag($modifier, $tag_name, $whitespace);
 		}
 
 		$this->_otag = $otag_orig;
@@ -502,7 +508,7 @@ class Mustache {
 	 * @throws MustacheException Unmatched section tag encountered.
 	 * @return string
 	 */
-	protected function _renderTag($modifier, $tag_name) {
+	protected function _renderTag($modifier, $tag_name, $whitespace) {
 		switch ($modifier) {
 			case '#':
 			case '^':
@@ -527,7 +533,7 @@ class Mustache {
 				break;
 			case '>':
 			case '<':
-				return $this->_renderPartial($tag_name);
+				return $this->_renderPartial($tag_name, $whitespace);
 				break;
 			case '{':
 				// strip the trailing } ...
@@ -590,9 +596,10 @@ class Mustache {
 	 * @param string $tag_name
 	 * @return string
 	 */
-	protected function _renderPartial($tag_name) {
+	protected function _renderPartial($tag_name, $whitespace = '') {
 		$view = clone($this);
-		return $view->render($this->_getPartial($tag_name));
+
+		return $whitespace . preg_replace('/\n(?!$)/s', "\n" . $whitespace, $view->render($this->_getPartial($tag_name)));
 	}
 
 	/**
