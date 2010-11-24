@@ -34,6 +34,14 @@ class MustacheExceptionTest extends PHPUnit_Framework_TestCase {
 	 * @group sections
 	 * @expectedException MustacheException
 	 */
+	public function testThrowsUnclosedInvertedSectionException() {
+		$this->pickyMustache->render('{{^unclosed}}');
+	}
+
+	/**
+	 * @group sections
+	 * @expectedException MustacheException
+	 */
 	public function testThrowsUnexpectedCloseSectionException() {
 		$this->pickyMustache->render('{{/unopened}}');
 	}
