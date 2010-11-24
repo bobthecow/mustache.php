@@ -258,6 +258,17 @@ class Mustache {
 		return $template;
 	}
 
+	const SECTION_TYPES = '^#/';
+
+	protected function _prepareSectionRegEx($otag, $ctag) {
+		return sprintf(
+			'/(?:(?<=\\n)[ \\t]*)?%s(?<type>[%s])(?<tag_name>.+?)%s\\n?/s',
+			preg_quote($otag, '/'),
+			preg_quote(self::SECTION_TYPES, '/'),
+			preg_quote($ctag, '/')
+		);
+	}
+
 	/**
 	 * Extract a section from $template.
 	 *
@@ -268,9 +279,7 @@ class Mustache {
 	 * @return array $section, $offset, $type, $tag_name and $content
 	 */
 	protected function _findSection($template) {
-		$otag  = preg_quote($this->_otag, '/');
-		$ctag  = preg_quote($this->_ctag, '/');
-		$regex = '/' . $otag . '([\\^\\#\\/])\\s*(.+?)\\s*' . $ctag . '\\s*/ms';
+		$regex = $this->_prepareSectionRegEx($this->_otag, $this->_ctag);
 
 		$section_start = null;
 		$section_type  = null;
@@ -284,8 +293,8 @@ class Mustache {
 
 			$match    = $matches[0][0];
 			$offset   = $matches[0][1];
-			$type     = $matches[1][0];
-			$tag_name = trim($matches[2][0]);
+			$type     = $matches['type'][0];
+			$tag_name = trim($matches['tag_name'][0]);
 
 			$search_offset = $offset + strlen($match);
 
@@ -323,6 +332,14 @@ class Mustache {
 		}
 	}
 
+	protected function _preparePragmaRegEx($otag, $ctag) {
+		return sprintf(
+			'/%s%%\\s*(?<pragma_name>[\\w_-]+)(?<options_string>(?: [\\w]+=[\\w]+)*)\\s*%s\\n?/s',
+			preg_quote($otag, '/'),
+			preg_quote($ctag, '/')
+		);
+	}
+
 	/**
 	 * Initialize pragmas and remove all pragma tags.
 	 *
@@ -338,9 +355,7 @@ class Mustache {
 			return $template;
 		}
 
-		$otag = preg_quote($this->_otag, '/');
-		$ctag = preg_quote($this->_ctag, '/');
-		$regex = '/' . $otag . '%\\s*([\\w_-]+)((?: [\\w]+=[\\w]+)*)\\s*' . $ctag . '\\n?/s';
+		$regex = $this->_preparePragmaRegEx($this->_otag, $this->_ctag);
 		return preg_replace_callback($regex, array($this, '_renderPragma'), $template);
 	}
 
@@ -354,8 +369,8 @@ class Mustache {
 	 */
 	protected function _renderPragma($matches) {
 		$pragma         = $matches[0];
-		$pragma_name    = $matches[1];
-		$options_string = $matches[2];
+		$pragma_name    = $matches['pragma_name'];
+		$options_string = $matches['options_string'];
 
 		if (!in_array($pragma_name, $this->_pragmasImplemented)) {
 			throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
@@ -422,6 +437,17 @@ class Mustache {
 		return (isset($this->_throwsExceptions[$exception]) && $this->_throwsExceptions[$exception]);
 	}
 
+	const TAG_TYPES = '#^/=!<>\\{&';
+
+	protected function _prepareTagRegex($otag, $ctag) {
+		return sprintf(
+			'/(?:(?<=\\n)[ \\t]*)?%s(?<type>[%s]?)(?<tag_name>.+?)(?:\\1|})?%s(?:\\s*(?=\\n))?/s',
+			preg_quote($otag, '/'),
+			preg_quote(self::TAG_TYPES, '/'),
+			preg_quote($ctag, '/')
+		);
+	}
+
 	/**
 	 * Loop through and render individual Mustache tags.
 	 *
@@ -437,22 +463,25 @@ class Mustache {
 		$otag_orig = $this->_otag;
 		$ctag_orig = $this->_ctag;
 
-		$otag = preg_quote($this->_otag, '/');
-		$ctag = preg_quote($this->_ctag, '/');
-
-		$this->_tagRegEx = '/' . $otag . "([#\^\/=!<>\\{&])?(.+?)\\1?" . $ctag . "+/s";
+		$this->_tagRegEx = $this->_prepareTagRegEx($this->_otag, $this->_ctag);
 
 		$html = '';
 		$matches = array();
 		while (preg_match($this->_tagRegEx, $template, $matches, PREG_OFFSET_CAPTURE)) {
 			$tag      = $matches[0][0];
 			$offset   = $matches[0][1];
-			$modifier = $matches[1][0];
-			$tag_name = trim($matches[2][0]);
+			$modifier = $matches['type'][0];
+			$tag_name = trim($matches['tag_name'][0]);
 
 			$html .= substr($template, 0, $offset);
+
+			$next_offset = $offset + strlen($tag);
+			if ((substr($html, -1) == "\n") && (substr($template, $next_offset, 1) == "\n")) {
+				$next_offset++;
+			}
+			$template = substr($template, $next_offset);
+
 			$html .= $this->_renderTag($modifier, $tag_name);
-			$template = substr($template, $offset + strlen($tag));
 		}
 
 		$this->_otag = $otag_orig;
@@ -501,6 +530,10 @@ class Mustache {
 				return $this->_renderPartial($tag_name);
 				break;
 			case '{':
+				// strip the trailing } ...
+				if ($tag_name[(strlen($tag_name) - 1)] == '}') {
+					$tag_name = substr($tag_name, 0, -1);
+				}
 			case '&':
 				if ($this->_hasPragma(self::PRAGMA_UNESCAPED)) {
 					return $this->_renderEscaped($tag_name);
@@ -571,13 +604,12 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _changeDelimiter($tag_name) {
-		$tags = explode(' ', $tag_name);
-		$this->_otag = $tags[0];
-		$this->_ctag = $tags[1];
+		list($otag, $ctag) = explode(' ', $tag_name);
+		$this->_otag = $otag;
+		$this->_ctag = $ctag;
 
-		$otag  = preg_quote($this->_otag, '/');
-		$ctag  = preg_quote($this->_ctag, '/');
-		$this->_tagRegEx = '/' . $otag . "([#\^\/=!<>\\{&])?(.+?)\\1?" . $ctag . "+/s";
+		$this->_tagRegEx = $this->_prepareTagRegEx($this->_otag, $this->_ctag);
+
 		return '';
 	}
 
