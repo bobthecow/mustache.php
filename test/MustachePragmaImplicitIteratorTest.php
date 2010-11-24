@@ -50,4 +50,11 @@ class MustachePragmaImplicitIteratorTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('foobarbaz', $m->render('{{%IMPLICIT-ITERATOR iterator=i}}{{%DOT-NOTATION}}{{#items}}{{i.name}}{{/items}}'));
 	}
 
+	public function testRecursiveSections() {
+		$m = new Mustache(
+			'{{%IMPLICIT-ITERATOR}}{{#items}}{{#.}}{{.}}{{/.}}{{/items}}',
+			array('items' => array(array('a', 'b', 'c'), array('d', 'e', 'f')))
+		);
+		$this->assertEquals('abcdef', $m->render());
+	}
 }
