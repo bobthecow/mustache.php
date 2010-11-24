@@ -1,7 +1,7 @@
 <?php
 
 require_once '../Mustache.php';
-require_once './lib/spyc.php';
+require_once './lib/yaml/lib/sfYamlParser.php';
 
 /**
  * A PHPUnit test case wrapping the Mustache Spec
@@ -77,10 +77,6 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider loadPartialsSpec
 	 */
 	public function testPartialsSpec($template, $data, $partials, $expected, $desc) {
-		// skip partial recursion tests, see: http://hile.mn/bYIIYt
-		if (strpos($desc, 'recurse') !== false) {
-			$this->markTestSkipped('Mustache.php has an issue with recursive partials. See http://hile.mn/bYIIYt');
-		}
 		$m = new Mustache($template, $data, $partials);
 		$this->assertEquals($expected, $m->render(), $desc);
 	}
@@ -138,7 +134,9 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 
 		$data = array();
 
-		$spec = spyc_load_file($filename);
+		$yaml = new sfYamlParser();
+
+		$spec = $yaml->parse(file_get_contents($filename));
 		foreach ($spec['tests'] as $test) {
 			$data[] = array($test['template'], $test['data'], isset($test['partials']) ? $test['partials'] : array(), $test['expected'], $test['desc']);
 		}
