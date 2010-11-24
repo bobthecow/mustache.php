@@ -15,6 +15,7 @@ class MustacheExceptionTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @group interpolation
 	 * @expectedException MustacheException
 	 */
 	public function testThrowsUnknownVariableException() {
@@ -22,6 +23,7 @@ class MustacheExceptionTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @group sections
 	 * @expectedException MustacheException
 	 */
 	public function testThrowsUnclosedSectionException() {
@@ -29,6 +31,7 @@ class MustacheExceptionTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @group sections
 	 * @expectedException MustacheException
 	 */
 	public function testThrowsUnexpectedCloseSectionException() {
@@ -36,6 +39,7 @@ class MustacheExceptionTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @group partials
 	 * @expectedException MustacheException
 	 */
 	public function testThrowsUnknownPartialException() {
@@ -43,25 +47,36 @@ class MustacheExceptionTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @group pragmas
 	 * @expectedException MustacheException
 	 */
 	public function testThrowsUnknownPragmaException() {
 		$this->pickyMustache->render('{{%SWEET-MUSTACHE-BRO}}');
 	}
 
+	/**
+	 * @group sections
+	 */
 	public function testDoesntThrowUnclosedSectionException() {
 		$this->assertEquals('', $this->slackerMustache->render('{{#unclosed}}'));
 	}
 
+	/**
+	 * @group sections
+	 */
 	public function testDoesntThrowUnexpectedCloseSectionException() {
 		$this->assertEquals('', $this->slackerMustache->render('{{/unopened}}'));
 	}
 
+	/**
+	 * @group partials
+	 */
 	public function testDoesntThrowUnknownPartialException() {
 		$this->assertEquals('', $this->slackerMustache->render('{{>impartial}}'));
 	}
 
 	/**
+	 * @group pragmas
 	 * @expectedException MustacheException
 	 */
 	public function testGetPragmaOptionsThrowsExceptionsIfItThinksYouHaveAPragmaButItTurnsOutYouDont() {
