@@ -5,6 +5,8 @@ require_once './lib/spyc.php';
 
 /**
  * A PHPUnit test case wrapping the Mustache Spec
+ *
+ * @group mustache-spec
  */
 class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 
@@ -20,6 +22,7 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @group comments
 	 * @dataProvider loadCommentSpec
 	 */
 	public function testCommentSpec($template, $data, $partials, $expected, $desc) {
@@ -28,6 +31,7 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @group delimiters
 	 * @dataProvider loadDelimitersSpec
 	 */
 	public function testDelimitersSpec($template, $data, $partials, $expected, $desc) {
@@ -36,6 +40,7 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @group interpolation
 	 * @dataProvider loadInterpolationSpec
 	 */
 	public function testInterpolationSpec($template, $data, $partials, $expected, $desc) {
@@ -44,6 +49,7 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @group inverted-sections
 	 * @dataProvider loadInvertedSpec
 	 */
 	public function testInvertedSpec($template, $data, $partials, $expected, $desc) {
@@ -52,6 +58,7 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @group lambdas
 	 * @dataProvider loadLambdasSpec
 	 */
 	public function testLambdasSpec($template, $data, $partials, $expected, $desc) {
@@ -66,6 +73,7 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @group partials
 	 * @dataProvider loadPartialsSpec
 	 */
 	public function testPartialsSpec($template, $data, $partials, $expected, $desc) {
@@ -78,6 +86,7 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @group sections
 	 * @dataProvider loadSectionsSpec
 	 */
 	public function testSectionsSpec($template, $data, $partials, $expected, $desc) {
