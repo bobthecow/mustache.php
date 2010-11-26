@@ -475,21 +475,6 @@ class Mustache {
 	 */
 	protected function _renderTag($modifier, $tag_name) {
 		switch ($modifier) {
-			case '#':
-			case '^':
-				if ($this->_throwsException(MustacheException::UNCLOSED_SECTION)) {
-					throw new MustacheException('Unclosed section: ' . $tag_name, MustacheException::UNCLOSED_SECTION);
-				} else {
-					return '';
-				}
-				break;
-			case '/':
-				if ($this->_throwsException(MustacheException::UNEXPECTED_CLOSE_SECTION)) {
-					throw new MustacheException('Unexpected close section: ' . $tag_name, MustacheException::UNEXPECTED_CLOSE_SECTION);
-				} else {
-					return '';
-				}
-				break;
 			case '=':
 				return $this->_changeDelimiter($tag_name);
 				break;
@@ -507,6 +492,12 @@ class Mustache {
 				} else {
 					return $this->_renderUnescaped($tag_name);
 				}
+				break;
+			case '#':
+			case '^':
+			case '/':
+				// remove any leftovers from _renderSections
+				return '';
 				break;
 		}
 
