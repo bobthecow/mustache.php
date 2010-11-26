@@ -258,13 +258,13 @@ class Mustache {
 		return $template;
 	}
 
-	const SECTION_TYPES = '^#/';
+	const SECTION_TYPES = '\^#\/';
 
 	protected function _prepareSectionRegEx($otag, $ctag) {
 		return sprintf(
 			'/(?:(?<=\\n)[ \\t]*)?%s(?<type>[%s])(?<tag_name>.+?)%s\\n?/s',
 			preg_quote($otag, '/'),
-			preg_quote(self::SECTION_TYPES, '/'),
+			self::SECTION_TYPES,
 			preg_quote($ctag, '/')
 		);
 	}
@@ -437,13 +437,13 @@ class Mustache {
 		return (isset($this->_throwsExceptions[$exception]) && $this->_throwsExceptions[$exception]);
 	}
 
-	const TAG_TYPES = '#^/=!<>\\{&';
+	const TAG_TYPES = '#\^\/=!<>\\{&';
 
 	protected function _prepareTagRegex($otag, $ctag) {
 		return sprintf(
 			'/(?<whitespace>(?<=\\n)[ \\t]*)?%s(?<type>[%s]?)(?<tag_name>.+?)(?:\\2|})?%s(?:\\s*(?=\\n))?/s',
 			preg_quote($otag, '/'),
-			preg_quote(self::TAG_TYPES, '/'),
+			self::TAG_TYPES,
 			preg_quote($ctag, '/')
 		);
 	}
