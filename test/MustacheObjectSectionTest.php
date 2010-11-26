@@ -2,6 +2,9 @@
 
 require_once '../Mustache.php';
 
+/**
+ * @group sections
+ */
 class MustacheObjectSectionTest extends PHPUnit_Framework_TestCase {
 	public function testBasicObject() {
 		$alpha = new Alpha();
