@@ -3,4 +3,8 @@
 	<testsuite name="Mustache">
 		<directory>./</directory>
 	</testsuite>
+	<blacklist>
+		<directory suffix=".php">../examples</directory>
+		<directory suffix=".php">./</directory>
+	</blacklist>
 </phpunit>
