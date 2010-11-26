@@ -660,7 +660,7 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _getVariable($tag_name) {
-		if ($this->_hasPragma(self::PRAGMA_DOT_NOTATION) && $tag_name != '.') {
+		if ($tag_name != '.' && strpos($tag_name, '.') !== false && $this->_hasPragma(self::PRAGMA_DOT_NOTATION)) {
 			$chunks = explode('.', $tag_name);
 			$first = array_shift($chunks);
 
