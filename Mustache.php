@@ -379,7 +379,7 @@ class Mustache {
 		$options = array();
 		foreach (explode(' ', trim($options_string)) as $o) {
 			if ($p = trim($o)) {
-				$p = explode('=', trim($p));
+				$p = explode('=', $p);
 				$options[$p[0]] = $p[1];
 			}
 		}
