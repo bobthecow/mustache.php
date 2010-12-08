@@ -57,20 +57,20 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $m->render(), $desc);
 	}
 
-	/**
-	 * @group lambdas
-	 * @dataProvider loadLambdasSpec
-	 */
-	public function testLambdasSpec($template, $data, $partials, $expected, $desc) {
-		$this->markTestSkipped("Lambdas for PHP haven't made it into the spec yet, so we'll skip them to avoid a bajillion failed tests.");
-
-		if (!version_compare(PHP_VERSION, '5.3.0', '>=')) {
-			$this->markTestSkipped('Unable to test Lambdas spec with PHP < 5.3.');
-		}
-
-		$m = new Mustache($template, $data, $partials);
-		$this->assertEquals($expected, $m->render(), $desc);
-	}
+	// /**
+	//  * @group lambdas
+	//  * @dataProvider loadLambdasSpec
+	//  */
+	// public function testLambdasSpec($template, $data, $partials, $expected, $desc) {
+	// 	$this->markTestSkipped("Lambdas for PHP haven't made it into the spec yet, so we'll skip them to avoid a bajillion failed tests.");
+	//
+	// 	if (!version_compare(PHP_VERSION, '5.3.0', '>=')) {
+	// 		$this->markTestSkipped('Unable to test Lambdas spec with PHP < 5.3.');
+	// 	}
+	//
+	// 	$m = new Mustache($template, $data, $partials);
+	// 	$this->assertEquals($expected, $m->render(), $desc);
+	// }
 
 	/**
 	 * @group partials
@@ -106,9 +106,9 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 		return $this->loadSpec('inverted');
 	}
 
-	public function loadLambdasSpec() {
-		return $this->loadSpec('lambdas');
-	}
+	// public function loadLambdasSpec() {
+	// 	return $this->loadSpec('lambdas');
+	// }
 
 	public function loadPartialsSpec() {
 		return $this->loadSpec('partials');
