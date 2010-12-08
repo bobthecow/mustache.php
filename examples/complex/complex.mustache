@@ -1,16 +1,16 @@
 <h1>{{header}}</h1>
 {{#notEmpty}}
-  <ul>
-  {{#item}}
-    {{#current}}
-      <li><strong>{{name}}</strong></li>
-    {{/current}}
-    {{^current}}
-      <li><a href="{{url}}">{{name}}</a></li>
-    {{/current}}
-  {{/item}}
-  </ul>
+<ul>
+{{#item}}
+{{#current}}
+    <li><strong>{{name}}</strong></li>
+{{/current}}
+{{^current}}
+    <li><a href="{{url}}">{{name}}</a></li>
+{{/current}}
+{{/item}}
+</ul>
 {{/notEmpty}}
 {{#isEmpty}}
-  <p>The list is empty.</p>
+<p>The list is empty.</p>
 {{/isEmpty}}
