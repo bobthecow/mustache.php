@@ -37,7 +37,6 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 
 	protected $knownIssues = array(
 		'Delimiters'     => "Known issue: sections don't respect delimiter changes",
-		'SectionsSpaces' => "Known issue: Mustache fails miserably at whitespace",
 	);
 
 	/**
@@ -349,5 +348,22 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 			array('{{#foo}}{{#bar}}{{/foo}}{{/bar}}'),
 			array('{{#foo}}{{/bar}}{{/foo}}'),
 		);
+	}
+
+	/**
+	 * Ensure that Mustache doesn't double-render sections (allowing mustache injection).
+	 *
+	 * @group sections
+	 */
+	public function testMustacheInjection() {
+		$template = '{{#foo}}{{bar}}{{/foo}}';
+		$view = array(
+			'foo' => true,
+			'bar' => '{{win}}',
+			'win' => 'FAIL',
+		);
+
+		$m = new Mustache($template, $view);
+		$this->assertEquals('{{win}}', $m->render());
 	}
 }

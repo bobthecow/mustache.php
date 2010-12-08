@@ -83,7 +83,6 @@ Known Issues
 
  * Sections don't respect delimiter changes -- `delimiters` example currently fails with an
    "unclosed section" exception.
- * Mustache isn't always very good at whitespace.
 
 
 See Also
