@@ -11,7 +11,11 @@ class MustachePragmaImplicitIteratorTest extends PHPUnit_Framework_TestCase {
 		$m = $this->getMock('Mustache', array('_renderPragma'), array('{{%IMPLICIT-ITERATOR}}'));
 		$m->expects($this->exactly(1))
 			->method('_renderPragma')
-			->with(array('{{%IMPLICIT-ITERATOR}}', 'IMPLICIT-ITERATOR', null));
+			->with(array(
+				0 => '{{%IMPLICIT-ITERATOR}}',
+				1 => 'IMPLICIT-ITERATOR', 'pragma_name' => 'IMPLICIT-ITERATOR',
+				2 => null, 'options_string' => null
+			));
 		$m->render();
 	}
 

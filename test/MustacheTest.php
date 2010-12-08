@@ -37,7 +37,6 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 
 	protected $knownIssues = array(
 		'Delimiters'     => "Known issue: sections don't respect delimiter changes",
-		'SectionsSpaces' => "Known issue: Mustache fails miserably at whitespace",
 	);
 
 	/**
