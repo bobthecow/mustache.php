@@ -264,6 +264,14 @@ class Mustache {
 		return $template;
 	}
 
+	/**
+	 * Prepare a section RegEx string for the given opening/closing tags.
+	 *
+	 * @access protected
+	 * @param string $otag
+	 * @param string $ctag
+	 * @return string
+	 */
 	protected function _prepareSectionRegEx($otag, $ctag) {
 		return sprintf(
 			'/(?:(?<=\\n)[ \\t]*)?%s(?<type>[%s])(?<tag_name>.+?)%s\\n?/s',
@@ -283,7 +291,7 @@ class Mustache {
 	 * @return array $section, $offset, $type, $tag_name and $content
 	 */
 	protected function _findSection($template) {
-		$regex = $this->_prepareSectionRegEx($this->_otag, $this->_ctag);
+		$regEx = $this->_prepareSectionRegEx($this->_otag, $this->_ctag);
 
 		$section_start = null;
 		$section_type  = null;
@@ -293,7 +301,7 @@ class Mustache {
 
 		$section_stack = array();
 		$matches = array();
-		while (preg_match($regex, $template, $matches, PREG_OFFSET_CAPTURE, $search_offset)) {
+		while (preg_match($regEx, $template, $matches, PREG_OFFSET_CAPTURE, $search_offset)) {
 
 			$match    = $matches[0][0];
 			$offset   = $matches[0][1];
@@ -336,6 +344,14 @@ class Mustache {
 		}
 	}
 
+	/**
+	 * Prepare a pragma RegEx for the given opening/closing tags.
+	 *
+	 * @access protected
+	 * @param string $otag
+	 * @param string $ctag
+	 * @return string
+	 */
 	protected function _preparePragmaRegEx($otag, $ctag) {
 		return sprintf(
 			'/%s%%\\s*(?<pragma_name>[\\w_-]+)(?<options_string>(?: [\\w]+=[\\w]+)*)\\s*%s\\n?/s',
@@ -359,8 +375,8 @@ class Mustache {
 			return $template;
 		}
 
-		$regex = $this->_preparePragmaRegEx($this->_otag, $this->_ctag);
-		return preg_replace_callback($regex, array($this, '_renderPragma'), $template);
+		$regEx = $this->_preparePragmaRegEx($this->_otag, $this->_ctag);
+		return preg_replace_callback($regEx, array($this, '_renderPragma'), $template);
 	}
 
 	/**
@@ -441,7 +457,15 @@ class Mustache {
 		return (isset($this->_throwsExceptions[$exception]) && $this->_throwsExceptions[$exception]);
 	}
 
-	protected function _prepareTagRegex($otag, $ctag) {
+	/**
+	 * Prepare a tag RegEx for the given opening/closing tags.
+	 *
+	 * @access protected
+	 * @param string $otag
+	 * @param string $ctag
+	 * @return string
+	 */
+	protected function _prepareTagRegEx($otag, $ctag) {
 		return sprintf(
 			'/(?<whitespace>(?<=\\n)[ \\t]*)?%s(?<type>[%s]?)(?<tag_name>.+?)(?:\\2|})?%s(?:\\s*(?=\\n))?/s',
 			preg_quote($otag, '/'),
@@ -628,7 +652,6 @@ class Mustache {
 		}
 		$this->_context = $new;
 	}
-
 
 	/**
 	 * Remove the latest context from the stack.
