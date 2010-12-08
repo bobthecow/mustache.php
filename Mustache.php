@@ -14,9 +14,6 @@
  */
 class Mustache {
 
-	public $_otag = '{{';
-	public $_ctag = '}}';
-
 	/**
 	 * Should this Mustache throw exceptions when it finds unexpected tags?
 	 *
@@ -84,6 +81,15 @@ class Mustache {
 	 * This may be useful in non-HTML Mustache situations.
 	 */
 	const PRAGMA_UNESCAPED    = 'UNESCAPED';
+
+	/**
+	 * Constants used for section and tag RegEx
+	 */
+	const SECTION_TYPES = '\^#\/';
+	const TAG_TYPES = '#\^\/=!<>\\{&';
+
+	public $_otag = '{{';
+	public $_ctag = '}}';
 
 	protected $_tagRegEx;
 
@@ -257,8 +263,6 @@ class Mustache {
 
 		return $template;
 	}
-
-	const SECTION_TYPES = '\^#\/';
 
 	protected function _prepareSectionRegEx($otag, $ctag) {
 		return sprintf(
@@ -436,8 +440,6 @@ class Mustache {
 	protected function _throwsException($exception) {
 		return (isset($this->_throwsExceptions[$exception]) && $this->_throwsExceptions[$exception]);
 	}
-
-	const TAG_TYPES = '#\^\/=!<>\\{&';
 
 	protected function _prepareTagRegex($otag, $ctag) {
 		return sprintf(
