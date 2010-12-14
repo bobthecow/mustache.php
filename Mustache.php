@@ -274,7 +274,7 @@ class Mustache {
 	 */
 	protected function _prepareSectionRegEx($otag, $ctag) {
 		return sprintf(
-			'/(?:(?<=\\n)[ \\t]*)?%s(?<type>[%s])(?<tag_name>.+?)%s\\n?/s',
+			'/(?:(?<=\\n)[ \\t]*)?%s(?P<type>[%s])(?P<tag_name>.+?)%s\\n?/s',
 			preg_quote($otag, '/'),
 			self::SECTION_TYPES,
 			preg_quote($ctag, '/')
@@ -354,7 +354,7 @@ class Mustache {
 	 */
 	protected function _preparePragmaRegEx($otag, $ctag) {
 		return sprintf(
-			'/%s%%\\s*(?<pragma_name>[\\w_-]+)(?<options_string>(?: [\\w]+=[\\w]+)*)\\s*%s\\n?/s',
+			'/%s%%\\s*(?P<pragma_name>[\\w_-]+)(?P<options_string>(?: [\\w]+=[\\w]+)*)\\s*%s\\n?/s',
 			preg_quote($otag, '/'),
 			preg_quote($ctag, '/')
 		);
@@ -467,7 +467,7 @@ class Mustache {
 	 */
 	protected function _prepareTagRegEx($otag, $ctag) {
 		return sprintf(
-			'/(?<whitespace>(?<=\\n)[ \\t]*)?%s(?<type>[%s]?)(?<tag_name>.+?)(?:\\2|})?%s(?:\\s*(?=\\n))?/s',
+			'/(?P<whitespace>(?<=\\n)[ \\t]*)?%s(?P<type>[%s]?)(?P<tag_name>.+?)(?:\\2|})?%s(?:\\s*(?=\\n))?/s',
 			preg_quote($otag, '/'),
 			self::TAG_TYPES,
 			preg_quote($ctag, '/')
