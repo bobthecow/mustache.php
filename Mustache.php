@@ -107,6 +107,11 @@ class Mustache {
 	protected $_localPragmas = array();
 
 	/**
+	 * Interpolated lambdas should be called only once... store 'em for later here
+	 */
+	protected $_interpolatedLambdas = array();
+
+	/**
 	 * Mustache class constructor.
 	 *
 	 * This method accepts a $template string and a $view object. Optionally, pass an associative
@@ -226,7 +231,7 @@ class Mustache {
 				case '#':
 
 					// higher order sections
-					if ($this->_sectionIsCallable($val)) {
+					if ($this->_varIsCallable($val)) {
 						$content = call_user_func($val, $content);
 						$replace .= $this->_renderTemplate($content);
 					} else if ($this->_varIsIterable($val)) {
@@ -586,7 +591,7 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _renderEscaped($tag_name) {
-		return htmlentities($this->_getVariable($tag_name), ENT_COMPAT, $this->_charset);
+		return htmlentities($this->_renderUnescaped($tag_name), ENT_COMPAT, $this->_charset);
 	}
 
 	/**
@@ -608,7 +613,17 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _renderUnescaped($tag_name) {
-		return $this->_getVariable($tag_name);
+		$val = $this->_getVariable($tag_name);
+
+		if ($this->_varIsCallable($val)) {
+			$key = is_object($val) ? spl_object_hash($val) : serialize($val);
+			if (!isset($this->_interpolatedLambdas[$key])) {
+				$this->_interpolatedLambdas[$key] = call_user_func($val);
+			}
+			return $this->_renderTemplate($this->_interpolatedLambdas[$key]);
+		}
+
+		return $val;
 	}
 
 	/**
@@ -783,7 +798,7 @@ class Mustache {
 	 * @param mixed $var
 	 * @return bool
 	 */
-	protected function _sectionIsCallable($var) {
+	protected function _varIsCallable($var) {
 		if (is_string($var) && (strpos($var, '::') == false)) {
 			return false;
 		}
