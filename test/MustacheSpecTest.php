@@ -57,20 +57,25 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $m->render(), $desc);
 	}
 
-	// /**
-	//  * @group lambdas
-	//  * @dataProvider loadLambdasSpec
-	//  */
-	// public function testLambdasSpec($template, $data, $partials, $expected, $desc) {
-	// 	$this->markTestSkipped("Lambdas for PHP haven't made it into the spec yet, so we'll skip them to avoid a bajillion failed tests.");
-	//
-	// 	if (!version_compare(PHP_VERSION, '5.3.0', '>=')) {
-	// 		$this->markTestSkipped('Unable to test Lambdas spec with PHP < 5.3.');
-	// 	}
-	//
-	// 	$m = new Mustache($template, $data, $partials);
-	// 	$this->assertEquals($expected, $m->render(), $desc);
-	// }
+	/**
+	 * @group lambdas
+	 * @dataProvider loadLambdasSpec
+	 */
+	public function testLambdasSpec($template, $data, $partials, $expected, $desc) {
+		if (!isset($data['lambda']['php'])) {
+			$this->markTestSkipped(sprintf('PHP lambda test not implemented for "%s".', $desc));
+		}
+
+		if (!version_compare(PHP_VERSION, '5.3.0', '>=')) {
+			$this->markTestSkipped('Unable to test Lambdas spec with PHP < 5.3.');
+		}
+
+		$func = $data['lambda']['php'];
+		$data['lambda'] = function($text = null) use ($func) { return eval($func); };
+
+		$m = new Mustache($template, $data, $partials);
+		$this->assertEquals($expected, $m->render(), $desc);
+	}
 
 	/**
 	 * @group partials
@@ -106,9 +111,9 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 		return $this->loadSpec('inverted');
 	}
 
-	// public function loadLambdasSpec() {
-	// 	return $this->loadSpec('lambdas');
-	// }
+	public function loadLambdasSpec() {
+	 return $this->loadSpec('lambdas');
+	}
 
 	public function loadPartialsSpec() {
 		return $this->loadSpec('partials');
@@ -133,12 +138,23 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 		}
 
 		$data = array();
-
 		$yaml = new sfYamlParser();
+		$file = file_get_contents($filename);
 
-		$spec = $yaml->parse(file_get_contents($filename));
+		// @hack: pre-process the 'lambdas' spec so the Symfony YAML parser doesn't complain.
+		if ($name === 'lambdas') {
+			$file = str_replace(" !code\n", "\n", $file);
+		}
+
+		$spec = $yaml->parse($file);
 		foreach ($spec['tests'] as $test) {
-			$data[] = array($test['template'], $test['data'], isset($test['partials']) ? $test['partials'] : array(), $test['expected'], $test['desc']);
+			$data[] = array(
+				$test['template'],
+				$test['data'],
+				isset($test['partials']) ? $test['partials'] : array(),
+				$test['expected'],
+				$test['desc']
+			);
 		}
 		return $data;
 	}
