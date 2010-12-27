@@ -62,19 +62,32 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider loadLambdasSpec
 	 */
 	public function testLambdasSpec($template, $data, $partials, $expected, $desc) {
-		if (!isset($data['lambda']['php'])) {
-			$this->markTestSkipped(sprintf('PHP lambda test not implemented for "%s".', $desc));
-		}
-
 		if (!version_compare(PHP_VERSION, '5.3.0', '>=')) {
 			$this->markTestSkipped('Unable to test Lambdas spec with PHP < 5.3.');
 		}
 
-		$func = $data['lambda']['php'];
-		$data['lambda'] = function($text = null) use ($func) { return eval($func); };
-
+		$data = $this->prepareLambdasSpec($data);
 		$m = new Mustache($template, $data, $partials);
 		$this->assertEquals($expected, $m->render(), $desc);
+	}
+
+	/**
+	 * Extract and lambdafy any 'lambda' values found in the $data array.
+	 */
+	protected function prepareLambdasSpec($data) {
+		foreach ($data as $key => $val) {
+			if ($key === 'lambda') {
+				if (!isset($val['php'])) {
+					$this->markTestSkipped(sprintf('PHP lambda test not implemented for this test.'));
+				}
+
+				$func = $val['php'];
+				$data[$key] = function($text = null) use ($func) { return eval($func); };
+			} else if (is_array($val)) {
+				$data[$key] = $this->prepareLambdasSpec($val);
+			}
+		}
+		return $data;
 	}
 
 	/**
@@ -112,7 +125,7 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function loadLambdasSpec() {
-	 return $this->loadSpec('lambdas');
+		return $this->loadSpec('~lambdas');
 	}
 
 	public function loadPartialsSpec() {
@@ -142,7 +155,7 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 		$file = file_get_contents($filename);
 
 		// @hack: pre-process the 'lambdas' spec so the Symfony YAML parser doesn't complain.
-		if ($name === 'lambdas') {
+		if ($name === '~lambdas') {
 			$file = str_replace(" !code\n", "\n", $file);
 		}
 
