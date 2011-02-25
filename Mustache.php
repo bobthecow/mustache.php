@@ -147,6 +147,22 @@ class Mustache {
 	}
 
 	/**
+	 * Change the internal character set.
+	 *
+	 * This method accepts a $charset string. Any character set supported by
+	 * {@link http://php.net/htmlentities} and local enviornment can be passed.
+	 *
+	 * @access public
+	 * @param string $charset
+	 * @return Mustache
+	 */
+	public function charset($charset) {
+		$this->_charset = $charset;
+
+		return $this;
+	}
+
+	/**
 	 * Render the given template and view object.
 	 *
 	 * Defaults to the template and view passed to the class constructor unless a new one is provided.
