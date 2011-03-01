@@ -615,8 +615,10 @@ class Mustache {
 	 */
 	protected function _renderPartial($tag_name, $whitespace = '') {
 		$view = clone($this);
-
-		return $whitespace . preg_replace('/\n(?!$)/s', "\n" . $whitespace, $view->render($this->_getPartial($tag_name)));
+		
+		$partial = $whitespace . preg_replace('/\n(?!$)/s', "\n" . $whitespace, $this->_getPartial($tag_name));
+		
+		return $view->render($partial);
 	}
 
 	/**
