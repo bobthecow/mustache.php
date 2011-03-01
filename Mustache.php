@@ -112,6 +112,23 @@ class Mustache {
 	 * This method accepts a $template string and a $view object. Optionally, pass an associative
 	 * array of partials as well.
 	 *
+	 * Passing an $options array allows overriding certain Mustache options during instantiation:
+	 *
+	 *     $options = array(
+	 *         // `charset` -- must be supported by `htmlspecialentities()`. defaults to 'UTF-8'
+	 *         'charset' => 'ISO-8859-1',
+	 *
+	 *         // opening and closing delimiters, as an array or a space-separated string
+	 *         'delimiters' => '<% %>',
+	 *
+	 *         // an array of pragmas to enable
+	 *         'pragmas' => array(
+	 *             Mustache::PRAGMA_UNESCAPED,
+	 *             Mustache::PRAGMA_DOT_NOTATION,
+	 *             Mustache::PRAGMA_IMPLICIT_ITERATOR
+	 *         ),
+	 *     );
+	 *
 	 * @access public
 	 * @param string $template (default: null)
 	 * @param mixed $view (default: null)
@@ -127,7 +144,7 @@ class Mustache {
 	}
 
 	/**
-	 * _setOptions function.
+	 * Helper function for setting options from constructor args.
 	 *
 	 * @access protected
 	 * @param array $options
@@ -143,19 +160,20 @@ class Mustache {
 			if (!is_array($delims)) {
 				$delims = array_map('trim', explode(' ', $delims, 2));
 			}
-			$this->_otag = preg_quote($delims[0]);
-			$this->_ctag = preg_quote($delims[1]);
+			$this->_otag = $delims[0];
+			$this->_ctag = $delims[1];
 		}
 
 		if (isset($options['pragmas'])) {
-			foreach ($pragmas as $pragma_name) {
+			foreach ($options['pragmas'] as $pragma_name) {
 				if (!in_array($pragma_name, $this->_pragmasImplemented)) {
 					throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
 				}
 			}
-			$this->_pragmas = $pragmas;
+			$this->_pragmas = $options['pragmas'];
 		}
 	}
+
 	/**
 	 * Mustache class clone method.
 	 *
