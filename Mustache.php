@@ -116,14 +116,46 @@ class Mustache {
 	 * @param string $template (default: null)
 	 * @param mixed $view (default: null)
 	 * @param array $partials (default: null)
+	 * @param array $options (default: array())
 	 * @return void
 	 */
-	public function __construct($template = null, $view = null, $partials = null) {
+	public function __construct($template = null, $view = null, $partials = null, array $options = null) {
 		if ($template !== null) $this->_template = $template;
 		if ($partials !== null) $this->_partials = $partials;
 		if ($view !== null)     $this->_context = array($view);
+		if ($options !== null)  $this->_setOptions($options);
 	}
 
+	/**
+	 * _setOptions function.
+	 *
+	 * @access protected
+	 * @param array $options
+	 * @return void
+	 */
+	protected function _setOptions(array $options) {
+		if (isset($options['charset'])) {
+			$this->_charset = $options['charset'];
+		}
+
+		if (isset($options['delimiters'])) {
+			$delims = $options['delimiters'];
+			if (!is_array($delims)) {
+				$delims = array_map('trim', explode(' ', $delims, 2));
+			}
+			$this->_otag = preg_quote($delims[0]);
+			$this->_ctag = preg_quote($delims[1]);
+		}
+
+		if (isset($options['pragmas'])) {
+			foreach ($pragmas as $pragma_name) {
+				if (!in_array($pragma_name, $this->_pragmasImplemented)) {
+					throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
+				}
+			}
+			$this->_pragmas = $pragmas;
+		}
+	}
 	/**
 	 * Mustache class clone method.
 	 *
