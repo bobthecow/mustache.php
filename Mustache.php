@@ -88,8 +88,8 @@ class Mustache {
 	const SECTION_TYPES = '\^#\/';
 	const TAG_TYPES = '#\^\/=!<>\\{&';
 
-	public $_otag = '{{';
-	public $_ctag = '}}';
+	protected $_otag = '{{';
+	protected $_ctag = '}}';
 
 	protected $_tagRegEx;
 
