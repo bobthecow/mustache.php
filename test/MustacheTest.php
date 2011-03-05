@@ -73,6 +73,54 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @dataProvider constructorOptions
+	 */
+	public function testConstructorOptions($options, $charset, $delimiters, $pragmas) {
+		$mustache = new MustacheExposedOptionsStub(null, null, null, $options);
+		$this->assertEquals($charset,    $mustache->getCharset());
+		$this->assertEquals($delimiters, $mustache->getDelimiters());
+		$this->assertEquals($pragmas,    $mustache->getPragmas());
+	}
+
+	public function constructorOptions() {
+		return array(
+			array(
+				array(),
+				'UTF-8',
+				array('{{', '}}'),
+				array(),
+			),
+			array(
+				array(
+					'charset'    => 'UTF-8',
+					'delimiters' => '<< >>',
+					'pragmas'    => array(Mustache::PRAGMA_UNESCAPED)
+				),
+				'UTF-8',
+				array('<<', '>>'),
+				array(Mustache::PRAGMA_UNESCAPED),
+			),
+			array(
+				array(
+					'charset'    => 'cp866',
+					'delimiters' => array('[[[[', ']]]]'),
+					'pragmas'    => array(Mustache::PRAGMA_DOT_NOTATION, Mustache::PRAGMA_IMPLICIT_ITERATOR)
+				),
+				'cp866',
+				array('[[[[', ']]]]'),
+				array(Mustache::PRAGMA_DOT_NOTATION, Mustache::PRAGMA_IMPLICIT_ITERATOR),
+			),
+		);
+	}
+
+	/**
+	 * @expectedException MustacheException
+	 */
+	public function testConstructorInvalidPragmaOptionsThrowExceptions() {
+		$mustache = new Mustache(null, null, null, array('pragmas' => array('banana phone')));
+	}
+
+	/**
 	 * Test __toString() function.
 	 *
 	 * @access public
@@ -365,5 +413,17 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 
 		$m = new Mustache($template, $view);
 		$this->assertEquals('{{win}}', $m->render());
+	}
+}
+
+class MustacheExposedOptionsStub extends Mustache {
+	public function getPragmas() {
+		return $this->_pragmas;
+	}
+	public function getCharset() {
+		return $this->_charset;
+	}
+	public function getDelimiters() {
+		return array($this->_otag, $this->_ctag);
 	}
 }
