@@ -39,38 +39,6 @@ class Mustache {
 	 */
 
 	/**
-	 * The {{%DOT-NOTATION}} pragma allows context traversal via dots. Given the following context:
-	 *
-	 *     $context = array('foo' => array('bar' => array('baz' => 'qux')));
-	 *
-	 * One could access nested properties using dot notation:
-	 *
-	 *      {{%DOT-NOTATION}}{{foo.bar.baz}}
-	 *
-	 * Which would render as `qux`.
-	 */
-	const PRAGMA_DOT_NOTATION      = 'DOT-NOTATION';
-
-	/**
-	 * The {{%IMPLICIT-ITERATOR}} pragma allows access to non-associative array data in an
-	 * iterable section:
-	 *
-	 *     $context = array('items' => array('foo', 'bar', 'baz'));
-	 *
-	 * With this template:
-	 *
-	 *     {{%IMPLICIT-ITERATOR}}{{#items}}{{.}}{{/items}}
-	 *
-	 * Would render as `foobarbaz`.
-	 *
-	 * {{%IMPLICIT-ITERATOR}} accepts an optional 'iterator' argument which allows implicit
-	 * iterator tags other than {{.}} ...
-	 *
-	 *     {{%IMPLICIT-ITERATOR iterator=i}}{{#items}}{{i}}{{/items}}
-	 */
-	const PRAGMA_IMPLICIT_ITERATOR = 'IMPLICIT-ITERATOR';
-
-	/**
 	 * The {{%UNESCAPED}} pragma swaps the meaning of the {{normal}} and {{{unescaped}}}
 	 * Mustache tags. That is, once this pragma is activated the {{normal}} tag will not be
 	 * escaped while the {{{unescaped}}} tag will be escaped.
@@ -99,8 +67,6 @@ class Mustache {
 	protected $_pragmas  = array();
 
 	protected $_pragmasImplemented = array(
-		self::PRAGMA_DOT_NOTATION,
-		self::PRAGMA_IMPLICIT_ITERATOR,
 		self::PRAGMA_UNESCAPED
 	);
 
@@ -128,9 +94,7 @@ class Mustache {
 	 *
 	 *         // an array of pragmas to enable
 	 *         'pragmas' => array(
-	 *             Mustache::PRAGMA_UNESCAPED,
-	 *             Mustache::PRAGMA_DOT_NOTATION,
-	 *             Mustache::PRAGMA_IMPLICIT_ITERATOR
+	 *             Mustache::PRAGMA_UNESCAPED
 	 *         ),
 	 *     );
 	 *
@@ -279,30 +243,13 @@ class Mustache {
 
 				// regular section
 				case '#':
-
 					// higher order sections
 					if ($this->_varIsCallable($val)) {
 						$content = call_user_func($val, $content);
 						$replace .= $this->_renderTemplate($content);
 					} else if ($this->_varIsIterable($val)) {
-						if ($this->_hasPragma(self::PRAGMA_IMPLICIT_ITERATOR)) {
-							if ($opt = $this->_getPragmaOptions(self::PRAGMA_IMPLICIT_ITERATOR)) {
-								$iterator = $opt['iterator'];
-							} else {
-								$iterator = '.';
-							}
-						} else {
-							$iterator = false;
-						}
-
 						foreach ($val as $local_context) {
-							if ($iterator) {
-								$iterator_context = array($iterator => $local_context);
-								$this->_pushContext($iterator_context);
-							} else {
-								$this->_pushContext($local_context);
-							}
-
+							$this->_pushContext($local_context);
 							$replace .= $this->_renderTemplate($content);
 							$this->_popContext();
 						}
@@ -685,8 +632,10 @@ class Mustache {
 	 */
 	protected function _renderPartial($tag_name, $whitespace = '') {
 		$view = clone($this);
-
-		return $whitespace . preg_replace('/\n(?!$)/s', "\n" . $whitespace, $view->render($this->_getPartial($tag_name)));
+		
+		$partial = $whitespace . preg_replace('/\n(?!$)/s', "\n" . $whitespace, $this->_getPartial($tag_name));
+		
+		return $view->render($partial);
 	}
 
 	/**
@@ -755,7 +704,9 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _getVariable($tag_name) {
-		if ($tag_name != '.' && strpos($tag_name, '.') !== false && $this->_hasPragma(self::PRAGMA_DOT_NOTATION)) {
+		if ($tag_name === '.') {
+			return $this->_context[0];
+		} else if (strpos($tag_name, '.') !== false) {
 			$chunks = explode('.', $tag_name);
 			$first = array_shift($chunks);
 
