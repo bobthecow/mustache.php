@@ -104,11 +104,11 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 				array(
 					'charset'    => 'cp866',
 					'delimiters' => array('[[[[', ']]]]'),
-					'pragmas'    => array(Mustache::PRAGMA_DOT_NOTATION, Mustache::PRAGMA_IMPLICIT_ITERATOR)
+					'pragmas'    => array(Mustache::PRAGMA_UNESCAPED)
 				),
 				'cp866',
 				array('[[[[', ']]]]'),
-				array(Mustache::PRAGMA_DOT_NOTATION, Mustache::PRAGMA_IMPLICIT_ITERATOR),
+				array(Mustache::PRAGMA_UNESCAPED),
 			),
 		);
 	}
