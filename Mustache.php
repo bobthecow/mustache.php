@@ -73,11 +73,6 @@ class Mustache {
 	protected $_localPragmas = array();
 
 	/**
-	 * Interpolated lambdas should be called only once... store 'em for later here
-	 */
-	protected $_interpolatedLambdas = array();
-
-	/**
 	 * Mustache class constructor.
 	 *
 	 * This method accepts a $template string and a $view object. Optionally, pass an associative
@@ -614,10 +609,7 @@ class Mustache {
 
 		if ($this->_varIsCallable($val)) {
 			$key = is_object($val) ? spl_object_hash($val) : serialize($val);
-			if (!isset($this->_interpolatedLambdas[$key])) {
-				$this->_interpolatedLambdas[$key] = call_user_func($val);
-			}
-			return $this->_renderTemplate($this->_interpolatedLambdas[$key]);
+			return $this->_renderTemplate(call_user_func($val));
 		}
 
 		return $val;
