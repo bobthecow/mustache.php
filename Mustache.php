@@ -28,7 +28,7 @@ class Mustache {
 	);
 
 	// Override charset passed to htmlentities() and htmlspecialchars(). Defaults to UTF-8.
-	protected $_charset = 'UTF-8';
+	public $_charset = 'UTF-8';
 
 	/**
 	 * Pragmas are macro-like directives that, when invoked, change the behavior or
