@@ -96,7 +96,7 @@ class Mustache {
 	protected $_template = '';
 	protected $_context  = array();
 	protected $_partials = array();
-	protected $_pragmas  = array();
+	public $_pragmas  = array();
 
 	protected $_pragmasImplemented = array(
 		self::PRAGMA_DOT_NOTATION,
