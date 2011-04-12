@@ -104,7 +104,7 @@ class Mustache {
 		self::PRAGMA_UNESCAPED
 	);
 
-	protected $_localPragmas = array();
+	public $_localPragmas = array();
 
 	/**
 	 * Mustache class constructor.
