@@ -713,6 +713,9 @@ class Mustache {
 	 */
 	protected function _findVariableInContext($tag_name, $context) {
 		foreach ($context as $view) {
+      if (get_class($view) == "Closure") {
+        return $view($tag_name);
+      }
 			if (is_object($view)) {
 				if (method_exists($view, $tag_name)) {
 					return $view->$tag_name();
