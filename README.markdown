@@ -89,4 +89,4 @@ See Also
 --------
 
  * [Readme for the Ruby Mustache implementation](http://github.com/defunkt/mustache/blob/master/README.md).
- * [mustache(1)](http://defunkt.github.com/mustache/mustache.1.html) and [mustache(5)](http://defunkt.github.com/mustache/mustache.5.html) man pages.
+ * [mustache(1)](http://mustache.github.com/mustache.1.html) and [mustache(5)](http://mustache.github.com/mustache.5.html) man pages.
