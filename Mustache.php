@@ -14,7 +14,7 @@
  */
 class Mustache {
 
-	const VERSION = '0.7.1-dev';
+	const VERSION = '0.7.1';
 
 	/**
 	 * Should this Mustache throw exceptions when it finds unexpected tags?
