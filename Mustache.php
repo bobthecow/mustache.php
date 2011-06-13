@@ -14,6 +14,8 @@
  */
 class Mustache {
 
+	const VERSION = '0.7.1-dev';
+
 	/**
 	 * Should this Mustache throw exceptions when it finds unexpected tags?
 	 *
@@ -175,7 +177,7 @@ class Mustache {
 	public function render($template = null, $view = null, $partials = null) {
 		if ($template === null) $template = $this->_template;
 		if ($partials !== null) $this->_partials = $partials;
-		
+
 		$otag_orig = $this->_otag;
 		$ctag_orig = $this->_ctag;
 
@@ -190,7 +192,7 @@ class Mustache {
 
 		$this->_otag = $otag_orig;
 		$this->_ctag = $ctag_orig;
-		
+
 		return $template;
 	}
 
@@ -221,7 +223,7 @@ class Mustache {
 	protected function _renderTemplate($template) {
 		if ($section = $this->_findSection($template)) {
 			list($before, $type, $tag_name, $content, $after) = $section;
-			
+
 			$rendered_before = $this->_renderTags($before);
 
 			$rendered_content = '';
