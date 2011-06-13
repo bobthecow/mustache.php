@@ -195,6 +195,30 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Charlie Chaplin', $m->render(null, array('first_name' => 'Charlie', 'last_name' => 'Chaplin')));
 		$this->assertEquals('Zappa, Frank', $m->render('{{last_name}}, {{first_name}}', array('first_name' => 'Frank', 'last_name' => 'Zappa')));
 	}
+	
+	/**
+	 * @group interpolation
+	 * @dataProvider interpolationData
+	 */
+	public function testDoubleRenderMustacheTags($template, $context, $expected) {
+		$m = new Mustache($template, $context);
+		$this->assertEquals($expected, $m->render());
+	}
+
+	public function interpolationData() {
+		return array(
+			array(
+				'{{#a}}{{=<% %>=}}{{b}} c<%={{ }}=%>{{/a}}',
+				array('a' => array(array('b' => 'Do Not Render'))),
+				'{{b}} c'
+			),
+			array(
+				'{{#a}}{{b}}{{/a}}',
+				array('a' => array('b' => '{{c}}'), 'c' => 'FAIL'),
+				'{{c}}'
+			),
+		);
+	}
 
 	/**
 	 * Mustache should allow newlines (and other whitespace) in comments and all other tags.
