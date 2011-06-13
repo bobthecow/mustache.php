@@ -81,7 +81,7 @@ And render it:
 Known Issues
 ------------
 
- * As of v1.1.2, there are a couple of whitespace bugs around section tags... Despite these failing tests, this
+ * As of Mustache spec v1.1.2, there are a couple of whitespace bugs around section tags... Despite these failing tests, this
    version is actually *closer* to correct than previous releases.
 
 
