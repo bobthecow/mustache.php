@@ -271,7 +271,7 @@ class Mustache {
 	 */
 	protected function _prepareSectionRegEx($otag, $ctag) {
 		return sprintf(
-			'/(?:(?<=\\n)[ \\t]*)?%s(?P<type>[%s])(?P<tag_name>.+?)%s\\n?/s',
+			'/(?:(?<=\\n)[ \\t]*)?%s(?:(?P<type>[%s])(?P<tag_name>.+?)|=(?P<delims>.*?)=)%s\\n?/s',
 			preg_quote($otag, '/'),
 			self::SECTION_TYPES,
 			preg_quote($ctag, '/')
@@ -297,6 +297,12 @@ class Mustache {
 		$section_stack = array();
 		$matches = array();
 		while (preg_match($regEx, $template, $matches, PREG_OFFSET_CAPTURE, $search_offset)) {
+			if (isset($matches['delims'][0])) {
+				list($otag, $ctag) = explode(' ', $matches['delims'][0]);
+				$regEx = $this->_prepareSectionRegEx($otag, $ctag);
+				$search_offset = $matches[0][1] + strlen($matches[0][0]);
+				continue;
+			}
 
 			$match    = $matches[0][0];
 			$offset   = $matches[0][1];
