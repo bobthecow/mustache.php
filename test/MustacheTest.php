@@ -403,6 +403,15 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @group delimiters
+	 */
+	public function testStickyDelimiters() {
+		$m = new Mustache(null, array('result' => 'FAIL'));
+		$this->assertEquals('{{ result }}', $m->render('{{=[[ ]]=}}{{ result }}[[={{ }}=]]'));
+		$this->assertEquals('{{#result}}{{/result}}', $m->render('{{=[[ ]]=}}{{#result}}{{/result}}[[={{ }}=]]'));
+	}
+
+	/**
 	 * @group sections
 	 * @dataProvider poorlyNestedSections
 	 * @expectedException MustacheException
