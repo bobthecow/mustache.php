@@ -39,38 +39,6 @@ class Mustache {
 	 */
 
 	/**
-	 * The {{%DOT-NOTATION}} pragma allows context traversal via dots. Given the following context:
-	 *
-	 *     $context = array('foo' => array('bar' => array('baz' => 'qux')));
-	 *
-	 * One could access nested properties using dot notation:
-	 *
-	 *      {{%DOT-NOTATION}}{{foo.bar.baz}}
-	 *
-	 * Which would render as `qux`.
-	 */
-	const PRAGMA_DOT_NOTATION      = 'DOT-NOTATION';
-
-	/**
-	 * The {{%IMPLICIT-ITERATOR}} pragma allows access to non-associative array data in an
-	 * iterable section:
-	 *
-	 *     $context = array('items' => array('foo', 'bar', 'baz'));
-	 *
-	 * With this template:
-	 *
-	 *     {{%IMPLICIT-ITERATOR}}{{#items}}{{.}}{{/items}}
-	 *
-	 * Would render as `foobarbaz`.
-	 *
-	 * {{%IMPLICIT-ITERATOR}} accepts an optional 'iterator' argument which allows implicit
-	 * iterator tags other than {{.}} ...
-	 *
-	 *     {{%IMPLICIT-ITERATOR iterator=i}}{{#items}}{{i}}{{/items}}
-	 */
-	const PRAGMA_IMPLICIT_ITERATOR = 'IMPLICIT-ITERATOR';
-
-	/**
 	 * The {{%UNESCAPED}} pragma swaps the meaning of the {{normal}} and {{{unescaped}}}
 	 * Mustache tags. That is, once this pragma is activated the {{normal}} tag will not be
 	 * escaped while the {{{unescaped}}} tag will be escaped.
@@ -88,8 +56,8 @@ class Mustache {
 	const SECTION_TYPES = '\^#\/';
 	const TAG_TYPES = '#\^\/=!<>\\{&';
 
-	public $_otag = '{{';
-	public $_ctag = '}}';
+	protected $_otag = '{{';
+	protected $_ctag = '}}';
 
 	protected $_tagRegEx;
 
@@ -99,8 +67,6 @@ class Mustache {
 	protected $_pragmas  = array();
 
 	protected $_pragmasImplemented = array(
-		self::PRAGMA_DOT_NOTATION,
-		self::PRAGMA_IMPLICIT_ITERATOR,
 		self::PRAGMA_UNESCAPED
 	);
 
@@ -112,16 +78,64 @@ class Mustache {
 	 * This method accepts a $template string and a $view object. Optionally, pass an associative
 	 * array of partials as well.
 	 *
+	 * Passing an $options array allows overriding certain Mustache options during instantiation:
+	 *
+	 *     $options = array(
+	 *         // `charset` -- must be supported by `htmlspecialentities()`. defaults to 'UTF-8'
+	 *         'charset' => 'ISO-8859-1',
+	 *
+	 *         // opening and closing delimiters, as an array or a space-separated string
+	 *         'delimiters' => '<% %>',
+	 *
+	 *         // an array of pragmas to enable
+	 *         'pragmas' => array(
+	 *             Mustache::PRAGMA_UNESCAPED
+	 *         ),
+	 *     );
+	 *
 	 * @access public
 	 * @param string $template (default: null)
 	 * @param mixed $view (default: null)
 	 * @param array $partials (default: null)
+	 * @param array $options (default: array())
 	 * @return void
 	 */
-	public function __construct($template = null, $view = null, $partials = null) {
+	public function __construct($template = null, $view = null, $partials = null, array $options = null) {
 		if ($template !== null) $this->_template = $template;
 		if ($partials !== null) $this->_partials = $partials;
 		if ($view !== null)     $this->_context = array($view);
+		if ($options !== null)  $this->_setOptions($options);
+	}
+
+	/**
+	 * Helper function for setting options from constructor args.
+	 *
+	 * @access protected
+	 * @param array $options
+	 * @return void
+	 */
+	protected function _setOptions(array $options) {
+		if (isset($options['charset'])) {
+			$this->_charset = $options['charset'];
+		}
+
+		if (isset($options['delimiters'])) {
+			$delims = $options['delimiters'];
+			if (!is_array($delims)) {
+				$delims = array_map('trim', explode(' ', $delims, 2));
+			}
+			$this->_otag = $delims[0];
+			$this->_ctag = $delims[1];
+		}
+
+		if (isset($options['pragmas'])) {
+			foreach ($options['pragmas'] as $pragma_name) {
+				if (!in_array($pragma_name, $this->_pragmasImplemented)) {
+					throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
+				}
+			}
+			$this->_pragmas = $options['pragmas'];
+		}
 	}
 
 	/**
@@ -225,24 +239,8 @@ class Mustache {
 				// regular section
 				case '#':
 					if ($this->_varIsIterable($val)) {
-						if ($this->_hasPragma(self::PRAGMA_IMPLICIT_ITERATOR)) {
-							if ($opt = $this->_getPragmaOptions(self::PRAGMA_IMPLICIT_ITERATOR)) {
-								$iterator = $opt['iterator'];
-							} else {
-								$iterator = '.';
-							}
-						} else {
-							$iterator = false;
-						}
-
 						foreach ($val as $local_context) {
-
-							if ($iterator) {
-								$iterator_context = array($iterator => $local_context);
-								$this->_pushContext($iterator_context);
-							} else {
-								$this->_pushContext($local_context);
-							}
+							$this->_pushContext($local_context);
 							$replace .= $this->_renderTemplate($content);
 							$this->_popContext();
 						}
@@ -615,8 +613,10 @@ class Mustache {
 	 */
 	protected function _renderPartial($tag_name, $whitespace = '') {
 		$view = clone($this);
-
-		return $whitespace . preg_replace('/\n(?!$)/s', "\n" . $whitespace, $view->render($this->_getPartial($tag_name)));
+		
+		$partial = $whitespace . preg_replace('/\n(?!$)/s', "\n" . $whitespace, $this->_getPartial($tag_name));
+		
+		return $view->render($partial);
 	}
 
 	/**
@@ -685,7 +685,9 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _getVariable($tag_name) {
-		if ($tag_name != '.' && strpos($tag_name, '.') !== false && $this->_hasPragma(self::PRAGMA_DOT_NOTATION)) {
+		if ($tag_name === '.') {
+			return $this->_context[0];
+		} else if (strpos($tag_name, '.') !== false) {
 			$chunks = explode('.', $tag_name);
 			$first = array_shift($chunks);
 
