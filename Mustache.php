@@ -175,6 +175,9 @@ class Mustache {
 	public function render($template = null, $view = null, $partials = null) {
 		if ($template === null) $template = $this->_template;
 		if ($partials !== null) $this->_partials = $partials;
+		
+		$otag_orig = $this->_otag;
+		$ctag_orig = $this->_ctag;
 
 		if ($view) {
 			$this->_context = array($view);
@@ -183,7 +186,12 @@ class Mustache {
 		}
 
 		$template = $this->_renderPragmas($template);
-		return $this->_renderTemplate($template, $this->_context);
+		$template = $this->_renderTemplate($template, $this->_context);
+
+		$this->_otag = $otag_orig;
+		$this->_ctag = $ctag_orig;
+		
+		return $template;
 	}
 
 	/**
@@ -475,9 +483,6 @@ class Mustache {
 			return $template;
 		}
 
-		$otag_orig = $this->_otag;
-		$ctag_orig = $this->_ctag;
-
 		$first = true;
 		$this->_tagRegEx = $this->_prepareTagRegEx($this->_otag, $this->_ctag, true);
 
@@ -516,9 +521,6 @@ class Mustache {
 				$this->_tagRegEx = $this->_prepareTagRegEx($this->_otag, $this->_ctag);
 			}
 		}
-
-		$this->_otag = $otag_orig;
-		$this->_ctag = $ctag_orig;
 
 		return $html . $template;
 	}
