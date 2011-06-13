@@ -36,7 +36,7 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	const TEST_CLASS = 'Mustache';
 
 	protected $knownIssues = array(
-		'Delimiters'     => "Known issue: sections don't respect delimiter changes",
+		// Just the whitespace ones...
 	);
 
 	/**
@@ -400,6 +400,17 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('success', $m->render('{{=[[ ]]=}}[[ result ]]'));
 		$this->assertEquals('success', $m->render('{{=<< >>=}}<< result >>'));
 		$this->assertEquals('success', $m->render('{{=<% %>=}}<% result %>'));
+	}
+
+	/**
+	 * @group delimiters
+	 */
+	public function testStickyDelimiters() {
+		$m = new Mustache(null, array('result' => 'FAIL'));
+		$this->assertEquals('{{ result }}', $m->render('{{=[[ ]]=}}{{ result }}[[={{ }}=]]'));
+		$this->assertEquals('{{#result}}{{/result}}', $m->render('{{=[[ ]]=}}{{#result}}{{/result}}[[={{ }}=]]'));
+		$this->assertEquals('{{ result }}', $m->render('{{=[[ ]]=}}[[#result]]{{ result }}[[/result]][[={{ }}=]]'));
+		$this->assertEquals('{{ result }}', $m->render('{{#result}}{{=[[ ]]=}}{{ result }}[[/result]][[^result]][[={{ }}=]][[ result ]]{{/result}}'));
 	}
 
 	/**
