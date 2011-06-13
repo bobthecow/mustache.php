@@ -219,7 +219,6 @@ class Mustache {
 	 * @return string Rendered Mustache template.
 	 */
 	protected function _renderTemplate($template) {
-		
 		if ($section = $this->_findSection($template)) {
 			list($before, $type, $tag_name, $content, $after) = $section;
 			
@@ -271,7 +270,7 @@ class Mustache {
 	 */
 	protected function _prepareSectionRegEx($otag, $ctag) {
 		return sprintf(
-			'/(?:(?<=\\n)[ \\t]*)?%s(?P<type>[%s])(?P<tag_name>.+?)%s\\n?/s',
+			'/(?:(?<=\\n)[ \\t]*)?%s(?:(?P<type>[%s])(?P<tag_name>.+?)|=(?P<delims>.*?)=)%s\\n?/s',
 			preg_quote($otag, '/'),
 			self::SECTION_TYPES,
 			preg_quote($ctag, '/')
@@ -297,11 +296,18 @@ class Mustache {
 		$section_stack = array();
 		$matches = array();
 		while (preg_match($regEx, $template, $matches, PREG_OFFSET_CAPTURE, $search_offset)) {
-
+		
 			$match    = $matches[0][0];
 			$offset   = $matches[0][1];
 			$type     = $matches['type'][0];
 			$tag_name = trim($matches['tag_name'][0]);
+			
+			if (isset($matches['delims'][0])) {
+				list($otag, $ctag) = explode(' ', $matches['delims'][0]);
+				$regEx = $this->_prepareSectionRegEx($otag, $ctag);
+				$search_offset = $offset + strlen($match);
+				continue;
+			}
 
 			$search_offset = $offset + strlen($match);
 
