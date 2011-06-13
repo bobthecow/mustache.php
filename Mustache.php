@@ -211,20 +211,10 @@ class Mustache {
 	 * @return string Rendered Mustache template.
 	 */
 	protected function _renderTemplate($template) {
-		$template = $this->_renderSections($template);
-		return $this->_renderTags($template);
-	}
-
-	/**
-	 * Render boolean, enumerable and inverted sections.
-	 *
-	 * @access protected
-	 * @param string $template
-	 * @return string
-	 */
-	protected function _renderSections($template) {
-		while ($section_data = $this->_findSection($template)) {
-			list($section, $offset, $type, $tag_name, $content) = $section_data;
+		if ($section = $this->_findSection($template)) {
+			list($section, $offset, $type, $tag_name, $content) = $section;
+			$before = substr($template, 0, $offset);
+			$after = substr($template, $offset + strlen($section));
 
 			$replace = '';
 			$val = $this->_getVariable($tag_name);
@@ -256,10 +246,10 @@ class Mustache {
 					break;
 			}
 
-			$template = substr_replace($template, $replace, $offset, strlen($section));
+			return $this->_renderTags($before) . $replace . $this->_renderTemplate($after);
 		}
 
-		return $template;
+		return $this->_renderTags($template);
 	}
 
 	/**
