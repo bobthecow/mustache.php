@@ -219,8 +219,11 @@ class Mustache {
 	 * @return string Rendered Mustache template.
 	 */
 	protected function _renderTemplate($template) {
+		
 		if ($section = $this->_findSection($template)) {
 			list($before, $type, $tag_name, $content, $after) = $section;
+			
+			$rendered_before = $this->_renderTags($before);
 
 			$renderedContent = '';
 			$val = $this->_getVariable($tag_name);
@@ -252,7 +255,7 @@ class Mustache {
 					break;
 			}
 
-			return $this->_renderTags($before) . $renderedContent . $this->_renderTemplate($after);
+			return $rendered_before . $renderedContent . $this->_renderTemplate($after);
 		}
 
 		return $this->_renderTags($template);
