@@ -214,13 +214,13 @@ class Mustache {
 		if ($section = $this->_findSection($template)) {
 			list($before, $type, $tag_name, $content, $after) = $section;
 
-			$replace = '';
+			$renderedContent = '';
 			$val = $this->_getVariable($tag_name);
 			switch($type) {
 				// inverted section
 				case '^':
 					if (empty($val)) {
-						$replace .= $content;
+						$renderedContent = $this->_renderTemplate($content);
 					}
 					break;
 
@@ -229,22 +229,22 @@ class Mustache {
 					if ($this->_varIsIterable($val)) {
 						foreach ($val as $local_context) {
 							$this->_pushContext($local_context);
-							$replace .= $this->_renderTemplate($content);
+							$renderedContent .= $this->_renderTemplate($content);
 							$this->_popContext();
 						}
 					} else if ($val) {
 						if (is_array($val) || is_object($val)) {
 							$this->_pushContext($val);
-							$replace .= $this->_renderTemplate($content);
+							$renderedContent = $this->_renderTemplate($content);
 							$this->_popContext();
 						} else {
-							$replace .= $content;
+							$renderedContent = $this->_renderTemplate($content);
 						}
 					}
 					break;
 			}
 
-			return $this->_renderTags($before) . $replace . $this->_renderTemplate($after);
+			return $this->_renderTags($before) . $renderedContent . $this->_renderTemplate($after);
 		}
 
 		return $this->_renderTags($template);
@@ -268,9 +268,7 @@ class Mustache {
 	}
 
 	/**
-	 * Extract a section from $template.
-	 *
-	 * This is a helper function to find sections needed by _renderSections.
+	 * Extract the first section from $template.
 	 *
 	 * @access protected
 	 * @param string $template
@@ -566,7 +564,7 @@ class Mustache {
 			case '#':
 			case '^':
 			case '/':
-				// remove any leftovers from _renderSections
+				// remove any leftover section tags
 				return $leading . $trailing;
 				break;
 			default:
