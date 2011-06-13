@@ -410,6 +410,7 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('{{ result }}', $m->render('{{=[[ ]]=}}{{ result }}[[={{ }}=]]'));
 		$this->assertEquals('{{ result }}', $m->render('{{=[[ ]]=}}[[#result]]{{ result }}[[/result]]'));
 		$this->assertEquals('{{ result }}', $m->render('{{=[[ ]]=}}[[#result]]{{ result }}[[/result]][[={{ }}=]]'));
+		$this->assertEquals('{{ result }}', $m->render('{{#result}}{{=[[ ]]=}}{{ result }}[[/result]][[^result]][[={{ }}=]][[ result ]]{{/result}}'));
 	}
 
 	/**

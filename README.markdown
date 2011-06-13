@@ -81,8 +81,6 @@ And render it:
 Known Issues
 ------------
 
- * Things get weird when you change delimiters inside a section -- `delimiters` example currently fails with an
-   "unclosed section" exception.
  * As of v1.1.2, there are a couple of whitespace bugs around section tags... Despite these failing tests, this
    version is actually *closer* to correct than previous releases.
 
