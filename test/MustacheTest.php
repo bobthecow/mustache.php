@@ -153,7 +153,7 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testRenderDelimitersInPartials() {
 		$m = new Mustache('{{>stache}}', null, array('stache' => '{{=<% %>=}}{{first_name}} {{last_name}}<%={{ }}=%>'));
-		$this->assertEquals('Charlie Chaplin', $m->render(null, array('first_name' => 'Charlie', 'last_name' => 'Chaplin')));
+		$this->assertEquals('{{first_name}} {{last_name}}', $m->render(null, array('first_name' => 'Charlie', 'last_name' => 'Chaplin')));
 		$this->assertEquals('{{first_name}} {{last_name}}', $m->render('{{last_name}}, {{first_name}}', array('first_name' => 'Frank', 'last_name' => 'Zappa')));
 	}
 
