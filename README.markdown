@@ -81,8 +81,11 @@ And render it:
 Known Issues
 ------------
 
+ * As of v1.1.2, there are a couple of whitespace bugs around section tags.
  * Things get weird when you change delimiters inside a section -- `delimiters` example currently fails with an
    "unclosed section" exception.
+ * The current spec test exposes several whitespace bugs (which are mostly instances of the exact same whitespace
+   bug) ... Despite these failing tests, this version is actually *closer* to correct than previous releases.
 
 
 See Also

@@ -467,9 +467,10 @@ class Mustache {
 	 * @param string $ctag
 	 * @return string
 	 */
-	protected function _prepareTagRegEx($otag, $ctag) {
+	protected function _prepareTagRegEx($otag, $ctag, $first = false) {
 		return sprintf(
-			'/(?P<whitespace>(?<=\\n)[ \\t]*)?%s(?P<type>[%s]?)(?P<tag_name>.+?)(?:\\2|})?%s(?:\\s*(?=\\n))?/s',
+			'/(?P<leading>(?:%s\\r?\\n)[ \\t]*)?%s(?P<type>[%s]?)(?P<tag_name>.+?)(?:\\2|})?%s(?P<trailing>\\s*(?:\\r?\\n|\\Z))?/s',
+			($first ? '\\A|' : ''),
 			preg_quote($otag, '/'),
 			self::TAG_TYPES,
 			preg_quote($ctag, '/')
@@ -491,7 +492,8 @@ class Mustache {
 		$otag_orig = $this->_otag;
 		$ctag_orig = $this->_ctag;
 
-		$this->_tagRegEx = $this->_prepareTagRegEx($this->_otag, $this->_ctag);
+		$first = true;
+		$this->_tagRegEx = $this->_prepareTagRegEx($this->_otag, $this->_ctag, true);
 
 		$html = '';
 		$matches = array();
@@ -501,10 +503,16 @@ class Mustache {
 			$modifier = $matches['type'][0];
 			$tag_name = trim($matches['tag_name'][0]);
 
-			if (isset($matches['whitespace']) && $matches['whitespace'][1] > -1) {
-				$whitespace = $matches['whitespace'][0];
+			if (isset($matches['leading']) && $matches['leading'][1] > -1) {
+				$leading = $matches['leading'][0];
 			} else {
-				$whitespace = null;
+				$leading = null;
+			}
+
+			if (isset($matches['trailing']) && $matches['trailing'][1] > -1) {
+				$trailing = $matches['trailing'][0];
+			} else {
+				$trailing = null;
 			}
 
 			$html .= substr($template, 0, $offset);
@@ -515,7 +523,12 @@ class Mustache {
 			}
 			$template = substr($template, $next_offset);
 
-			$html .= $this->_renderTag($modifier, $tag_name, $whitespace);
+			$html .= $this->_renderTag($modifier, $tag_name, $leading, $trailing);
+
+			if ($first == true) {
+				$first = false;
+				$this->_tagRegEx = $this->_prepareTagRegEx($this->_otag, $this->_ctag);
+			}
 		}
 
 		$this->_otag = $otag_orig;
@@ -533,20 +546,22 @@ class Mustache {
 	 * @access protected
 	 * @param string $modifier
 	 * @param string $tag_name
+	 * @param string $leading Whitespace
+	 * @param string $trailing Whitespace
 	 * @throws MustacheException Unmatched section tag encountered.
 	 * @return string
 	 */
-	protected function _renderTag($modifier, $tag_name, $whitespace) {
+	protected function _renderTag($modifier, $tag_name, $leading, $trailing) {
 		switch ($modifier) {
 			case '=':
-				return $this->_changeDelimiter($tag_name);
+				return $this->_changeDelimiter($tag_name, $leading, $trailing);
 				break;
 			case '!':
-				return $this->_renderComment($tag_name);
+				return $this->_renderComment($tag_name, $leading, $trailing);
 				break;
 			case '>':
 			case '<':
-				return $this->_renderPartial($tag_name, $whitespace);
+				return $this->_renderPartial($tag_name, $leading, $trailing);
 				break;
 			case '{':
 				// strip the trailing } ...
@@ -555,24 +570,41 @@ class Mustache {
 				}
 			case '&':
 				if ($this->_hasPragma(self::PRAGMA_UNESCAPED)) {
-					return $this->_renderEscaped($tag_name);
+					return $this->_renderEscaped($tag_name, $leading, $trailing);
 				} else {
-					return $this->_renderUnescaped($tag_name);
+					return $this->_renderUnescaped($tag_name, $leading, $trailing);
 				}
 				break;
 			case '#':
 			case '^':
 			case '/':
 				// remove any leftovers from _renderSections
-				return '';
+				return $leading . $trailing;
+				break;
+			default:
+				if ($this->_hasPragma(self::PRAGMA_UNESCAPED)) {
+					return $this->_renderUnescaped($modifier . $tag_name, $leading, $trailing);
+				} else {
+					return $this->_renderEscaped($modifier . $tag_name, $leading, $trailing);
+				}
 				break;
 		}
+	}
 
-		if ($this->_hasPragma(self::PRAGMA_UNESCAPED)) {
-			return $this->_renderUnescaped($modifier . $tag_name);
-		} else {
-			return $this->_renderEscaped($modifier . $tag_name);
+	/**
+	 * Returns true if any of its args contains the "\r" character.
+	 *
+	 * @access protected
+	 * @param string $str
+	 * @return boolean
+	 */
+	protected function _stringHasR($str) {
+		foreach (func_get_args() as $arg) {
+			if (strpos($arg, "\r") !== false) {
+				return true;
+			}
 		}
+		return false;
 	}
 
 	/**
@@ -580,10 +612,12 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
+	 * @param string $leading Whitespace
+	 * @param string $trailing Whitespace
 	 * @return string
 	 */
-	protected function _renderEscaped($tag_name) {
-		return htmlentities($this->_renderUnescaped($tag_name), ENT_COMPAT, $this->_charset);
+	protected function _renderEscaped($tag_name, $leading, $trailing) {
+		return $leading . htmlentities($this->_renderUnescaped($tag_name), ENT_COMPAT, $this->_charset) . $trailing;
 	}
 
 	/**
@@ -591,10 +625,18 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
+	 * @param string $leading Whitespace
+	 * @param string $trailing Whitespace
 	 * @return string
 	 */
-	protected function _renderComment($tag_name) {
-		return '';
+	protected function _renderComment($tag_name, $leading, $trailing) {
+		if ($leading !== null && $trailing !== null) {
+			if (strpos($leading, "\n") === false) {
+				return '';
+			}
+			return $this->_stringHasR($leading, $trailing) ? "\r\n" : "\n";
+		}
+		return $leading . $trailing;
 	}
 
 	/**
@@ -602,17 +644,19 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
+	 * @param string $leading Whitespace
+	 * @param string $trailing Whitespace
 	 * @return string
 	 */
-	protected function _renderUnescaped($tag_name) {
+	protected function _renderUnescaped($tag_name, $leading, $trailing) {
 		$val = $this->_getVariable($tag_name);
 
 		if ($this->_varIsCallable($val)) {
 			$key = is_object($val) ? spl_object_hash($val) : serialize($val);
-			return $this->_renderTemplate(call_user_func($val));
+			$val = $this->_renderTemplate(call_user_func($val));
 		}
 
-		return $val;
+		return $leading . $val . $trailing;
 	}
 
 	/**
@@ -620,14 +664,24 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
+	 * @param string $leading Whitespace
+	 * @param string $trailing Whitespace
 	 * @return string
 	 */
-	protected function _renderPartial($tag_name, $whitespace = '') {
+	protected function _renderPartial($tag_name, $leading, $trailing) {
+		$partial = $this->_getPartial($tag_name);
+		if ($leading !== null && $trailing !== null) {
+			$whitespace = trim($leading, "\r\n");
+			$partial = preg_replace('/(\\r?\\n)(?!$)/s', "\\1" . $whitespace, $partial);
+		}
+
 		$view = clone($this);
-		
-		$partial = $whitespace . preg_replace('/\n(?!$)/s', "\n" . $whitespace, $this->_getPartial($tag_name));
-		
-		return $view->render($partial);
+
+		if ($leading !== null && $trailing !== null) {
+			return $leading . $view->render($partial);
+		} else {
+			return $leading . $view->render($partial) . $trailing;
+		}
 	}
 
 	/**
@@ -636,16 +690,24 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
+	 * @param string $leading Whitespace
+	 * @param string $trailing Whitespace
 	 * @return string
 	 */
-	protected function _changeDelimiter($tag_name) {
+	protected function _changeDelimiter($tag_name, $leading, $trailing) {
 		list($otag, $ctag) = explode(' ', $tag_name);
 		$this->_otag = $otag;
 		$this->_ctag = $ctag;
 
 		$this->_tagRegEx = $this->_prepareTagRegEx($this->_otag, $this->_ctag);
 
-		return '';
+		if ($leading !== null && $trailing !== null) {
+			if (strpos($leading, "\n") === false) {
+				return '';
+			}
+			return $this->_stringHasR($leading, $trailing) ? "\r\n" : "\n";
+		}
+		return $leading . $trailing;
 	}
 
 	/**

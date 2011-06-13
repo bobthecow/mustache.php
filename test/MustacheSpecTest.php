@@ -25,7 +25,7 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	 * @group comments
 	 * @dataProvider loadCommentSpec
 	 */
-	public function testCommentSpec($template, $data, $partials, $expected, $desc) {
+	public function testCommentSpec($desc, $template, $data, $partials, $expected) {
 		$m = new Mustache($template, $data, $partials);
 		$this->assertEquals($expected, $m->render(), $desc);
 	}
@@ -34,7 +34,7 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	 * @group delimiters
 	 * @dataProvider loadDelimitersSpec
 	 */
-	public function testDelimitersSpec($template, $data, $partials, $expected, $desc) {
+	public function testDelimitersSpec($desc, $template, $data, $partials, $expected) {
 		$m = new Mustache($template, $data, $partials);
 		$this->assertEquals($expected, $m->render(), $desc);
 	}
@@ -43,7 +43,7 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	 * @group interpolation
 	 * @dataProvider loadInterpolationSpec
 	 */
-	public function testInterpolationSpec($template, $data, $partials, $expected, $desc) {
+	public function testInterpolationSpec($desc, $template, $data, $partials, $expected) {
 		$m = new Mustache($template, $data, $partials);
 		$this->assertEquals($expected, $m->render(), $desc);
 	}
@@ -52,7 +52,7 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	 * @group inverted-sections
 	 * @dataProvider loadInvertedSpec
 	 */
-	public function testInvertedSpec($template, $data, $partials, $expected, $desc) {
+	public function testInvertedSpec($desc, $template, $data, $partials, $expected) {
 		$m = new Mustache($template, $data, $partials);
 		$this->assertEquals($expected, $m->render(), $desc);
 	}
@@ -61,7 +61,7 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	 * @group lambdas
 	 * @dataProvider loadLambdasSpec
 	 */
-	public function testLambdasSpec($template, $data, $partials, $expected, $desc) {
+	public function testLambdasSpec($desc, $template, $data, $partials, $expected) {
 		if (!version_compare(PHP_VERSION, '5.3.0', '>=')) {
 			$this->markTestSkipped('Unable to test Lambdas spec with PHP < 5.3.');
 		}
@@ -94,7 +94,7 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	 * @group partials
 	 * @dataProvider loadPartialsSpec
 	 */
-	public function testPartialsSpec($template, $data, $partials, $expected, $desc) {
+	public function testPartialsSpec($desc, $template, $data, $partials, $expected) {
 		$m = new Mustache($template, $data, $partials);
 		$this->assertEquals($expected, $m->render(), $desc);
 	}
@@ -103,7 +103,7 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	 * @group sections
 	 * @dataProvider loadSectionsSpec
 	 */
-	public function testSectionsSpec($template, $data, $partials, $expected, $desc) {
+	public function testSectionsSpec($desc, $template, $data, $partials, $expected) {
 		$m = new Mustache($template, $data, $partials);
 		$this->assertEquals($expected, $m->render(), $desc);
 	}
@@ -162,11 +162,11 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 		$spec = $yaml->parse($file);
 		foreach ($spec['tests'] as $test) {
 			$data[] = array(
+				$test['name'] . ': ' . $test['desc'],
 				$test['template'],
 				$test['data'],
 				isset($test['partials']) ? $test['partials'] : array(),
 				$test['expected'],
-				$test['desc']
 			);
 		}
 		return $data;
