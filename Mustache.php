@@ -212,9 +212,7 @@ class Mustache {
 	 */
 	protected function _renderTemplate($template) {
 		if ($section = $this->_findSection($template)) {
-			list($section, $offset, $type, $tag_name, $content) = $section;
-			$before = substr($template, 0, $offset);
-			$after = substr($template, $offset + strlen($section));
+			list($before, $type, $tag_name, $content, $after) = $section;
 
 			$replace = '';
 			$val = $this->_getVariable($tag_name);
@@ -276,7 +274,7 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $template
-	 * @return array $section, $offset, $type, $tag_name and $content
+	 * @return array $before, $type, $tag_name, $content and $after
 	 */
 	protected function _findSection($template) {
 		$regEx = $this->_prepareSectionRegEx($this->_otag, $this->_ctag);
@@ -316,10 +314,14 @@ class Mustache {
 					}
 
 					if (empty($section_stack)) {
-						$section = substr($template, $section_start, $search_offset - $section_start);
-						$content = substr($template, $content_start, $offset - $content_start);
-
-						return array($section, $section_start, $section_type, $tag_name, $content);
+						// $before, $type, $tag_name, $content, $after
+						return array(
+							substr($template, 0, $section_start),
+							$section_type,
+							$tag_name,
+							substr($template, $content_start, $offset - $content_start),
+							substr($template, $search_offset),
+						);
 					}
 					break;
 			}
@@ -847,3 +849,4 @@ class MustacheException extends Exception {
 	const UNKNOWN_PRAGMA           = 4;
 
 }
+
