@@ -211,28 +211,16 @@ class Mustache {
 	 * @return string Rendered Mustache template.
 	 */
 	protected function _renderTemplate($template) {
-		$template = $this->_renderSections($template);
-		return $this->_renderTags($template);
-	}
+		if ($section = $this->_findSection($template)) {
+			list($before, $type, $tag_name, $content, $after) = $section;
 
-	/**
-	 * Render boolean, enumerable and inverted sections.
-	 *
-	 * @access protected
-	 * @param string $template
-	 * @return string
-	 */
-	protected function _renderSections($template) {
-		while ($section_data = $this->_findSection($template)) {
-			list($section, $offset, $type, $tag_name, $content) = $section_data;
-
-			$replace = '';
+			$renderedContent = '';
 			$val = $this->_getVariable($tag_name);
 			switch($type) {
 				// inverted section
 				case '^':
 					if (empty($val)) {
-						$replace .= $content;
+						$renderedContent = $this->_renderTemplate($content);
 					}
 					break;
 
@@ -241,25 +229,25 @@ class Mustache {
 					if ($this->_varIsIterable($val)) {
 						foreach ($val as $local_context) {
 							$this->_pushContext($local_context);
-							$replace .= $this->_renderTemplate($content);
+							$renderedContent .= $this->_renderTemplate($content);
 							$this->_popContext();
 						}
 					} else if ($val) {
 						if (is_array($val) || is_object($val)) {
 							$this->_pushContext($val);
-							$replace .= $this->_renderTemplate($content);
+							$renderedContent = $this->_renderTemplate($content);
 							$this->_popContext();
 						} else {
-							$replace .= $content;
+							$renderedContent = $this->_renderTemplate($content);
 						}
 					}
 					break;
 			}
 
-			$template = substr_replace($template, $replace, $offset, strlen($section));
+			return $this->_renderTags($before) . $renderedContent . $this->_renderTemplate($after);
 		}
 
-		return $template;
+		return $this->_renderTags($template);
 	}
 
 	/**
@@ -280,13 +268,11 @@ class Mustache {
 	}
 
 	/**
-	 * Extract a section from $template.
-	 *
-	 * This is a helper function to find sections needed by _renderSections.
+	 * Extract the first section from $template.
 	 *
 	 * @access protected
 	 * @param string $template
-	 * @return array $section, $offset, $type, $tag_name and $content
+	 * @return array $before, $type, $tag_name, $content and $after
 	 */
 	protected function _findSection($template) {
 		$regEx = $this->_prepareSectionRegEx($this->_otag, $this->_ctag);
@@ -326,10 +312,14 @@ class Mustache {
 					}
 
 					if (empty($section_stack)) {
-						$section = substr($template, $section_start, $search_offset - $section_start);
-						$content = substr($template, $content_start, $offset - $content_start);
-
-						return array($section, $section_start, $section_type, $tag_name, $content);
+						// $before, $type, $tag_name, $content, $after
+						return array(
+							substr($template, 0, $section_start),
+							$section_type,
+							$tag_name,
+							substr($template, $content_start, $offset - $content_start),
+							substr($template, $search_offset),
+						);
 					}
 					break;
 			}
@@ -463,9 +453,10 @@ class Mustache {
 	 * @param string $ctag
 	 * @return string
 	 */
-	protected function _prepareTagRegEx($otag, $ctag) {
+	protected function _prepareTagRegEx($otag, $ctag, $first = false) {
 		return sprintf(
-			'/(?P<whitespace>(?<=\\n)[ \\t]*)?%s(?P<type>[%s]?)(?P<tag_name>.+?)(?:\\2|})?%s(?:\\s*(?=\\n))?/s',
+			'/(?P<leading>(?:%s\\r?\\n)[ \\t]*)?%s(?P<type>[%s]?)(?P<tag_name>.+?)(?:\\2|})?%s(?P<trailing>\\s*(?:\\r?\\n|\\Z))?/s',
+			($first ? '\\A|' : ''),
 			preg_quote($otag, '/'),
 			self::TAG_TYPES,
 			preg_quote($ctag, '/')
@@ -487,7 +478,8 @@ class Mustache {
 		$otag_orig = $this->_otag;
 		$ctag_orig = $this->_ctag;
 
-		$this->_tagRegEx = $this->_prepareTagRegEx($this->_otag, $this->_ctag);
+		$first = true;
+		$this->_tagRegEx = $this->_prepareTagRegEx($this->_otag, $this->_ctag, true);
 
 		$html = '';
 		$matches = array();
@@ -497,10 +489,16 @@ class Mustache {
 			$modifier = $matches['type'][0];
 			$tag_name = trim($matches['tag_name'][0]);
 
-			if (isset($matches['whitespace']) && $matches['whitespace'][1] > -1) {
-				$whitespace = $matches['whitespace'][0];
+			if (isset($matches['leading']) && $matches['leading'][1] > -1) {
+				$leading = $matches['leading'][0];
 			} else {
-				$whitespace = null;
+				$leading = null;
+			}
+
+			if (isset($matches['trailing']) && $matches['trailing'][1] > -1) {
+				$trailing = $matches['trailing'][0];
+			} else {
+				$trailing = null;
 			}
 
 			$html .= substr($template, 0, $offset);
@@ -511,7 +509,12 @@ class Mustache {
 			}
 			$template = substr($template, $next_offset);
 
-			$html .= $this->_renderTag($modifier, $tag_name, $whitespace);
+			$html .= $this->_renderTag($modifier, $tag_name, $leading, $trailing);
+
+			if ($first == true) {
+				$first = false;
+				$this->_tagRegEx = $this->_prepareTagRegEx($this->_otag, $this->_ctag);
+			}
 		}
 
 		$this->_otag = $otag_orig;
@@ -529,20 +532,22 @@ class Mustache {
 	 * @access protected
 	 * @param string $modifier
 	 * @param string $tag_name
+	 * @param string $leading Whitespace
+	 * @param string $trailing Whitespace
 	 * @throws MustacheException Unmatched section tag encountered.
 	 * @return string
 	 */
-	protected function _renderTag($modifier, $tag_name, $whitespace) {
+	protected function _renderTag($modifier, $tag_name, $leading, $trailing) {
 		switch ($modifier) {
 			case '=':
-				return $this->_changeDelimiter($tag_name);
+				return $this->_changeDelimiter($tag_name, $leading, $trailing);
 				break;
 			case '!':
-				return $this->_renderComment($tag_name);
+				return $this->_renderComment($tag_name, $leading, $trailing);
 				break;
 			case '>':
 			case '<':
-				return $this->_renderPartial($tag_name, $whitespace);
+				return $this->_renderPartial($tag_name, $leading, $trailing);
 				break;
 			case '{':
 				// strip the trailing } ...
@@ -551,24 +556,41 @@ class Mustache {
 				}
 			case '&':
 				if ($this->_hasPragma(self::PRAGMA_UNESCAPED)) {
-					return $this->_renderEscaped($tag_name);
+					return $this->_renderEscaped($tag_name, $leading, $trailing);
 				} else {
-					return $this->_renderUnescaped($tag_name);
+					return $this->_renderUnescaped($tag_name, $leading, $trailing);
 				}
 				break;
 			case '#':
 			case '^':
 			case '/':
-				// remove any leftovers from _renderSections
-				return '';
+				// remove any leftover section tags
+				return $leading . $trailing;
+				break;
+			default:
+				if ($this->_hasPragma(self::PRAGMA_UNESCAPED)) {
+					return $this->_renderUnescaped($modifier . $tag_name, $leading, $trailing);
+				} else {
+					return $this->_renderEscaped($modifier . $tag_name, $leading, $trailing);
+				}
 				break;
 		}
+	}
 
-		if ($this->_hasPragma(self::PRAGMA_UNESCAPED)) {
-			return $this->_renderUnescaped($modifier . $tag_name);
-		} else {
-			return $this->_renderEscaped($modifier . $tag_name);
+	/**
+	 * Returns true if any of its args contains the "\r" character.
+	 *
+	 * @access protected
+	 * @param string $str
+	 * @return boolean
+	 */
+	protected function _stringHasR($str) {
+		foreach (func_get_args() as $arg) {
+			if (strpos($arg, "\r") !== false) {
+				return true;
+			}
 		}
+		return false;
 	}
 
 	/**
@@ -576,10 +598,12 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
+	 * @param string $leading Whitespace
+	 * @param string $trailing Whitespace
 	 * @return string
 	 */
-	protected function _renderEscaped($tag_name) {
-		return htmlentities($this->_getVariable($tag_name), ENT_COMPAT, $this->_charset);
+	protected function _renderEscaped($tag_name, $leading, $trailing) {
+		return $leading . htmlentities($this->_getVariable($tag_name), ENT_COMPAT, $this->_charset) . $trailing;
 	}
 
 	/**
@@ -587,10 +611,18 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
+	 * @param string $leading Whitespace
+	 * @param string $trailing Whitespace
 	 * @return string
 	 */
-	protected function _renderComment($tag_name) {
-		return '';
+	protected function _renderComment($tag_name, $leading, $trailing) {
+		if ($leading !== null && $trailing !== null) {
+			if (strpos($leading, "\n") === false) {
+				return '';
+			}
+			return $this->_stringHasR($leading, $trailing) ? "\r\n" : "\n";
+		}
+		return $leading . $trailing;
 	}
 
 	/**
@@ -598,10 +630,12 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
+	 * @param string $leading Whitespace
+	 * @param string $trailing Whitespace
 	 * @return string
 	 */
-	protected function _renderUnescaped($tag_name) {
-		return $this->_getVariable($tag_name);
+	protected function _renderUnescaped($tag_name, $leading, $trailing) {
+		return $leading . $this->_getVariable($tag_name) . $trailing;
 	}
 
 	/**
@@ -609,14 +643,24 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
+	 * @param string $leading Whitespace
+	 * @param string $trailing Whitespace
 	 * @return string
 	 */
-	protected function _renderPartial($tag_name, $whitespace = '') {
+	protected function _renderPartial($tag_name, $leading, $trailing) {
+		$partial = $this->_getPartial($tag_name);
+		if ($leading !== null && $trailing !== null) {
+			$whitespace = trim($leading, "\r\n");
+			$partial = preg_replace('/(\\r?\\n)(?!$)/s', "\\1" . $whitespace, $partial);
+		}
+
 		$view = clone($this);
-		
-		$partial = $whitespace . preg_replace('/\n(?!$)/s', "\n" . $whitespace, $this->_getPartial($tag_name));
-		
-		return $view->render($partial);
+
+		if ($leading !== null && $trailing !== null) {
+			return $leading . $view->render($partial);
+		} else {
+			return $leading . $view->render($partial) . $trailing;
+		}
 	}
 
 	/**
@@ -625,16 +669,24 @@ class Mustache {
 	 *
 	 * @access protected
 	 * @param string $tag_name
+	 * @param string $leading Whitespace
+	 * @param string $trailing Whitespace
 	 * @return string
 	 */
-	protected function _changeDelimiter($tag_name) {
+	protected function _changeDelimiter($tag_name, $leading, $trailing) {
 		list($otag, $ctag) = explode(' ', $tag_name);
 		$this->_otag = $otag;
 		$this->_ctag = $ctag;
 
 		$this->_tagRegEx = $this->_prepareTagRegEx($this->_otag, $this->_ctag);
 
-		return '';
+		if ($leading !== null && $trailing !== null) {
+			if (strpos($leading, "\n") === false) {
+				return '';
+			}
+			return $this->_stringHasR($leading, $trailing) ? "\r\n" : "\n";
+		}
+		return $leading . $trailing;
 	}
 
 	/**
@@ -795,3 +847,4 @@ class MustacheException extends Exception {
 	const UNKNOWN_PRAGMA           = 4;
 
 }
+
