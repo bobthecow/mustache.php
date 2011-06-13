@@ -225,13 +225,13 @@ class Mustache {
 			
 			$rendered_before = $this->_renderTags($before);
 
-			$renderedContent = '';
+			$rendered_content = '';
 			$val = $this->_getVariable($tag_name);
 			switch($type) {
 				// inverted section
 				case '^':
 					if (empty($val)) {
-						$renderedContent = $this->_renderTemplate($content);
+						$rendered_content = $this->_renderTemplate($content);
 					}
 					break;
 
@@ -240,22 +240,22 @@ class Mustache {
 					if ($this->_varIsIterable($val)) {
 						foreach ($val as $local_context) {
 							$this->_pushContext($local_context);
-							$renderedContent .= $this->_renderTemplate($content);
+							$rendered_content .= $this->_renderTemplate($content);
 							$this->_popContext();
 						}
 					} else if ($val) {
 						if (is_array($val) || is_object($val)) {
 							$this->_pushContext($val);
-							$renderedContent = $this->_renderTemplate($content);
+							$rendered_content = $this->_renderTemplate($content);
 							$this->_popContext();
 						} else {
-							$renderedContent = $this->_renderTemplate($content);
+							$rendered_content = $this->_renderTemplate($content);
 						}
 					}
 					break;
 			}
 
-			return $rendered_before . $renderedContent . $this->_renderTemplate($after);
+			return $rendered_before . $rendered_content . $this->_renderTemplate($after);
 		}
 
 		return $this->_renderTags($template);
