@@ -197,15 +197,27 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	}
 	
 	/**
-	 * @group partials
+	 * @group interpolation
+	 * @dataProvider interpolationData
 	 */
-	public function testRenderDelimitersInSections() {
-		$m = new Mustache('{{#a}}{{=<% %>=}}{{b}} c<%={{ }}=%>{{/a}}');
-		$this->assertEquals('{{b}} c', $m->render(null, array(
-			'a' => array(
-				array('b' => 'Do Not Render')
-			)
-		)));
+	public function testDoubleRenderMustacheTags($template, $context, $expected) {
+		$m = new Mustache($template, $context);
+		$this->assertEquals($expected, $m->render());
+	}
+
+	public function interpolationData() {
+		return array(
+			array(
+				'{{#a}}{{=<% %>=}}{{b}} c<%={{ }}=%>{{/a}}',
+				array('a' => array(array('b' => 'Do Not Render'))),
+				'{{b}} c'
+			),
+			array(
+				'{{#a}}{{b}}{{/a}}',
+				array('a' => array('b' => '{{c}}'), 'c' => 'FAIL'),
+				'{{c}}'
+			),
+		);
 	}
 
 	/**
