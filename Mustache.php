@@ -219,7 +219,6 @@ class Mustache {
 	 * @return string Rendered Mustache template.
 	 */
 	protected function _renderTemplate($template) {
-		
 		if ($section = $this->_findSection($template)) {
 			list($before, $type, $tag_name, $content, $after) = $section;
 			
@@ -308,6 +307,13 @@ class Mustache {
 			$offset   = $matches[0][1];
 			$type     = $matches['type'][0];
 			$tag_name = trim($matches['tag_name'][0]);
+			
+			if (isset($matches['delims'][0])) {
+				list($otag, $ctag) = explode(' ', $matches['delims'][0]);
+				$regEx = $this->_prepareSectionRegEx($otag, $ctag);
+				$search_offset = $offset + strlen($match);
+				continue;
+			}
 
 			$search_offset = $offset + strlen($match);
 
