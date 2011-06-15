@@ -238,7 +238,11 @@ class Mustache {
 
 				// regular section
 				case '#':
-					if ($this->_varIsIterable($val)) {
+					if ($tag_name=='!') {
+						$rendered_content = '';
+					} else if ($tag_name=='`') {
+						$rendered_content = $content;
+					} else if ($this->_varIsIterable($val)) {
 						foreach ($val as $local_context) {
 							$this->_pushContext($local_context);
 							$rendered_content .= $this->_renderTemplate($content);
@@ -255,7 +259,6 @@ class Mustache {
 					}
 					break;
 			}
-
 			return $rendered_before . $rendered_content . $this->_renderTemplate($after);
 		}
 
