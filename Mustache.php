@@ -63,7 +63,6 @@ class Mustache {
         protected $_context = array();
         protected $_partials = array();
         protected $_partialDirs = array();
-        protected $_partialRecursive = FALSE;
         protected $_pragmas = array();
         protected $_pragmasImplemented = array(
             self::PRAGMA_UNESCAPED
@@ -140,6 +139,10 @@ class Mustache {
                                 }
                         }
                         $this->_pragmas = $options['pragmas'];
+                }
+
+                if (isset($options['extension'])) {
+                        $this->_extension = $options['extension'];
                 }
         }
 
@@ -222,12 +225,9 @@ class Mustache {
                         $template = $this->_template;
                 } else {
                         $template = file_get_contents($templatePath);
-                        $templateDir = dirname($templatePath);
-                        if (!in_array($templateDir, $this->_partialDirs)) {
-                                $this->_partialDirs[] = $templateDir;
-                        }
+                        $this->addPartialDirectory(dirname($templatePath));
                 }
-                
+
                 return $this->render($template, $view, $partials);
         }
 
@@ -825,27 +825,18 @@ class Mustache {
 
         /**
          * Adds a path with partials to the partial search path
+         * The recursive parameter enables searching of subdirectories
          * 
          * @param string $directory 
+         * @param boolean $recursive (default: false)
          */
-        public function addPartialDirectory($directory) {
+        public function addPartialDirectory($directory, $recursive = FALSE) {
                 if (is_string($directory) && is_dir($directory)) {
-                        $this->_partialDirs[] = $directory;
+                        if (!array_key_exists($directory, $this->_partialDirs)) {
+                                $this->_partialDirs[$directory] = array('recursive' => $recursive);
+                        }
                 } else {
                         throw new InvalidArgumentException('An existing directory must be added.');
-                }
-        }
-
-        /**
-         * Sets the option to search the partial directories recursively
-         * 
-         * @param boolean $recursiveSearch 
-         */
-        public function setPartialRecursiveSearch($recursiveSearch) {
-                if (is_bool($recursiveSearch)) {
-                        $this->_partialRecursive = $recursiveSearch;
-                } else {
-                        throw new InvalidArgumentException('partialRecursiveSearch must be a boolean');
                 }
         }
 
@@ -864,11 +855,11 @@ class Mustache {
                         return $this->_partials[$tag_name];
                 } else if (is_array($this->_partialDirs) && !empty($this->_partialDirs)) {
                         $filename = $tag_name . '.' . $this->_extension;
-                        foreach ($this->_partialDirs as $partialDir) {
-                                if ($this->_partialRecursive) {
+                        foreach ($this->_partialDirs as $partialDir => $options) {
+                                if ($options['recursive'] === TRUE) {
                                         $directory = new RecursiveDirectoryIterator($partialDir);
                                         $iterator = new RecursiveIteratorIterator($directory);
-                                        $regex = new RegexIterator($iterator, '/'.$filename.'/i', RecursiveRegexIterator::GET_MATCH);
+                                        $regex = new RegexIterator($iterator, '/' . $filename . '/i', RecursiveRegexIterator::GET_MATCH);
                                         foreach ($regex as $key => $value) {
                                                 // returns the first partial found
                                                 $this->_partials[$tag_name] = file_get_contents($key);

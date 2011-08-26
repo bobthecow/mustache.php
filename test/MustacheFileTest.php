@@ -66,7 +66,7 @@ class MustacheFileTest extends PHPUnit_Framework_TestCase {
                 
                 $m = new Mustache();
                 
-                $m->setPartialRecursiveSearch(TRUE);
+                $m->addPartialDirectory($basedir, TRUE);
                 
                 $this->assertEquals(file_get_contents($basedir . '/file_render_recursive.txt'), $m->renderFile($basedir.'/file_render_recursive.mustache'));
         }
