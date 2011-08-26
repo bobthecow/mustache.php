@@ -39,6 +39,7 @@ Along with the associated Mustache class:
     
         public $in_ca = true;
     }
+    ?>
 
 
 Render it like so:
