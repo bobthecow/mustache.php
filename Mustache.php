@@ -13,7 +13,7 @@
  * @author Justin Hileman {@link http://justinhileman.com}
  */
 class Mustache {
-        const VERSION = '0.7.1';
+        const VERSION = '0.7.2';
 
         /**
          * Should this Mustache throw exceptions when it finds unexpected tags?
