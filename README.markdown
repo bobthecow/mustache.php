@@ -77,6 +77,22 @@ And render it:
     ?>
 
 
+Files can also be loaded and rendered:
+
+    <?php
+    $m = new Mustache();
+    echo $m->renderFile('/path/to/template.mustache');
+    ?>
+
+Partials can be autoloaded by specifying search paths
+
+   <?php
+   $m = new Mustache();
+   $m->addPartialDirectory('/path/to/partials');
+   $m->addPartialDirectory('/new/path/to/partial');
+   echo $m->renderFile('/path/to/template/with/partial.mustache');
+   ?>
+
 
 
 Known Issues
