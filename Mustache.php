@@ -59,6 +59,7 @@ class Mustache {
         protected $_ctag = '}}';
         protected $_tagRegEx;
         protected $_template = '';
+        protected $_extension = 'mustache';
         protected $_context = array();
         protected $_partials = array();
         protected $_partialDirs = array();
@@ -88,6 +89,9 @@ class Mustache {
          *         'pragmas' => array(
          *             Mustache::PRAGMA_UNESCAPED
          *         ),
+         * 
+         *         // used to change the default extension of 'mustache'
+         *         'extension' => 'foo'
          *     );
          *
          * @access public
@@ -859,7 +863,7 @@ class Mustache {
                 if (is_array($this->_partials) && isset($this->_partials[$tag_name])) {
                         return $this->_partials[$tag_name];
                 } else if (is_array($this->_partialDirs) && !empty($this->_partialDirs)) {
-                        $filename = $tag_name . '.mustache';
+                        $filename = $tag_name . '.' . $this->_extension;
                         foreach ($this->_partialDirs as $partialDir) {
                                 if ($this->_partialRecursive) {
                                         $directory = new RecursiveDirectoryIterator($partialDir);
