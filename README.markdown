@@ -92,6 +92,15 @@ Partials can be autoloaded by specifying search directories
     echo $m->renderFile('/path/to/template/with/partial.mustache', array('foo'=>'bar'));
     ?>
 
+You can even mix methods for loading partials
+
+    <?php
+    $m = new Mustache();
+    $m->addPartialDirectory('/path/to/partials');
+    
+    echo $m->renderFile('/path/to/template/with/partial.mustache', array('foo'=>'bar'), array('partial_one' => 'The answer is {{foo}}!'));
+    ?>
+
 
 
 
