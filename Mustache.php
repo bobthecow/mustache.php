@@ -835,7 +835,7 @@ class Mustache {
                         return '';
                 }
         }
-        
+
         /**
          * Adds a path with partials to the partial search path
          * 
@@ -844,12 +844,11 @@ class Mustache {
         public function addPartialDirectory($directory) {
                 if (is_string($directory) && is_dir($directory)) {
                         $this->_partialDirs[] = $directory;
-                }
-                else {
+                } else {
                         throw new InvalidArgumentException('An existing directory must be added.');
                 }
         }
-        
+
         /**
          * Sets the option to search the partial directories recursively
          * 
@@ -858,8 +857,7 @@ class Mustache {
         public function setPartialRecursiveSearch($recursiveSearch) {
                 if (is_bool($recursiveSearch)) {
                         $this->_partialRecursive = $recursiveSearch;
-                }
-                else {
+                } else {
                         throw new InvalidArgumentException('partialRecursiveSearch must be a boolean');
                 }
         }
@@ -878,11 +876,19 @@ class Mustache {
                 if (is_array($this->_partials) && isset($this->_partials[$tag_name])) {
                         return $this->_partials[$tag_name];
                 } else if (is_array($this->_partialDirs) && !empty($this->_partialDirs)) {
+                        $filename = $tag_name . '.mustache';
                         foreach ($this->_partialDirs as $partialDir) {
                                 if ($this->_partialRecursive) {
-                                        // TODO make recursion work
-                                } else if (is_file($partialDir . '/' . $tag_name . '.mustache')) {
-                                        $this->_partials[$tag_name] = file_get_contents($partialDir . '/' . $tag_name . '.mustache');
+                                        $directory = new RecursiveDirectoryIterator($partialDir);
+                                        $iterator = new RecursiveIteratorIterator($directory);
+                                        $regex = new RegexIterator($iterator, '/'.$filename.'/i', RecursiveRegexIterator::GET_MATCH);
+                                        foreach ($regex as $key => $value) {
+                                                // returns the first partial found
+                                                $this->_partials[$tag_name] = file_get_contents($key);
+                                                return $this->_partials[$tag_name];
+                                        }
+                                } else if (is_file($partialDir . '/' . $filename)) {
+                                        $this->_partials[$tag_name] = file_get_contents($partialDir . '/' . $filename);
                                         return $this->_partials[$tag_name];
                                 }
                         }
