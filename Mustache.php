@@ -218,6 +218,10 @@ class Mustache {
                         $template = $this->_template;
                 } else {
                         $template = file_get_contents($templatePath);
+                        $templateDir = dirname($template);
+                        if (!in_array($templateDir, $this->_partialDirs)) {
+                                $this->_partialDirs[] = $templateDir;
+                        }
                 }
                 if ($partials !== null)
                         $this->_partials = $partials;
@@ -831,6 +835,15 @@ class Mustache {
                         return '';
                 }
         }
+        
+        public function addPartialDirectory($directory) {
+                if (is_dir($directory)) {
+                        $this->_partialDirs[] = $directory;
+                }
+                else {
+                        throw new InvalidArgumentException('An existing directory must be added.');
+                }
+        }
 
         /**
          * Retrieve the partial corresponding to the requested tag name.
@@ -851,6 +864,7 @@ class Mustache {
                                         // TODO make recursion work
                                 } else if (is_file($partialDir . '/' . $tag_name . '.mustache')) {
                                         $this->_partials[$tag_name] = file_get_contents($partialDir . '/' . $tag_name . '.mustache');
+                                        return $this->_partials[$tag_name];
                                 }
                         }
                 }

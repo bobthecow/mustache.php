@@ -27,14 +27,16 @@ class MustacheFileTest extends PHPUnit_Framework_TestCase {
                 
                 try {
                        $m->renderFile(null);
+                       $this->fail('Mustache should throw an exception when trying to render a "null" file');
                 } catch (Exception $exc) {
-                        $this->assertInstanceOf(InvalidArgumentException, $exc);
+                        $this->assertInstanceOf('InvalidArgumentException', $exc);
                 }
                 
                 try {
                        $m->renderFile($basedir.'/bogus/bogus.mustache');
+                       $this->fail('Mustache should throw an exception when trying to render a non-existant file');
                 } catch (Exception $exc) {
-                        $this->assertInstanceOf(InvalidArgumentException, $exc);
+                        $this->assertInstanceOf('InvalidArgumentException', $exc);
                 }
         }
         
@@ -51,8 +53,6 @@ class MustacheFileTest extends PHPUnit_Framework_TestCase {
                 
                 // Mustache sound be able to look in the same directory for the required partials
                 $this->assertEquals(file_get_contents($basedir . '/file_render.txt'), $m->renderFile($basedir.'/file_render.mustache'));
-                
-                // TODO test that Mustache throws an exception when it can't find any partials with that name
         }
         
         /**
