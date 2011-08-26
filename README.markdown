@@ -76,22 +76,22 @@ And render it:
     echo $m->render($template, $chris);
     ?>
 
-
-Files can also be loaded and rendered:
+You can also render a template from a file path
 
     <?php
     $m = new Mustache();
-    echo $m->renderFile('/path/to/template.mustache');
+    echo $m->renderFile('/path/to/template.mustache', array('foo'=>'bar'));
     ?>
 
-Partials can be autoloaded by specifying search paths:
+Partials can be autoloaded by specifying search directories
 
     <?php
     $m = new Mustache();
     $m->addPartialDirectory('/path/to/partials');
     $m->addPartialDirectory('/new/path/to/partial');
-    echo $m->renderFile('/path/to/template/with/partial.mustache');
+    echo $m->renderFile('/path/to/template/with/partial.mustache', array('foo'=>'bar'));
     ?>
+
 
 
 
