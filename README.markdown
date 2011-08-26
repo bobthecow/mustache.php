@@ -84,14 +84,14 @@ Files can also be loaded and rendered:
     echo $m->renderFile('/path/to/template.mustache');
     ?>
 
-Partials can be autoloaded by specifying search paths
+Partials can be autoloaded by specifying search paths:
 
-   <?php
-   $m = new Mustache();
-   $m->addPartialDirectory('/path/to/partials');
-   $m->addPartialDirectory('/new/path/to/partial');
-   echo $m->renderFile('/path/to/template/with/partial.mustache');
-   ?>
+    <?php
+    $m = new Mustache();
+    $m->addPartialDirectory('/path/to/partials');
+    $m->addPartialDirectory('/new/path/to/partial');
+    echo $m->renderFile('/path/to/template/with/partial.mustache');
+    ?>
 
 
 
