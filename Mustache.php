@@ -223,25 +223,8 @@ class Mustache {
                                 $this->_partialDirs[] = $templateDir;
                         }
                 }
-                if ($partials !== null)
-                        $this->_partials = $partials;
-
-                $otag_orig = $this->_otag;
-                $ctag_orig = $this->_ctag;
-
-                if ($view) {
-                        $this->_context = array($view);
-                } else if (empty($this->_context)) {
-                        $this->_context = array($this);
-                }
-
-                $template = $this->_renderPragmas($template);
-                $template = $this->_renderTemplate($template, $this->_context);
-
-                $this->_otag = $otag_orig;
-                $this->_ctag = $ctag_orig;
-
-                return $template;
+                
+                return $this->render($template, $view, $partials);
         }
 
         /**
