@@ -20,8 +20,10 @@ class MustacheFileTest extends PHPUnit_Framework_TestCase {
                 $basedir = dirname(__FILE__) . '/../examples';
 
                 $m = new Mustache();
+                
+                require_once $basedir . '/simple/Simple.php';
 
-                $this->assertEquals(file_get_contents($basedir . '/simple/simple.txt'), $m->renderFile($basedir . '/simple/simple.mustache'));
+                $this->assertEquals(file_get_contents($basedir . '/simple/simple.txt'), $m->renderFile($basedir . '/simple/simple.mustache', new Simple()));
                 
                 try {
                        $m->renderFile(null);
@@ -64,8 +66,24 @@ class MustacheFileTest extends PHPUnit_Framework_TestCase {
                 
                 $m = new Mustache();
                 
-                // Mustache sound be able to look in the same directory for the required partials
-                $this->assertEquals(file_get_contents($basedir . '/file_render_recursive.txt'), $m->renderFile($basedir.'/file_render_recursive.mustache'), TRUE);
+                $this->assertEquals(file_get_contents($basedir . '/file_render_recursive.txt'), $m->renderFile($basedir.'/file_render_recursive.mustache'),array('') , TRUE);
+        }
+        
+        /**
+         * Tests the ability to render partials outside of the template being rendered
+         * 
+         * @access public
+         * @return void
+         */
+        public function testRenderSetPartialDir() {
+                $basedir = dirname(__FILE__) . '/../examples';
+                
+                $m = new Mustache();
+                
+                // Add a directory for mustache to search
+                $m->addPartialDirectory($basedir.'/file_render');
+                
+                $this->assertEquals(file_get_contents($basedir . '/file_render_external/file_render_external.txt'), $m->renderFile($basedir.'/file_render_external/file_render_external.mustache'));
         }
 
 }
