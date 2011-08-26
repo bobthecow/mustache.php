@@ -218,7 +218,7 @@ class Mustache {
                         $template = $this->_template;
                 } else {
                         $template = file_get_contents($templatePath);
-                        $templateDir = dirname($template);
+                        $templateDir = dirname($templatePath);
                         if (!in_array($templateDir, $this->_partialDirs)) {
                                 $this->_partialDirs[] = $templateDir;
                         }
@@ -836,12 +836,31 @@ class Mustache {
                 }
         }
         
+        /**
+         * Adds a path with partials to the partial search path
+         * 
+         * @param string $directory 
+         */
         public function addPartialDirectory($directory) {
-                if (is_dir($directory)) {
+                if (is_string($directory) && is_dir($directory)) {
                         $this->_partialDirs[] = $directory;
                 }
                 else {
                         throw new InvalidArgumentException('An existing directory must be added.');
+                }
+        }
+        
+        /**
+         * Sets the option to search the partial directories recursively
+         * 
+         * @param boolean $recursiveSearch 
+         */
+        public function setPartialRecursiveSearch($recursiveSearch) {
+                if (is_bool($recursiveSearch)) {
+                        $this->_partialRecursive = $recursiveSearch;
+                }
+                else {
+                        throw new InvalidArgumentException('partialRecursiveSearch must be a boolean');
                 }
         }
 
@@ -858,7 +877,7 @@ class Mustache {
         protected function _getPartial($tag_name) {
                 if (is_array($this->_partials) && isset($this->_partials[$tag_name])) {
                         return $this->_partials[$tag_name];
-                } else if (is_array($this->_partialDirs)) {
+                } else if (is_array($this->_partialDirs) && !empty($this->_partialDirs)) {
                         foreach ($this->_partialDirs as $partialDir) {
                                 if ($this->_partialRecursive) {
                                         // TODO make recursion work
