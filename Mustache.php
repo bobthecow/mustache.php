@@ -847,17 +847,13 @@ class Mustache {
 	 *  1. an anonymous function.
 	 *  2. an object and the name of a public function, i.e. `array($SomeObject, 'methodName')`
 	 *  3. a class name and the name of a public static function, i.e. `array('SomeClass', 'methodName')`
-	 *  4. a static function name in the form `'SomeClass::methodName'`
 	 *
 	 * @access protected
 	 * @param mixed $var
 	 * @return bool
 	 */
 	protected function _varIsCallable($var) {
-		if (is_string($var) && (strpos($var, '::') == false)) {
-			return false;
-		}
-		return is_callable($var);
+	  return !is_string($var) && is_callable($var);
 	}
 }
 

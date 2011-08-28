@@ -40,9 +40,6 @@ class MustacheHigherOrderSectionsTest extends PHPUnit_Framework_TestCase {
 	public function testStaticSectionCallback() {
 		$this->foo->trimmer = array(get_class($this->foo), 'staticTrim');
 		$this->assertEquals($this->foo->name, $this->foo->render('{{#trimmer}}    {{name}}    {{/trimmer}}'));
-
-		$this->foo->trimmer = 'Foo::staticTrim';
-		$this->assertEquals($this->foo->lorem, $this->foo->render('{{#trimmer}}    {{lorem}}    {{/trimmer}}'));
 	}
 
 	public function testViewArraySectionCallback() {
