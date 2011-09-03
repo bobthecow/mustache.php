@@ -36,7 +36,7 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	const TEST_CLASS = 'Mustache';
 
 	protected $knownIssues = array(
-		'Delimiters'     => "Known issue: sections don't respect delimiter changes",
+		// Just the whitespace ones...
 	);
 
 	/**
@@ -70,6 +70,54 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 
 		$m4 = new Mustache(null, $data);
 		$this->assertEquals($output, $m4->render($template));
+	}
+
+	/**
+	 * @dataProvider constructorOptions
+	 */
+	public function testConstructorOptions($options, $charset, $delimiters, $pragmas) {
+		$mustache = new MustacheExposedOptionsStub(null, null, null, $options);
+		$this->assertEquals($charset,    $mustache->getCharset());
+		$this->assertEquals($delimiters, $mustache->getDelimiters());
+		$this->assertEquals($pragmas,    $mustache->getPragmas());
+	}
+
+	public function constructorOptions() {
+		return array(
+			array(
+				array(),
+				'UTF-8',
+				array('{{', '}}'),
+				array(),
+			),
+			array(
+				array(
+					'charset'    => 'UTF-8',
+					'delimiters' => '<< >>',
+					'pragmas'    => array(Mustache::PRAGMA_UNESCAPED)
+				),
+				'UTF-8',
+				array('<<', '>>'),
+				array(Mustache::PRAGMA_UNESCAPED),
+			),
+			array(
+				array(
+					'charset'    => 'cp866',
+					'delimiters' => array('[[[[', ']]]]'),
+					'pragmas'    => array(Mustache::PRAGMA_UNESCAPED)
+				),
+				'cp866',
+				array('[[[[', ']]]]'),
+				array(Mustache::PRAGMA_UNESCAPED),
+			),
+		);
+	}
+
+	/**
+	 * @expectedException MustacheException
+	 */
+	public function testConstructorInvalidPragmaOptionsThrowExceptions() {
+		$mustache = new Mustache(null, null, null, array('pragmas' => array('banana phone')));
 	}
 
 	/**
@@ -146,6 +194,30 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$m = new Mustache('{{>stache}}', null, array('stache' => '{{first_name}} {{last_name}}'));
 		$this->assertEquals('Charlie Chaplin', $m->render(null, array('first_name' => 'Charlie', 'last_name' => 'Chaplin')));
 		$this->assertEquals('Zappa, Frank', $m->render('{{last_name}}, {{first_name}}', array('first_name' => 'Frank', 'last_name' => 'Zappa')));
+	}
+	
+	/**
+	 * @group interpolation
+	 * @dataProvider interpolationData
+	 */
+	public function testDoubleRenderMustacheTags($template, $context, $expected) {
+		$m = new Mustache($template, $context);
+		$this->assertEquals($expected, $m->render());
+	}
+
+	public function interpolationData() {
+		return array(
+			array(
+				'{{#a}}{{=<% %>=}}{{b}} c<%={{ }}=%>{{/a}}',
+				array('a' => array(array('b' => 'Do Not Render'))),
+				'{{b}} c'
+			),
+			array(
+				'{{#a}}{{b}}{{/a}}',
+				array('a' => array('b' => '{{c}}'), 'c' => 'FAIL'),
+				'{{c}}'
+			),
+		);
 	}
 
 	/**
@@ -331,6 +403,17 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @group delimiters
+	 */
+	public function testStickyDelimiters() {
+		$m = new Mustache(null, array('result' => 'FAIL'));
+		$this->assertEquals('{{ result }}', $m->render('{{=[[ ]]=}}{{ result }}[[={{ }}=]]'));
+		$this->assertEquals('{{#result}}{{/result}}', $m->render('{{=[[ ]]=}}{{#result}}{{/result}}[[={{ }}=]]'));
+		$this->assertEquals('{{ result }}', $m->render('{{=[[ ]]=}}[[#result]]{{ result }}[[/result]][[={{ }}=]]'));
+		$this->assertEquals('{{ result }}', $m->render('{{#result}}{{=[[ ]]=}}{{ result }}[[/result]][[^result]][[={{ }}=]][[ result ]]{{/result}}'));
+	}
+
+	/**
 	 * @group sections
 	 * @dataProvider poorlyNestedSections
 	 * @expectedException MustacheException
@@ -365,5 +448,17 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 
 		$m = new Mustache($template, $view);
 		$this->assertEquals('{{win}}', $m->render());
+	}
+}
+
+class MustacheExposedOptionsStub extends Mustache {
+	public function getPragmas() {
+		return $this->_pragmas;
+	}
+	public function getCharset() {
+		return $this->_charset;
+	}
+	public function getDelimiters() {
+		return array($this->_otag, $this->_ctag);
 	}
 }
