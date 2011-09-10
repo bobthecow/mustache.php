@@ -14,7 +14,8 @@
  */
 class Mustache {
 
-	const VERSION = '0.7.1';
+	const VERSION      = '0.8.0';
+	const SPEC_VERSION = '1.1.2';
 
 	/**
 	 * Should this Mustache throw exceptions when it finds unexpected tags?
@@ -238,7 +239,10 @@ class Mustache {
 
 				// regular section
 				case '#':
-					if ($this->_varIsIterable($val)) {
+					// higher order sections
+					if ($this->_varIsCallable($val)) {
+						$rendered_content = $this->_renderTemplate(call_user_func($val, $content));
+					} else if ($this->_varIsIterable($val)) {
 						foreach ($val as $local_context) {
 							$this->_pushContext($local_context);
 							$rendered_content .= $this->_renderTemplate($content);
@@ -615,7 +619,8 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _renderEscaped($tag_name, $leading, $trailing) {
-		return $leading . htmlentities($this->_getVariable($tag_name), ENT_COMPAT, $this->_charset) . $trailing;
+		$rendered = htmlentities($this->_renderUnescaped($tag_name, '', ''), ENT_COMPAT, $this->_charset);
+		return $leading . $rendered . $trailing;
 	}
 
 	/**
@@ -647,7 +652,13 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _renderUnescaped($tag_name, $leading, $trailing) {
-		return $leading . $this->_getVariable($tag_name) . $trailing;
+		$val = $this->_getVariable($tag_name);
+
+		if ($this->_varIsCallable($val)) {
+			$val = $this->_renderTemplate(call_user_func($val));
+		}
+
+		return $leading . $val . $trailing;
 	}
 
 	/**
@@ -829,6 +840,23 @@ class Mustache {
 	protected function _varIsIterable($var) {
 		return $var instanceof Traversable || (is_array($var) && !array_diff_key($var, array_keys(array_keys($var))));
 	}
+
+	/**
+	 * Higher order sections helper: tests whether the section $var is a valid callback.
+	 *
+	 * In Mustache.php, a variable is considered 'callable' if the variable is:
+	 *
+	 *  1. an anonymous function.
+	 *  2. an object and the name of a public function, i.e. `array($SomeObject, 'methodName')`
+	 *  3. a class name and the name of a public static function, i.e. `array('SomeClass', 'methodName')`
+	 *
+	 * @access protected
+	 * @param mixed $var
+	 * @return bool
+	 */
+	protected function _varIsCallable($var) {
+	  return !is_string($var) && is_callable($var);
+	}
 }
 
 
@@ -859,4 +887,3 @@ class MustacheException extends Exception {
 	const UNKNOWN_PRAGMA           = 4;
 
 }
-
