@@ -783,7 +783,7 @@ class Mustache {
         if (get_class($view) == "Closure") {
           return $view($tag_name);
         }
-				if (method_exists($view, $tag_name)) {
+				if ( is_callable(array($view, $tag_name)) ) {
 					return $view->$tag_name();
 				} else if (isset($view->$tag_name)) {
 					return $view->$tag_name;
