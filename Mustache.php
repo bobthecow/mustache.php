@@ -654,7 +654,6 @@ class Mustache {
 		$val = $this->_getVariable($tag_name);
 
 		if ($this->_varIsCallable($val)) {
-			$key = is_object($val) ? spl_object_hash($val) : serialize($val);
 			$val = $this->_renderTemplate(call_user_func($val));
 		}
 
