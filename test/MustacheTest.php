@@ -36,7 +36,7 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	const TEST_CLASS = 'Mustache';
 
 	protected $knownIssues = array(
-		'Delimiters'     => "Known issue: sections don't respect delimiter changes",
+		// Just the whitespace ones...
 	);
 
 	/**
@@ -194,6 +194,30 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$m = new Mustache('{{>stache}}', null, array('stache' => '{{first_name}} {{last_name}}'));
 		$this->assertEquals('Charlie Chaplin', $m->render(null, array('first_name' => 'Charlie', 'last_name' => 'Chaplin')));
 		$this->assertEquals('Zappa, Frank', $m->render('{{last_name}}, {{first_name}}', array('first_name' => 'Frank', 'last_name' => 'Zappa')));
+	}
+	
+	/**
+	 * @group interpolation
+	 * @dataProvider interpolationData
+	 */
+	public function testDoubleRenderMustacheTags($template, $context, $expected) {
+		$m = new Mustache($template, $context);
+		$this->assertEquals($expected, $m->render());
+	}
+
+	public function interpolationData() {
+		return array(
+			array(
+				'{{#a}}{{=<% %>=}}{{b}} c<%={{ }}=%>{{/a}}',
+				array('a' => array(array('b' => 'Do Not Render'))),
+				'{{b}} c'
+			),
+			array(
+				'{{#a}}{{b}}{{/a}}',
+				array('a' => array('b' => '{{c}}'), 'c' => 'FAIL'),
+				'{{c}}'
+			),
+		);
 	}
 
 	/**
@@ -376,6 +400,17 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('success', $m->render('{{=[[ ]]=}}[[ result ]]'));
 		$this->assertEquals('success', $m->render('{{=<< >>=}}<< result >>'));
 		$this->assertEquals('success', $m->render('{{=<% %>=}}<% result %>'));
+	}
+
+	/**
+	 * @group delimiters
+	 */
+	public function testStickyDelimiters() {
+		$m = new Mustache(null, array('result' => 'FAIL'));
+		$this->assertEquals('{{ result }}', $m->render('{{=[[ ]]=}}{{ result }}[[={{ }}=]]'));
+		$this->assertEquals('{{#result}}{{/result}}', $m->render('{{=[[ ]]=}}{{#result}}{{/result}}[[={{ }}=]]'));
+		$this->assertEquals('{{ result }}', $m->render('{{=[[ ]]=}}[[#result]]{{ result }}[[/result]][[={{ }}=]]'));
+		$this->assertEquals('{{ result }}', $m->render('{{#result}}{{=[[ ]]=}}{{ result }}[[/result]][[^result]][[={{ }}=]][[ result ]]{{/result}}'));
 	}
 
 	/**

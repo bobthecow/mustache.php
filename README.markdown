@@ -81,15 +81,12 @@ And render it:
 Known Issues
 ------------
 
- * As of v1.1.2, there are a couple of whitespace bugs around section tags.
- * Things get weird when you change delimiters inside a section -- `delimiters` example currently fails with an
-   "unclosed section" exception.
- * The current spec test exposes several whitespace bugs (which are mostly instances of the exact same whitespace
-   bug) ... Despite these failing tests, this version is actually *closer* to correct than previous releases.
+ * As of Mustache spec v1.1.2, there are a couple of whitespace bugs around section tags... Despite these failing tests, this
+   version is actually *closer* to correct than previous releases.
 
 
 See Also
 --------
 
  * [Readme for the Ruby Mustache implementation](http://github.com/defunkt/mustache/blob/master/README.md).
- * [mustache(1)](http://defunkt.github.com/mustache/mustache.1.html) and [mustache(5)](http://defunkt.github.com/mustache/mustache.5.html) man pages.
+ * [mustache(1)](http://mustache.github.com/mustache.1.html) and [mustache(5)](http://mustache.github.com/mustache.5.html) man pages.

@@ -14,6 +14,9 @@
  */
 class Mustache {
 
+	const VERSION      = '0.7.1';
+	const SPEC_VERSION = '1.1.2';
+
 	/**
 	 * Should this Mustache throw exceptions when it finds unexpected tags?
 	 *
@@ -176,6 +179,9 @@ class Mustache {
 		if ($template === null) $template = $this->_template;
 		if ($partials !== null) $this->_partials = $partials;
 
+		$otag_orig = $this->_otag;
+		$ctag_orig = $this->_ctag;
+
 		if ($view) {
 			$this->_context = array($view);
 		} else if (empty($this->_context)) {
@@ -183,7 +189,12 @@ class Mustache {
 		}
 
 		$template = $this->_renderPragmas($template);
-		return $this->_renderTemplate($template, $this->_context);
+		$template = $this->_renderTemplate($template, $this->_context);
+
+		$this->_otag = $otag_orig;
+		$this->_ctag = $ctag_orig;
+
+		return $template;
 	}
 
 	/**
@@ -211,28 +222,18 @@ class Mustache {
 	 * @return string Rendered Mustache template.
 	 */
 	protected function _renderTemplate($template) {
-		$template = $this->_renderSections($template);
-		return $this->_renderTags($template);
-	}
+		if ($section = $this->_findSection($template)) {
+			list($before, $type, $tag_name, $content, $after) = $section;
 
-	/**
-	 * Render boolean, enumerable and inverted sections.
-	 *
-	 * @access protected
-	 * @param string $template
-	 * @return string
-	 */
-	protected function _renderSections($template) {
-		while ($section_data = $this->_findSection($template)) {
-			list($section, $offset, $type, $tag_name, $content) = $section_data;
+			$rendered_before = $this->_renderTags($before);
 
-			$replace = '';
+			$rendered_content = '';
 			$val = $this->_getVariable($tag_name);
 			switch($type) {
 				// inverted section
 				case '^':
 					if (empty($val)) {
-						$replace .= $content;
+						$rendered_content = $this->_renderTemplate($content);
 					}
 					break;
 
@@ -240,30 +241,29 @@ class Mustache {
 				case '#':
 					// higher order sections
 					if ($this->_varIsCallable($val)) {
-						$content = call_user_func($val, $content);
-						$replace .= $this->_renderTemplate($content);
+						$rendered_content = $this->_renderTemplate(call_user_func($val, $content));
 					} else if ($this->_varIsIterable($val)) {
 						foreach ($val as $local_context) {
 							$this->_pushContext($local_context);
-							$replace .= $this->_renderTemplate($content);
+							$rendered_content .= $this->_renderTemplate($content);
 							$this->_popContext();
 						}
 					} else if ($val) {
 						if (is_array($val) || is_object($val)) {
 							$this->_pushContext($val);
-							$replace .= $this->_renderTemplate($content);
+							$rendered_content = $this->_renderTemplate($content);
 							$this->_popContext();
 						} else {
-							$replace .= $content;
+							$rendered_content = $this->_renderTemplate($content);
 						}
 					}
 					break;
 			}
 
-			$template = substr_replace($template, $replace, $offset, strlen($section));
+			return $rendered_before . $rendered_content . $this->_renderTemplate($after);
 		}
 
-		return $template;
+		return $this->_renderTags($template);
 	}
 
 	/**
@@ -276,7 +276,7 @@ class Mustache {
 	 */
 	protected function _prepareSectionRegEx($otag, $ctag) {
 		return sprintf(
-			'/(?:(?<=\\n)[ \\t]*)?%s(?P<type>[%s])(?P<tag_name>.+?)%s\\n?/s',
+			'/(?:(?<=\\n)[ \\t]*)?%s(?:(?P<type>[%s])(?P<tag_name>.+?)|=(?P<delims>.*?)=)%s\\n?/s',
 			preg_quote($otag, '/'),
 			self::SECTION_TYPES,
 			preg_quote($ctag, '/')
@@ -284,13 +284,11 @@ class Mustache {
 	}
 
 	/**
-	 * Extract a section from $template.
-	 *
-	 * This is a helper function to find sections needed by _renderSections.
+	 * Extract the first section from $template.
 	 *
 	 * @access protected
 	 * @param string $template
-	 * @return array $section, $offset, $type, $tag_name and $content
+	 * @return array $before, $type, $tag_name, $content and $after
 	 */
 	protected function _findSection($template) {
 		$regEx = $this->_prepareSectionRegEx($this->_otag, $this->_ctag);
@@ -304,6 +302,12 @@ class Mustache {
 		$section_stack = array();
 		$matches = array();
 		while (preg_match($regEx, $template, $matches, PREG_OFFSET_CAPTURE, $search_offset)) {
+			if (isset($matches['delims'][0])) {
+				list($otag, $ctag) = explode(' ', $matches['delims'][0]);
+				$regEx = $this->_prepareSectionRegEx($otag, $ctag);
+				$search_offset = $matches[0][1] + strlen($matches[0][0]);
+				continue;
+			}
 
 			$match    = $matches[0][0];
 			$offset   = $matches[0][1];
@@ -330,10 +334,14 @@ class Mustache {
 					}
 
 					if (empty($section_stack)) {
-						$section = substr($template, $section_start, $search_offset - $section_start);
-						$content = substr($template, $content_start, $offset - $content_start);
-
-						return array($section, $section_start, $section_type, $tag_name, $content);
+						// $before, $type, $tag_name, $content, $after
+						return array(
+							substr($template, 0, $section_start),
+							$section_type,
+							$tag_name,
+							substr($template, $content_start, $offset - $content_start),
+							substr($template, $search_offset),
+						);
 					}
 					break;
 			}
@@ -489,9 +497,6 @@ class Mustache {
 			return $template;
 		}
 
-		$otag_orig = $this->_otag;
-		$ctag_orig = $this->_ctag;
-
 		$first = true;
 		$this->_tagRegEx = $this->_prepareTagRegEx($this->_otag, $this->_ctag, true);
 
@@ -530,9 +535,6 @@ class Mustache {
 				$this->_tagRegEx = $this->_prepareTagRegEx($this->_otag, $this->_ctag);
 			}
 		}
-
-		$this->_otag = $otag_orig;
-		$this->_ctag = $ctag_orig;
 
 		return $html . $template;
 	}
@@ -578,7 +580,7 @@ class Mustache {
 			case '#':
 			case '^':
 			case '/':
-				// remove any leftovers from _renderSections
+				// remove any leftover section tags
 				return $leading . $trailing;
 				break;
 			default:
