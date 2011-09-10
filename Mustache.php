@@ -14,7 +14,7 @@
  */
 class Mustache {
 
-	const VERSION      = '0.7.1';
+	const VERSION      = '0.8.0';
 	const SPEC_VERSION = '1.1.2';
 
 	/**
