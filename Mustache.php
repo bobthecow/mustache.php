@@ -57,7 +57,7 @@ class Mustache {
 	 * Constants used for section and tag RegEx
 	 */
 	const SECTION_TYPES = '\^#\/';
-	const TAG_TYPES = '#\^\/=!<>\\{&';
+	const TAG_TYPES = '#\^\/=!<>\\{&|';
 
 	protected $_otag = '{{';
 	protected $_ctag = '}}';
@@ -561,6 +561,9 @@ class Mustache {
 			case '!':
 				return $this->_renderComment($tag_name, $leading, $trailing);
 				break;
+			case '|':
+				return $this->_renderJson($tag_name, $leading, $trailing);
+				break;
 			case '>':
 			case '<':
 				return $this->_renderPartial($tag_name, $leading, $trailing);
@@ -640,6 +643,24 @@ class Mustache {
 			return $this->_stringHasR($leading, $trailing) ? "\r\n" : "\n";
 		}
 		return $leading . $trailing;
+	}
+	
+	/**
+	 * Return the requested tag as JSON.
+	 *
+	 * @access protected
+	 * @param string $tag_name
+	 * @param string $leading Whitespace
+	 * @param string $trailing Whitespace
+	 * @return string
+	 */
+	protected function _renderJson($tag_name, $leading, $trailing) {
+		$v = $this->_getVariable($tag_name);
+		$v = $v && !$v instanceof Closure ? $v : array();
+		$v = is_array($v) || is_object($v) ? $v : array($v);
+		$v = json_encode($v);
+		$v = strlen($v) > 0 ? $v : json_encode(array());
+		return $leading . $v . $trailing;
 	}
 
 	/**
