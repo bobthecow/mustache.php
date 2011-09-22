@@ -819,7 +819,10 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _getPartial($tag_name) {
-		if (is_array($this->_partials) && isset($this->_partials[$tag_name])) {
+		if (
+			(is_array($this->_partials) || $this->_partials instanceof ArrayAccess)
+			&& isset($this->_partials[$tag_name])
+		) {
 			return $this->_partials[$tag_name];
 		}
 
