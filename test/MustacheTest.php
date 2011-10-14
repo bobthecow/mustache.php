@@ -94,21 +94,21 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 				array(
 					'charset'    => 'UTF-8',
 					'delimiters' => '<< >>',
-					'pragmas'    => array(Mustache::PRAGMA_UNESCAPED)
+					'pragmas'    => array(Mustache::PRAGMA_UNESCAPED => true)
 				),
 				'UTF-8',
 				array('<<', '>>'),
-				array(Mustache::PRAGMA_UNESCAPED),
+				array(Mustache::PRAGMA_UNESCAPED => true),
 			),
 			array(
 				array(
 					'charset'    => 'cp866',
 					'delimiters' => array('[[[[', ']]]]'),
-					'pragmas'    => array(Mustache::PRAGMA_UNESCAPED)
+					'pragmas'    => array(Mustache::PRAGMA_UNESCAPED => true)
 				),
 				'cp866',
 				array('[[[[', ']]]]'),
-				array(Mustache::PRAGMA_UNESCAPED),
+				array(Mustache::PRAGMA_UNESCAPED => true),
 			),
 		);
 	}
@@ -117,7 +117,7 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	 * @expectedException MustacheException
 	 */
 	public function testConstructorInvalidPragmaOptionsThrowExceptions() {
-		$mustache = new Mustache(null, null, null, array('pragmas' => array('banana phone')));
+		$mustache = new Mustache(null, null, null, array('pragmas' => array('banana phone' => true)));
 	}
 
 	/**
@@ -195,7 +195,7 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Charlie Chaplin', $m->render(null, array('first_name' => 'Charlie', 'last_name' => 'Chaplin')));
 		$this->assertEquals('Zappa, Frank', $m->render('{{last_name}}, {{first_name}}', array('first_name' => 'Frank', 'last_name' => 'Zappa')));
 	}
-	
+
 	/**
 	 * @group interpolation
 	 * @dataProvider interpolationData

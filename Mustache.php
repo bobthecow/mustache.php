@@ -14,7 +14,7 @@
  */
 class Mustache {
 
-	const VERSION      = '0.8.0';
+	const VERSION      = '0.8.1';
 	const SPEC_VERSION = '1.1.2';
 
 	/**
@@ -90,9 +90,9 @@ class Mustache {
 	 *         // opening and closing delimiters, as an array or a space-separated string
 	 *         'delimiters' => '<% %>',
 	 *
-	 *         // an array of pragmas to enable
+	 *         // an array of pragmas to enable/disable
 	 *         'pragmas' => array(
-	 *             Mustache::PRAGMA_UNESCAPED
+	 *             Mustache::PRAGMA_UNESCAPED => true
 	 *         ),
 	 *     );
 	 *
@@ -132,8 +132,8 @@ class Mustache {
 		}
 
 		if (isset($options['pragmas'])) {
-			foreach ($options['pragmas'] as $pragma_name) {
-				if (!in_array($pragma_name, $this->_pragmasImplemented)) {
+			foreach ($options['pragmas'] as $pragma_name => $pragma_value) {
+				if (!in_array($pragma_name, $this->_pragmasImplemented, true)) {
 					throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
 				}
 			}
