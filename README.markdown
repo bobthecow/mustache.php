@@ -39,6 +39,7 @@ Along with the associated Mustache class:
     
         public $in_ca = true;
     }
+    ?>
 
 
 Render it like so:
@@ -73,6 +74,31 @@ And render it:
     $chris = new Chris;
     $m = new Mustache;
     echo $m->render($template, $chris);
+    ?>
+
+You can also render a template from a file path
+
+    <?php
+    $m = new Mustache();
+    echo $m->renderFile('/path/to/template.mustache', array('foo'=>'bar'));
+    ?>
+
+Partials can be autoloaded by specifying search directories
+
+    <?php
+    $m = new Mustache();
+    $m->addPartialDirectory('/path/to/partials');
+    $m->addPartialDirectory('/new/path/to/partial');
+    echo $m->renderFile('/path/to/template/with/partial.mustache', array('foo'=>'bar'));
+    ?>
+
+You can even mix methods for loading partials
+
+    <?php
+    $m = new Mustache();
+    $m->addPartialDirectory('/path/to/partials');
+    
+    echo $m->renderFile('/path/to/template/with/partial.mustache', array('foo'=>'bar'), array('partial_one' => 'The answer is {{foo}}!'));
     ?>
 
 

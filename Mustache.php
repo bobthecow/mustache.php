@@ -23,13 +23,12 @@ class Mustache {
 	 * @see self::_throwsException()
 	 */
 	protected $_throwsExceptions = array(
-		MustacheException::UNKNOWN_VARIABLE         => false,
-		MustacheException::UNCLOSED_SECTION         => true,
+		MustacheException::UNKNOWN_VARIABLE => false,
+		MustacheException::UNCLOSED_SECTION => true,
 		MustacheException::UNEXPECTED_CLOSE_SECTION => true,
-		MustacheException::UNKNOWN_PARTIAL          => false,
-		MustacheException::UNKNOWN_PRAGMA           => true,
+		MustacheException::UNKNOWN_PARTIAL => false,
+		MustacheException::UNKNOWN_PRAGMA => true,
 	);
-
 	// Override charset passed to htmlentities() and htmlspecialchars(). Defaults to UTF-8.
 	protected $_charset = 'UTF-8';
 
@@ -40,7 +39,6 @@ class Mustache {
 	 * They should be considered extremely experimental. Most likely their implementation
 	 * will change in the future.
 	 */
-
 	/**
 	 * The {{%UNESCAPED}} pragma swaps the meaning of the {{normal}} and {{{unescaped}}}
 	 * Mustache tags. That is, once this pragma is activated the {{normal}} tag will not be
@@ -51,7 +49,7 @@ class Mustache {
 	 *
 	 * This may be useful in non-HTML Mustache situations.
 	 */
-	const PRAGMA_UNESCAPED    = 'UNESCAPED';
+	const PRAGMA_UNESCAPED = 'UNESCAPED';
 
 	/**
 	 * Constants used for section and tag RegEx
@@ -61,18 +59,16 @@ class Mustache {
 
 	protected $_otag = '{{';
 	protected $_ctag = '}}';
-
 	protected $_tagRegEx;
-
 	protected $_template = '';
-	protected $_context  = array();
+	protected $_extension = 'mustache';
+	protected $_context = array();
 	protected $_partials = array();
-	protected $_pragmas  = array();
-
+	protected $_partialDirs = array();
+	protected $_pragmas = array();
 	protected $_pragmasImplemented = array(
 		self::PRAGMA_UNESCAPED
 	);
-
 	protected $_localPragmas = array();
 
 	/**
@@ -94,6 +90,9 @@ class Mustache {
 	 *         'pragmas' => array(
 	 *             Mustache::PRAGMA_UNESCAPED => true
 	 *         ),
+	 * 
+	 *         // used to change the default extension of 'mustache'
+	 *         'extension' => 'foo'
 	 *     );
 	 *
 	 * @access public
@@ -104,10 +103,14 @@ class Mustache {
 	 * @return void
 	 */
 	public function __construct($template = null, $view = null, $partials = null, array $options = null) {
-		if ($template !== null) $this->_template = $template;
-		if ($partials !== null) $this->_partials = $partials;
-		if ($view !== null)     $this->_context = array($view);
-		if ($options !== null)  $this->_setOptions($options);
+		if ($template !== null)
+			$this->_template = $template;
+		if ($partials !== null)
+			$this->_partials = $partials;
+		if ($view !== null)
+			$this->_context = array($view);
+		if ($options !== null)
+			$this->_setOptions($options);
 	}
 
 	/**
@@ -139,6 +142,10 @@ class Mustache {
 			}
 			$this->_pragmas = $options['pragmas'];
 		}
+
+		if (isset($options['extension'])) {
+			$this->_extension = $options['extension'];
+		}
 	}
 
 	/**
@@ -158,7 +165,7 @@ class Mustache {
 		if ($keys = array_keys($this->_context)) {
 			$last = array_pop($keys);
 			if ($this->_context[$last] instanceof Mustache) {
-				$this->_context[$last] =& $this;
+				$this->_context[$last] = & $this;
 			}
 		}
 	}
@@ -176,8 +183,10 @@ class Mustache {
 	 * @return string Rendered Mustache template.
 	 */
 	public function render($template = null, $view = null, $partials = null) {
-		if ($template === null) $template = $this->_template;
-		if ($partials !== null) $this->_partials = $partials;
+		if ($template === null)
+			$template = $this->_template;
+		if ($partials !== null)
+			$this->_partials = $partials;
 
 		$otag_orig = $this->_otag;
 		$ctag_orig = $this->_ctag;
@@ -195,6 +204,33 @@ class Mustache {
 		$this->_ctag = $ctag_orig;
 
 		return $template;
+	}
+
+	/**
+	 * Render the given template from a file
+	 *
+	 * Defaults to the template and view passed to the class constructor unless a new one is provided.
+	 * Optionally, pass an associative array of partials as well.
+	 *
+	 * @access public
+	 * @param string $templatePath (default: null)
+	 * @param mixed $view (default: null)
+	 * @param array $partials (default: null)
+	 * @return string Rendered Mustache template.
+	 */
+	public function renderFile($templatePath = null, $view = null, $partials = null) {
+		if (!is_file($templatePath)) {
+			throw new InvalidArgumentException('Could not find mustache file at ' . $templatePath);
+		}
+
+		if ($templatePath === null) {
+			$template = $this->_template;
+		} else {
+			$template = file_get_contents($templatePath);
+			$this->addPartialDirectory(dirname($templatePath));
+		}
+
+		return $this->render($template, $view, $partials);
 	}
 
 	/**
@@ -229,7 +265,7 @@ class Mustache {
 
 			$rendered_content = '';
 			$val = $this->_getVariable($tag_name);
-			switch($type) {
+			switch ($type) {
 				// inverted section
 				case '^':
 					if (empty($val)) {
@@ -276,10 +312,7 @@ class Mustache {
 	 */
 	protected function _prepareSectionRegEx($otag, $ctag) {
 		return sprintf(
-			'/(?:(?<=\\n)[ \\t]*)?%s(?:(?P<type>[%s])(?P<tag_name>.+?)|=(?P<delims>.*?)=)%s\\n?/s',
-			preg_quote($otag, '/'),
-			self::SECTION_TYPES,
-			preg_quote($ctag, '/')
+						'/(?:(?<=\\n)[ \\t]*)?%s(?:(?P<type>[%s])(?P<tag_name>.+?)|=(?P<delims>.*?)=)%s\\n?/s', preg_quote($otag, '/'), self::SECTION_TYPES, preg_quote($ctag, '/')
 		);
 	}
 
@@ -294,7 +327,7 @@ class Mustache {
 		$regEx = $this->_prepareSectionRegEx($this->_otag, $this->_ctag);
 
 		$section_start = null;
-		$section_type  = null;
+		$section_type = null;
 		$content_start = null;
 
 		$search_offset = 0;
@@ -309,9 +342,9 @@ class Mustache {
 				continue;
 			}
 
-			$match    = $matches[0][0];
-			$offset   = $matches[0][1];
-			$type     = $matches['type'][0];
+			$match = $matches[0][0];
+			$offset = $matches[0][1];
+			$type = $matches['type'][0];
 			$tag_name = trim($matches['tag_name'][0]);
 
 			$search_offset = $offset + strlen($match);
@@ -321,7 +354,7 @@ class Mustache {
 				case '#':
 					if (empty($section_stack)) {
 						$section_start = $offset;
-						$section_type  = $type;
+						$section_type = $type;
 						$content_start = $search_offset;
 					}
 					array_push($section_stack, $tag_name);
@@ -364,9 +397,7 @@ class Mustache {
 	 */
 	protected function _preparePragmaRegEx($otag, $ctag) {
 		return sprintf(
-			'/%s%%\\s*(?P<pragma_name>[\\w_-]+)(?P<options_string>(?: [\\w]+=[\\w]+)*)\\s*%s\\n?/s',
-			preg_quote($otag, '/'),
-			preg_quote($ctag, '/')
+						'/%s%%\\s*(?P<pragma_name>[\\w_-]+)(?P<options_string>(?: [\\w]+=[\\w]+)*)\\s*%s\\n?/s', preg_quote($otag, '/'), preg_quote($ctag, '/')
 		);
 	}
 
@@ -398,8 +429,8 @@ class Mustache {
 	 * @throws MustacheException unknown pragma
 	 */
 	protected function _renderPragma($matches) {
-		$pragma         = $matches[0];
-		$pragma_name    = $matches['pragma_name'];
+		$pragma = $matches[0];
+		$pragma_name = $matches['pragma_name'];
 		$options_string = $matches['options_string'];
 
 		if (!in_array($pragma_name, $this->_pragmasImplemented)) {
@@ -477,11 +508,7 @@ class Mustache {
 	 */
 	protected function _prepareTagRegEx($otag, $ctag, $first = false) {
 		return sprintf(
-			'/(?P<leading>(?:%s\\r?\\n)[ \\t]*)?%s(?P<type>[%s]?)(?P<tag_name>.+?)(?:\\2|})?%s(?P<trailing>\\s*(?:\\r?\\n|\\Z))?/s',
-			($first ? '\\A|' : ''),
-			preg_quote($otag, '/'),
-			self::TAG_TYPES,
-			preg_quote($ctag, '/')
+						'/(?P<leading>(?:%s\\r?\\n)[ \\t]*)?%s(?P<type>[%s]?)(?P<tag_name>.+?)(?:\\2|})?%s(?P<trailing>\\s*(?:\\r?\\n|\\Z))?/s', ($first ? '\\A|' : ''), preg_quote($otag, '/'), self::TAG_TYPES, preg_quote($ctag, '/')
 		);
 	}
 
@@ -503,8 +530,8 @@ class Mustache {
 		$html = '';
 		$matches = array();
 		while (preg_match($this->_tagRegEx, $template, $matches, PREG_OFFSET_CAPTURE)) {
-			$tag      = $matches[0][0];
-			$offset   = $matches[0][1];
+			$tag = $matches[0][0];
+			$offset = $matches[0][1];
 			$modifier = $matches['type'][0];
 			$tag_name = trim($matches['tag_name'][0]);
 
@@ -721,9 +748,9 @@ class Mustache {
 	 */
 	protected function _pushContext(&$local_context) {
 		$new = array();
-		$new[] =& $local_context;
+		$new[] = & $local_context;
 		foreach (array_keys($this->_context) as $key) {
-			$new[] =& $this->_context[$key];
+			$new[] = & $this->_context[$key];
 		}
 		$this->_context = $new;
 	}
@@ -740,7 +767,7 @@ class Mustache {
 		$keys = array_keys($this->_context);
 		array_shift($keys);
 		foreach ($keys as $key) {
-			$new[] =& $this->_context[$key];
+			$new[] = & $this->_context[$key];
 		}
 		$this->_context = $new;
 	}
@@ -809,6 +836,23 @@ class Mustache {
 	}
 
 	/**
+	 * Adds a path with partials to the partial search path
+	 * The recursive parameter enables searching of subdirectories
+	 * 
+	 * @param string $directory 
+	 * @param boolean $recursive (default: false)
+	 */
+	public function addPartialDirectory($directory, $recursive = FALSE) {
+		if (is_string($directory) && is_dir($directory)) {
+			if (!array_key_exists($directory, $this->_partialDirs)) {
+				$this->_partialDirs[$directory] = array('recursive' => $recursive);
+			}
+		} else {
+			throw new InvalidArgumentException('An existing directory must be added.');
+		}
+	}
+
+	/**
 	 * Retrieve the partial corresponding to the requested tag name.
 	 *
 	 * Silently fails (i.e. returns '') when the requested partial is not found.
@@ -821,6 +865,23 @@ class Mustache {
 	protected function _getPartial($tag_name) {
 		if (is_array($this->_partials) && isset($this->_partials[$tag_name])) {
 			return $this->_partials[$tag_name];
+		} else if (is_array($this->_partialDirs) && !empty($this->_partialDirs)) {
+			$filename = $tag_name . '.' . $this->_extension;
+			foreach ($this->_partialDirs as $partialDir => $options) {
+				if ($options['recursive'] === TRUE) {
+					$directory = new RecursiveDirectoryIterator($partialDir);
+					$iterator = new RecursiveIteratorIterator($directory);
+					$regex = new RegexIterator($iterator, '/' . $filename . '/i', RecursiveRegexIterator::GET_MATCH);
+					foreach ($regex as $key => $value) {
+						// returns the first partial found
+						$this->_partials[$tag_name] = file_get_contents($key);
+						return $this->_partials[$tag_name];
+					}
+				} else if (is_file($partialDir . '/' . $filename)) {
+					$this->_partials[$tag_name] = file_get_contents($partialDir . '/' . $filename);
+					return $this->_partials[$tag_name];
+				}
+			}
 		}
 
 		if ($this->_throwsException(MustacheException::UNKNOWN_PARTIAL)) {
@@ -859,6 +920,7 @@ class Mustache {
 	}
 }
 
+}
 
 /**
  * MustacheException class.
@@ -866,13 +928,12 @@ class Mustache {
  * @extends Exception
  */
 class MustacheException extends Exception {
-
 	// An UNKNOWN_VARIABLE exception is thrown when a {{variable}} is not found
 	// in the current context.
-	const UNKNOWN_VARIABLE         = 0;
+	const UNKNOWN_VARIABLE = 0;
 
 	// An UNCLOSED_SECTION exception is thrown when a {{#section}} is not closed.
-	const UNCLOSED_SECTION         = 1;
+	const UNCLOSED_SECTION = 1;
 
 	// An UNEXPECTED_CLOSE_SECTION exception is thrown when {{/section}} appears
 	// without a corresponding {{#section}} or {{^section}}.
@@ -880,10 +941,9 @@ class MustacheException extends Exception {
 
 	// An UNKNOWN_PARTIAL exception is thrown whenever a {{>partial}} tag appears
 	// with no associated partial.
-	const UNKNOWN_PARTIAL          = 3;
+	const UNKNOWN_PARTIAL = 3;
 
 	// An UNKNOWN_PRAGMA exception is thrown whenever a {{%PRAGMA}} tag appears
 	// which can't be handled by this Mustache instance.
-	const UNKNOWN_PRAGMA           = 4;
-
+	const UNKNOWN_PRAGMA = 4;
 }
