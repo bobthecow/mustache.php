@@ -133,7 +133,7 @@ class Mustache {
 
 		if (isset($options['pragmas'])) {
 			foreach ($options['pragmas'] as $pragma_name => $pragma_value) {
-				if (!in_array($pragma_name, $this->_pragmasImplemented)) {
+				if (!in_array($pragma_name, $this->_pragmasImplemented, true)) {
 					throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
 				}
 			}
