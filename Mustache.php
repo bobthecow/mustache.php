@@ -90,9 +90,9 @@ class Mustache {
 	 *         // opening and closing delimiters, as an array or a space-separated string
 	 *         'delimiters' => '<% %>',
 	 *
-	 *         // an array of pragmas to enable
+	 *         // an array of pragmas to enable/disable
 	 *         'pragmas' => array(
-	 *             Mustache::PRAGMA_UNESCAPED
+	 *             Mustache::PRAGMA_UNESCAPED => true
 	 *         ),
 	 *     );
 	 *
@@ -132,7 +132,7 @@ class Mustache {
 		}
 
 		if (isset($options['pragmas'])) {
-			foreach ($options['pragmas'] as $pragma_name) {
+			foreach ($options['pragmas'] as $pragma_name => $pragma_value) {
 				if (!in_array($pragma_name, $this->_pragmasImplemented)) {
 					throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
 				}
