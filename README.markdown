@@ -44,7 +44,7 @@ Along with the associated Mustache class:
 Render it like so:
 
     <?php
-    $c = new Chris;
+    $chris = new Chris;
     echo $chris->render($template);
     ?>
 
