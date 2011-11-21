@@ -64,6 +64,10 @@ class Mustache {
 
 	protected $_tagRegEx;
 
+	protected $_yaml_namespace = '';
+	protected $_yaml_parser = 'yaml_parse';
+	protected $_yaml_iterations = array();
+
 	protected $_template = '';
 	protected $_context  = array();
 	protected $_partials = array();
@@ -139,6 +143,14 @@ class Mustache {
 			}
 			$this->_pragmas = $options['pragmas'];
 		}
+
+		if (isset($options['yaml_namespace'])) {
+			$this->_yaml_namespace = $options['yaml_namespace'];
+		}
+
+		if (isset($options['yaml_parser'])) {
+			$this->_yaml_parser = $options['yaml_parser'];
+		}
 	}
 
 	/**
@@ -182,14 +194,16 @@ class Mustache {
 		$otag_orig = $this->_otag;
 		$ctag_orig = $this->_ctag;
 
+		$template = $this->_parseFrontmatter($template);
+
 		if ($view) {
-			$this->_context = array($view);
+			$this->_context = empty($this->_context) ? array($view) : array($view) + $this->_context;
 		} else if (empty($this->_context)) {
 			$this->_context = array($this);
 		}
 
 		$template = $this->_renderPragmas($template);
-		$template = $this->_renderTemplate($template, $this->_context);
+		$template = $this->_renderTemplate($template);
 
 		$this->_otag = $otag_orig;
 		$this->_ctag = $ctag_orig;
@@ -212,6 +226,41 @@ class Mustache {
 		} catch (Exception $e) {
 			return "Error rendering mustache: " . $e->getMessage();
 		}
+	}
+
+	/**
+	 * Internal parse frontmatter function
+	 *
+	 * @access protected
+	 * @param string $template
+	 * @return string Mustache template, minus frontmatter block
+	 */
+	protected function _parseFrontmatter($template) {
+		$yaml_parser = $this->_yaml_parser;
+
+		if (is_callable($yaml_parser) && preg_match("/(-{3}[^-]+)+-{3}\r?\n/", $template, $match)) {
+			preg_match_all("/-{3}\r?\n([^-]+)+\r?\n/", $match[0], $iterations);
+
+			$iteration_count = count($iterations[1]);
+
+			for ($i = 0; $i < $iteration_count; $i++) {
+				$view = call_user_func($yaml_parser, $iterations[1][$i]);
+
+				if (strlen($this->_yaml_namespace)) {
+					$view = array($this->_yaml_namespace => $view);
+				}
+
+				$this->_yaml_iterations[] = $view;
+			}
+
+			$view = array_shift($this->_yaml_iterations);
+
+			$this->_context = empty($this->_context) ? array($view) : $this->_context + array($view);
+
+			$template = substr($template, strlen($match[0]));
+		}
+
+		return $template;
 	}
 
 	/**
@@ -260,10 +309,18 @@ class Mustache {
 					break;
 			}
 
-			return $rendered_before . $rendered_content . $this->_renderTemplate($after);
+			$rendered = $rendered_before . $rendered_content . $this->_renderTemplate($after);
+		} else {
+			$rendered = $this->_renderTags($template);
 		}
 
-		return $this->_renderTags($template);
+		while ( count($this->_yaml_iterations) ) {
+			$this->_context = array(array_shift($this->_yaml_iterations)) + $this->_context;
+
+			$rendered .= "\n" . $this->_renderTemplate($template);
+		}
+
+		return $rendered;
 	}
 
 	/**
