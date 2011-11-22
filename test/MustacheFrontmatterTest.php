@@ -5,6 +5,17 @@ require_once './lib/yaml/lib/sfYamlParser.php';
 
 class MustacheFrontmatterTest extends PHPUnit_Framework_TestCase {
 
+	protected $_yaml;
+	protected $_yamlMustache;
+	
+	public function setUp() {
+		$this->_yaml = new sfYamlParser();
+
+		$this->_yamlMustache = new Mustache(null, null, null, array(
+			'yaml_parser' => array($this->_yaml, 'parse')
+		));
+	}
+
 	public function testFrontmatter() {
 		$template = <<<MUSTACHE_IN
 ---
@@ -13,14 +24,7 @@ name: chris
   Hi {{name}}!
 MUSTACHE_IN;
 
-		if (!function_exists('yaml_parse')) {
-			$this->markTestSkipped('Unable to test Mustache frontmatter without yaml_parse()');
-			return;
-		}
-
-		$mustache = new Mustache;
-
-		$this->assertEquals("  Hi chris!", $mustache->render($template));
+		$this->assertEquals("  Hi chris!", $this->_yamlMustache->render($template));
 	}
 
 	public function testNoFrontmatter() {
@@ -43,14 +47,7 @@ MUSTACHE_IN;
 
 		$data = array('name' => 'mark');
 
-		if (!function_exists('yaml_parse')) {
-			$this->markTestSkipped('Unable to test Mustache frontmatter without yaml_parse()');
-			return;
-		}
-
-		$mustache = new Mustache;
-
-		$this->assertEquals("  Hi mark!", $mustache->render($template, $data));
+		$this->assertEquals("  Hi mark!", $this->_yamlMustache->render($template, $data));
 	}
 
 	public function testFrontmatterDepthAndSections() {
@@ -70,14 +67,7 @@ MUSTACHE_IN;
 
 MUSTACHE_OUT;
 
-		if (!function_exists('yaml_parse')) {
-			$this->markTestSkipped('Unable to test Mustache frontmatter without yaml_parse()');
-			return;
-		}
-
-		$mustache = new Mustache;
-
-		$this->assertEquals($output, $mustache->render($template));
+		$this->assertEquals($output, $this->_yamlMustache->render($template));
 	}
 
 	public function testFrontmatterRepeat() {
@@ -101,14 +91,7 @@ MUSTACHE_IN;
   Whatever Scott!
 MUSTACHE_OUT;
 
-		if (!function_exists('yaml_parse')) {
-			$this->markTestSkipped('Unable to test Mustache frontmatter without yaml_parse()');
-			return;
-		}
-
-		$mustache = new Mustache;
-
-		$this->assertEquals($output, $mustache->render($template));
+		$this->assertEquals($output, $this->_yamlMustache->render($template));
 	}
 
 	public function testFrontmatterYamlNamespace() {
@@ -119,12 +102,10 @@ title: Hello World
 <h1>{{ page.title }}</h1>
 MUSTACHE_IN;
 
-		if (!function_exists('yaml_parse')) {
-			$this->markTestSkipped('Unable to test Mustache frontmatter without yaml_parse()');
-			return;
-		}
+		$yaml = new sfYamlParser();
 
 		$mustache = new Mustache($template, null, null, array(
+			'yaml_parser' => array($yaml, 'parse'),
 			'yaml_namespace' => 'page'
 		));
 
@@ -139,12 +120,10 @@ title: Hello World
 <h1>{{ page.title }}</h1>
 MUSTACHE_IN;
 
-		if (!function_exists('yaml_parse')) {
-			$this->markTestSkipped('Unable to test Mustache frontmatter without yaml_parse()');
-			return;
-		}
+		$yaml = new sfYamlParser();
 
 		$mustache = new Mustache($template, array('page' => array('title' => 'Goodnight Moon')), null, array(
+			'yaml_parser' => array($yaml, 'parse'),
 			'yaml_namespace' => 'page'
 		));
 
