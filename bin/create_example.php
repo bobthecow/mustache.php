@@ -1,9 +1,10 @@
+#!/usr/bin/env php
 <?php
 
 /**
  * A commandline script to create an example and the needed files
  * use like this:
- * $ php create_example.php my_new_example
+ * $ bin/create_example.php my_new_example
  *
  * and the folder my_new_example will be created in the examples/ folder containing 3 files
  *
@@ -11,7 +12,7 @@
 
 // some constants
 define('USAGE', <<<USAGE
-USAGE: php {$argv[0]} example_name
+USAGE: {$argv[0]} example_name
 
 This creates a new example and the corresponding files in the examples/ directory
 
@@ -19,7 +20,7 @@ USAGE
 );
 
 define('DS', DIRECTORY_SEPARATOR);
-define('EXAMPLE_PATH', dirname(__FILE__) . DS . "examples");
+define('EXAMPLE_PATH', realpath(dirname(__FILE__) . DS . ".." . DS . "examples"));
 
 
 /**
