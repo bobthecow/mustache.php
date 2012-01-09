@@ -14,7 +14,7 @@
  */
 class Mustache {
 
-	const VERSION      = '0.8.1';
+	const VERSION      = '0.9.0';
 	const SPEC_VERSION = '1.1.2';
 
 	/**
@@ -819,7 +819,7 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _getPartial($tag_name) {
-		if (is_array($this->_partials) && isset($this->_partials[$tag_name])) {
+		if ((is_array($this->_partials) || $this->_partials instanceof ArrayAccess) && isset($this->_partials[$tag_name])) {
 			return $this->_partials[$tag_name];
 		}
 
