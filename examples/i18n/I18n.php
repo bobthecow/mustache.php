@@ -6,7 +6,7 @@ class I18n extends Mustache {
     public $name = 'Bob';
 
     // Add a {{#__}} lambda for i18n
-    public $__ = array(self, '__trans');
+    public $__ = array(__CLASS__, '__trans');
 
     // A *very* small i18n dictionary :)
     private $dictionary = array(
