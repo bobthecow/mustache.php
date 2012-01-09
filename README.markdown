@@ -75,7 +75,39 @@ And render it:
     echo $m->render($template, $chris);
     ?>
 
+Finally, if you have the [PHP YAML module](http://php.net/YAML) (yaml_parse) installed or specify an [alternative YAML parser](http://symfony.com/doc/2.0/reference/YAML.html), then [YAML frontmatter](http://mustache.github.com/mustache.1.html) at the beginning of your Mustache templates is also supported:
 
+    ---
+    names: [ {name: chris}, {name: mark}, {name: scott} ]
+    ---
+    {{#names}}
+      Hi {{name}}!
+    {{/names}}
+
+If you don't want to use yaml_parse(), specify your alternative as an option before rendering:
+
+    <?php
+    $m = new Mustache($template, null, null, array(
+        'yaml_parser' => array('Symfony\Component\Yaml\Yaml', 'parse')
+    ));
+    echo $m->render();
+    ?>
+
+For [Jekyll](http://github.com/mojombo/jekyll/wiki/YAML-Front-Matter)-like frontmatter, you can also define a namespace for your YAML data:
+
+    <?php
+    $template = <<<MUSTACHE_IN
+    ---
+    title: Hello World
+    ---
+    <h1>{{ page.title }}</h1>
+    MUSTACHE_IN;
+
+    $m = new Mustache($template, null, null, array(
+        'yaml_namespace' => 'page'
+    ));
+    echo $m->render();
+    ?>
 
 
 Known Issues

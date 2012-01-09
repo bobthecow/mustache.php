@@ -36,8 +36,8 @@ class MustacheTest extends PHPUnit_Framework_TestCase {
 	const TEST_CLASS = 'Mustache';
 
 	protected $knownIssues = array(
-		// Just the whitespace ones...
-	);
+		'FrontmatterIteration' => '[PHP 5.3.6] Last line of output is duplicated in place of first. Weird?'
+	); // ... and the whitespace ones...
 
 	/**
 	 * Test Mustache constructor.
