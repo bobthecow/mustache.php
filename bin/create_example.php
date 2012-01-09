@@ -2,12 +2,15 @@
 <?php
 
 /**
- * A commandline script to create an example and the needed files
- * use like this:
- * $ bin/create_example.php my_new_example
+ * A commandline script to create an example and the needed files:
  *
- * and the folder my_new_example will be created in the examples/ folder containing 3 files
+ *     $ bin/create_example.php my_new_example
  *
+ * ... and the folder my_new_example will be created in the examples/ folder containing 3 files:
+ *
+ *     my_new_example/my_new_example.mustache
+ *     my_new_example/my_new_example.txt
+ *     my_new_example/MyNewExample.php
  */
 
 // some constants
@@ -30,16 +33,16 @@ define('EXAMPLE_PATH', realpath(dirname(__FILE__) . DS . ".." . DS . "examples")
  * AString -> a_string
  * SomeStrings -> some_strings
  * AStringMore -> a_string_more
- * 
- * @param string $name 
+ *
+ * @param string $name
  * @access public
  * @return string
  */
 function getLowerCaseName($name) {
-  return preg_replace_callback("/([A-Z])/", create_function ( 
-    '$match',
-    'return "_" . strtolower($match[1]);'
-  ), lcfirst($name));
+	return preg_replace_callback("/([A-Z])/", create_function (
+		'$match',
+		'return "_" . strtolower($match[1]);'
+	), lcfirst($name));
 }
 
 /**
@@ -49,29 +52,29 @@ function getLowerCaseName($name) {
  * a_string -> AString
  * some_strings -> SomeStrings
  * a_string_more -> AStringMore -> a_string_more
- * 
- * @param string $name 
+ *
+ * @param string $name
  * @access public
  * @return string
  */
 function getUpperCaseName($name) {
-  return preg_replace_callback("/_([a-z])/", create_function ( 
-    '$match',
-    'return strtoupper($match{1});'
-  ), ucfirst($name));
+	return preg_replace_callback("/_([a-z])/", create_function (
+		'$match',
+		'return strtoupper($match{1});'
+	), ucfirst($name));
 }
 
 
 /**
  * return the given value and echo it out appending "\n"
- * 
- * @param mixed $value 
+ *
+ * @param mixed $value
  * @access public
  * @return mixed
  */
 function out($value) {
-  echo $value . "\n";
-  return $value;
+	echo $value . "\n";
+	return $value;
 }
 
 /**
@@ -79,7 +82,7 @@ function out($value) {
  * returns the directory name if only $directory is given.
  * if an extension is given a complete filename is returned.
  * the returned filename will be echoed out
- * 
+ *
  * @param string $directory directory without / at the end
  * @param string $filename filename without path and extension
  * @param string $extension extension of the file without "."
@@ -87,28 +90,28 @@ function out($value) {
  * @return string
  */
 function buildPath($directory, $filename = null,  $extension = null) {
-  return out(EXAMPLE_PATH . DS . $directory.
-          ($extension !== null && $filename !== null ? DS . $filename. "." . $extension : ""));
+	return out(EXAMPLE_PATH . DS . $directory.
+					($extension !== null && $filename !== null ? DS . $filename. "." . $extension : ""));
 }
 
 /**
  * creates the directory for the example
  * the script die()'s if mkdir() fails
- * 
- * @param string $directory 
+ *
+ * @param string $directory
  * @access public
  * @return void
  */
 function createDirectory($directory) {
- if(!@mkdir(buildPath($directory))) {
-   die("FAILED to create directory\n");
- }
+	if(!@mkdir(buildPath($directory))) {
+		die("FAILED to create directory\n");
+	}
 }
 
 /**
  * create a file for the example with the given $content
  * the script die()'s if fopen() fails
- * 
+ *
  * @param string $directory directory without / at the end
  * @param string $filename filename without path and extension
  * @param string $extension extension of the file without "."
@@ -117,13 +120,13 @@ function createDirectory($directory) {
  * @return void
  */
 function createFile($directory, $filename, $extension, $content = "") {
-  $handle = @fopen(buildPath($directory, $filename, $extension), "w");
-  if($handle) {
-    fwrite($handle, $content);
-    fclose($handle);
-  } else {
-    die("FAILED to create file\n");
-  }
+	$handle = @fopen(buildPath($directory, $filename, $extension), "w");
+	if($handle) {
+		fwrite($handle, $content);
+		fclose($handle);
+	} else {
+		die("FAILED to create file\n");
+	}
 }
 
 
@@ -135,18 +138,18 @@ function createFile($directory, $filename, $extension, $content = "") {
  * examples/some_thing/some_thing.mustache
  * examples/some_thing/some_thing.txt
  * examples/some_thing/SomeThing.php
- * 
- * @param mixed $example_name 
+ *
+ * @param mixed $example_name
  * @access public
  * @return void
  */
 function main($example_name) {
-  $lowercase = getLowerCaseName($example_name);
-  $uppercase = getUpperCaseName($example_name);
-  createDirectory($lowercase);
-  createFile($lowercase, $lowercase, "mustache");
-  createFile($lowercase, $lowercase, "txt");
-  createFile($lowercase, $uppercase, "php", <<<CONTENT
+	$lowercase = getLowerCaseName($example_name);
+	$uppercase = getUpperCaseName($example_name);
+	createDirectory($lowercase);
+	createFile($lowercase, $lowercase, "mustache");
+	createFile($lowercase, $lowercase, "txt");
+	createFile($lowercase, $uppercase, "php", <<<CONTENT
 <?php
 
 class {$uppercase} extends Mustache {
@@ -154,16 +157,16 @@ class {$uppercase} extends Mustache {
 }
 
 CONTENT
-  );
+	);
 }
 
 // check if enougth arguments are given
 if(count($argv) > 1) {
-  // get the name of the example
-  $example_name = $argv[1];
-  
-  main($example_name);
+	// get the name of the example
+	$example_name = $argv[1];
+
+	main($example_name);
 
 } else {
-  echo USAGE;
+	echo USAGE;
 }
