@@ -15,16 +15,46 @@ class MustacheLoaderTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testMustacheUsesFilesystemLoader() {
-		$template = '{{> foo }}{{> bar }}';
+		$template = '{{> foo }} {{> bar }}';
 		$data = array(
 			'truthy' => true,
 			'foo'    => 'FOO',
-			'bar'    => 'BAR'
+			'bar'    => 'BAR',
 		);
-		$output = '{{ foo }}{{ bar }}';
+		$output = 'FOO BAR';
 		$m = new Mustache();
 		$partials = new MustacheLoader(dirname(__FILE__).'/fixtures');
-		$m->render($template, $data, $partials);
-		$this->assertEquals($output, $output);
+		$this->assertEquals($output, $m->render($template, $data, $partials));
 	}
+
+	public function testMustacheUsesDifferentLoadersToo() {
+		$template = '{{> foo }} {{> bar }}';
+		$data = array(
+			'truthy' => true,
+			'foo'    => 'FOO',
+			'bar'    => 'BAR',
+		);
+		$output = 'FOO BAR';
+		$m = new Mustache();
+		$partials = new DifferentMustacheLoader();
+		$this->assertEquals($output, $m->render($template, $data, $partials));
+	}
+}
+
+class DifferentMustacheLoader implements ArrayAccess {
+	protected $partials = array(
+		'foo' => '{{ foo }}',
+		'bar' => '{{# truthy }}{{ bar }}{{/ truthy }}',
+	);
+
+	public function offsetExists($offset) {
+		return isset($this->partials[$offset]);
+	}
+
+	public function offsetGet($offset) {
+		return $this->partials[$offset];
+	}
+
+	public function offsetSet($offset, $value) {}
+	public function offsetUnset($offset) {}
 }
