@@ -15,7 +15,6 @@ include('Mustache.php');
 $m = new Mustache;
 echo $m->render('Hello {{planet}}', array('planet' => 'World!'));
 // "Hello World!"
-
 ```
 
 
@@ -28,6 +27,7 @@ You have just won ${{value}}!
 Well, ${{taxed_value}}, after taxes.
 {{/in_ca}}
 ```
+
 
 Along with the associated Mustache class:
 
@@ -43,8 +43,8 @@ class Chris extends Mustache {
 
     public $in_ca = true;
 }
-
 ```
+
 
 Render it like so:
 
@@ -52,8 +52,8 @@ Render it like so:
 <?php
 $chris = new Chris;
 echo $chris->render($template);
-
 ```
+
 
 Here's the same thing, a different way:
 
@@ -71,8 +71,8 @@ class Chris {
 
     public $in_ca = true;
 }
-
 ```
+
 
 And render it:
 
@@ -81,7 +81,6 @@ And render it:
 $chris = new Chris;
 $m = new Mustache;
 echo $m->render($template, $chris);
-
 ```
 
 
