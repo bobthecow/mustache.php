@@ -403,10 +403,11 @@ class Mustache {
 		$options_string = $matches['options_string'];
 
 		if (!in_array($pragma_name, $this->_pragmasImplemented)) {
-			if($this->_throwsException(MustacheException::UNKNOWN_PRAGMA))
+			if ($this->_throwsException(MustacheException::UNKNOWN_PRAGMA)) {
 				throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
-			else
+			} else {
 				return '';
+			}
 		}
 
 		$options = array();
@@ -451,10 +452,9 @@ class Mustache {
 	 */
 	protected function _getPragmaOptions($pragma_name) {
 		if (!$this->_hasPragma($pragma_name)) {
-			if($this->_throwsException(MustacheException::UNKNOWN_PRAGMA))
+			if ($this->_throwsException(MustacheException::UNKNOWN_PRAGMA)) {
 				throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
-			else
-				return array();
+			}
 		}
 
 		return (is_array($this->_localPragmas[$pragma_name])) ? $this->_localPragmas[$pragma_name] : array();

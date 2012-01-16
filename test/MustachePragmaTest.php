@@ -20,6 +20,20 @@ class MustachePragmaTest extends PHPUnit_Framework_TestCase {
 		$this->fail('Mustache should have thrown an unknown pragma exception');
 	}
 
+	public function testSuppressUnknownPragmaException() {
+		$m = new LessWhinyMustache();
+
+		try {
+			$this->assertEquals('', $m->render('{{%I-HAVE-THE-GREATEST-MUSTACHE}}'));
+		} catch (MustacheException $e) {
+			if ($e->getCode() == MustacheException::UNKNOWN_PRAGMA) {
+				$this->fail('Mustache should have thrown an unknown pragma exception');
+			} else {
+				throw $e;
+			}
+		}
+	}
+
 	public function testPragmaReplace() {
 		$m = new Mustache();
 		$this->assertEquals('', $m->render('{{%UNESCAPED}}'), 'Pragma tag not removed');
@@ -47,4 +61,14 @@ class MustachePragmaTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('>>>', $m->render('{{%UNESCAPED}}{{symbol}}'));
 		$this->assertEquals('>>>', $m->render('{{{symbol}}}'));
 	}
+}
+
+class LessWhinyMustache extends Mustache {
+	protected $_throwsExceptions = array(
+		MustacheException::UNKNOWN_VARIABLE         => false,
+		MustacheException::UNCLOSED_SECTION         => true,
+		MustacheException::UNEXPECTED_CLOSE_SECTION => true,
+		MustacheException::UNKNOWN_PARTIAL          => false,
+		MustacheException::UNKNOWN_PRAGMA           => false,
+	);
 }
