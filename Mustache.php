@@ -189,7 +189,7 @@ class Mustache {
 		}
 
 		$template = $this->_renderPragmas($template);
-		$template = $this->_renderTemplate($template, $this->_context);
+		$template = $this->_renderTemplate($template);
 
 		$this->_otag = $otag_orig;
 		$this->_ctag = $ctag_orig;
