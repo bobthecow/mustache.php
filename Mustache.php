@@ -795,7 +795,7 @@ class Mustache {
 					return $view->$tag_name();
 				} else if (isset($view->$tag_name)) {
 					return $view->$tag_name;
-				} else {
+				} else if (method_exists($view, '__call')) {
 					$var = @$view->$tag_name();
 					if ($var) {
 						return $var;
