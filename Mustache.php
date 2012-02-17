@@ -773,7 +773,7 @@ class Mustache {
 			$first = array_shift($chunks);
 
 			$ret = $this->_findVariableInContext($first, $this->_context);
-			while ($next = array_shift($chunks)) {
+			foreach ($chunks as $next) {
 				// Slice off a chunk of context for dot notation traversal.
 				$c = array($ret);
 				$ret = $this->_findVariableInContext($next, $c);
