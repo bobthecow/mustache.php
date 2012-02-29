@@ -5,7 +5,7 @@ require_once '../Mustache.php';
 class MustacheCallTest extends PHPUnit_Framework_TestCase {
 
 	public function testCallEatsContext() {
-		$foo = new Foo();
+		$foo = new ClassWithCall();
 		$foo->name = 'Bob';
 
 		$template = '{{# foo }}{{ label }}: {{ name }}{{/ foo }}';
@@ -16,7 +16,7 @@ class MustacheCallTest extends PHPUnit_Framework_TestCase {
 	}
 }
 
-class Foo {
+class ClassWithCall {
 	public $name;
 	public function __call($method, $args) {
 		return 'unknown value';
