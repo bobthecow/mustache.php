@@ -94,6 +94,15 @@ class Mustache {
 	 *         'pragmas' => array(
 	 *             Mustache::PRAGMA_UNESCAPED => true
 	 *         ),
+	 *
+	 *         // an array of thrown exceptions to enable/disable
+	 *         'throws_exceptions' => array(
+	 *             MustacheException::UNKNOWN_VARIABLE         => false,
+	 *             MustacheException::UNCLOSED_SECTION         => true,
+	 *             MustacheException::UNEXPECTED_CLOSE_SECTION => true,
+	 *             MustacheException::UNKNOWN_PARTIAL          => false,
+	 *             MustacheException::UNKNOWN_PRAGMA           => true,
+	 *         ),
 	 *     );
 	 *
 	 * @access public
@@ -138,6 +147,12 @@ class Mustache {
 				}
 			}
 			$this->_pragmas = $options['pragmas'];
+		}
+
+		if (isset($options['throws_exceptions'])) {
+			foreach ($options['throws_exceptions'] as $exception => $value) {
+				$this->_throwsExceptions[$exception] = $value;
+			}
 		}
 	}
 

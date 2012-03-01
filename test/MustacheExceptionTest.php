@@ -8,7 +8,7 @@ class MustacheExceptionTest extends PHPUnit_Framework_TestCase {
 
 	protected $pickyMustache;
 	protected $slackerMustache;
-	
+
 	public function setUp() {
 		$this->pickyMustache      = new PickyMustache();
 		$this->slackerMustache    = new SlackerMustache();
@@ -91,6 +91,34 @@ class MustacheExceptionTest extends PHPUnit_Framework_TestCase {
 		$mustache = new TestableMustache();
 		$mustache->testableGetPragmaOptions('PRAGMATIC');
 	}
+
+	public function testOverrideThrownExceptionsViaConstructorOptions() {
+		$exceptions = array(
+			MustacheException::UNKNOWN_VARIABLE,
+			MustacheException::UNCLOSED_SECTION,
+			MustacheException::UNEXPECTED_CLOSE_SECTION,
+			MustacheException::UNKNOWN_PARTIAL,
+			MustacheException::UNKNOWN_PRAGMA,
+		);
+
+		$one = new TestableMustache(null, null, null, array(
+			'throws_exceptions' => array_fill_keys($exceptions, true)
+		));
+
+		$thrownExceptions = $one->getThrownExceptions();
+		foreach ($exceptions as $exception) {
+			$this->assertTrue($thrownExceptions[$exception]);
+		}
+
+		$two = new TestableMustache(null, null, null, array(
+			'throws_exceptions' => array_fill_keys($exceptions, false)
+		));
+
+		$thrownExceptions = $two->getThrownExceptions();
+		foreach ($exceptions as $exception) {
+			$this->assertFalse($thrownExceptions[$exception]);
+		}
+	}
 }
 
 class PickyMustache extends Mustache {
@@ -116,5 +144,9 @@ class SlackerMustache extends Mustache {
 class TestableMustache extends Mustache {
 	public function testableGetPragmaOptions($pragma_name) {
 		return $this->_getPragmaOptions($pragma_name);
+	}
+
+	public function getThrownExceptions() {
+		return $this->_throwsExceptions;
 	}
 }
