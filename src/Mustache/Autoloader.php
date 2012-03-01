@@ -22,7 +22,8 @@ class Mustache_Autoloader {
 	 * @param string $baseDir Mustache library base directory (default: dirname(__FILE__).'/..')
 	 */
 	public function __construct($baseDir = null) {
-		$this->baseDir = rtrim($baseDir, '/') ?: dirname(__FILE__).'/..';
+		$baseDir = rtrim($baseDir, '/');
+		$this->baseDir = $baseDir ? $basedir : dirname(__FILE__).'/..';
 	}
 
 	/**
