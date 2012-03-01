@@ -11,14 +11,13 @@ A quick example:
 
 ```php
 <?php
-include('Mustache.php');
 $m = new Mustache;
-echo $m->render('Hello {{planet}}', array('planet' => 'World!'));
-// "Hello World!"
+$tpl = $m->loadTemplate('Hello {{planet}}');
+echo $tpl->render(array('planet' => 'World!')); // "Hello World!"
 ```
 
 
-And a more in-depth example--this is the canonical Mustache template:
+And a more in-depth example -- this is the canonical Mustache template:
 
 ```
 Hello {{name}}
@@ -29,40 +28,12 @@ Well, ${{taxed_value}}, after taxes.
 ```
 
 
-Along with the associated Mustache class:
-
-```php
-<?php
-class Chris extends Mustache {
-    public $name = "Chris";
-    public $value = 10000;
-    
-    public function taxed_value() {
-        return $this->value - ($this->value * 0.4);
-    }
-
-    public $in_ca = true;
-}
-```
-
-
-Render it like so:
-
-```php
-<?php
-$chris = new Chris;
-echo $chris->render($template);
-```
-
-
-Here's the same thing, a different way:
-
-Create a view object--which could also be an associative array, but those don't do functions quite as well:
+Create a view "context" object -- which could also be an associative array, but those don't do functions quite as well:
 
 ```php
 <?php
 class Chris {
-    public $name = "Chris";
+    public $name  = "Chris";
     public $value = 10000;
 
     public function taxed_value() {
@@ -78,17 +49,11 @@ And render it:
 
 ```php
 <?php
-$chris = new Chris;
 $m = new Mustache;
-echo $m->render($template, $chris);
+$tpl = $m->loadTemplate($template);
+$chris = new Chris;
+echo $template->render($chris);
 ```
-
-
-Known Issues
-------------
-
- * As of Mustache spec v1.1.2, there are a couple of whitespace bugs around section tags... Despite these failing tests, this
-   version is actually *closer* to correct than previous releases.
 
 
 See Also
