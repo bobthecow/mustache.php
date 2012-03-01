@@ -33,7 +33,7 @@ class MustacheSpecTest extends \PHPUnit_Framework_TestCase {
 	 * simply to provide a 'skipped' test if the `spec` submodule isn't initialized.
 	 */
 	public function testSpecInitialized() {
-		if (!file_exists(__DIR__.'/../../../spec/specs/')) {
+		if (!file_exists(__DIR__.'/../../../../vendor/spec/specs/')) {
 			$this->markTestSkipped('Mustache spec submodule not initialized: run "git submodule update --init"');
 		}
 	}
@@ -161,7 +161,7 @@ class MustacheSpecTest extends \PHPUnit_Framework_TestCase {
 	 * @return array
 	 */
 	private function loadSpec($name) {
-		$filename = __DIR__ . '/../../../spec/specs/' . $name . '.yml';
+		$filename = __DIR__ . '/../../../../vendor/spec/specs/' . $name . '.yml';
 		if (!file_exists($filename)) {
 			return array();
 		}
