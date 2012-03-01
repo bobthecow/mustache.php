@@ -152,7 +152,7 @@ function main($example_name) {
 	createFile($lowercase, $uppercase, "php", <<<CONTENT
 <?php
 
-class {$uppercase} extends Mustache {
+class {$uppercase} {
 
 }
 
