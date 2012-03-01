@@ -9,14 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache;
-
 /**
  * Mustache Compiler class.
  *
  * This class is responsible for turning a Mustache token parse tree into normal PHP source code.
  */
-class Compiler {
+class Mustache_Compiler {
 
 	/**
 	 * Compile a Mustache token parse tree into PHP source code.
@@ -36,7 +34,7 @@ class Compiler {
 	/**
 	 * Helper function for walking the Mustache token parse tree.
 	 *
-	 * @throws \InvalidArgumentException upon encountering unknown token types.
+	 * @throws InvalidArgumentException upon encountering unknown token types.
 	 *
 	 * @param array $tree  Parse tree of Mustache tokens
 	 * @param int   $level (default: 0)
@@ -47,23 +45,23 @@ class Compiler {
 		$code = '';
 		$level++;
 		foreach ($tree as $node) {
-			switch (is_string($node) ? 'text' : $node[Tokenizer::TAG]) {
+			switch (is_string($node) ? 'text' : $node[Mustache_Tokenizer::TAG]) {
 				case '#':
 					$code .= $this->section(
-						$node[Tokenizer::NODES],
-						$node[Tokenizer::NAME],
-						$node[Tokenizer::INDEX],
-						$node[Tokenizer::END],
-						$node[Tokenizer::OTAG],
-						$node[Tokenizer::CTAG],
+						$node[Mustache_Tokenizer::NODES],
+						$node[Mustache_Tokenizer::NAME],
+						$node[Mustache_Tokenizer::INDEX],
+						$node[Mustache_Tokenizer::END],
+						$node[Mustache_Tokenizer::OTAG],
+						$node[Mustache_Tokenizer::CTAG],
 						$level
 					);
 					break;
 
 				case '^':
 					$code .= $this->invertedSection(
-						$node[Tokenizer::NODES],
-						$node[Tokenizer::NAME],
+						$node[Mustache_Tokenizer::NODES],
+						$node[Mustache_Tokenizer::NAME],
 						$level
 					);
 					break;
@@ -71,22 +69,22 @@ class Compiler {
 				case '<':
 				case '>':
 					$code .= $this->partial(
-						$node[Tokenizer::NAME],
-						isset($node[Tokenizer::INDENT]) ? $node[Tokenizer::INDENT] : '',
+						$node[Mustache_Tokenizer::NAME],
+						isset($node[Mustache_Tokenizer::INDENT]) ? $node[Mustache_Tokenizer::INDENT] : '',
 						$level
 					);
 					break;
 
 				case '{':
 				case '&':
-					$code .= $this->variable($node[Tokenizer::NAME], false, $level);
+					$code .= $this->variable($node[Mustache_Tokenizer::NAME], false, $level);
 					break;
 
 				case '!':
 					break;
 
 				case '_v':
-					$code .= $this->variable($node[Tokenizer::NAME], true, $level);
+					$code .= $this->variable($node[Mustache_Tokenizer::NAME], true, $level);
 					break;
 
 
@@ -95,7 +93,7 @@ class Compiler {
 					break;
 
 				default:
-					throw new \InvalidArgumentException('Unknown node type: '.json_encode($node));
+					throw new InvalidArgumentException('Unknown node type: '.json_encode($node));
 			}
 		}
 
@@ -104,10 +102,10 @@ class Compiler {
 
 	const KLASS = '<?php
 
-		class %s extends \Mustache\Template {
-			public function renderInternal(\Mustache\Context $context, $indent = \'\') {
+		class %s extends Mustache_Template {
+			public function renderInternal(Mustache_Context $context, $indent = \'\') {
 				$mustache = $this->mustache;
-				$buffer = new \Mustache\Buffer($indent, $mustache->getCharset());
+				$buffer = new Mustache_Buffer($indent, $mustache->getCharset());
 		%s
 
 				return $buffer->flush();
@@ -281,9 +279,9 @@ class Compiler {
 	 *
 	 * The return value will be one of `find`, `findDot` or `last`.
 	 *
-	 * @see \Mustache\Context::find
-	 * @see \Mustache\Context::findDot
-	 * @see \Mustache\Context::last
+	 * @see Mustache_Context::find
+	 * @see Mustache_Context::findDot
+	 * @see Mustache_Context::last
 	 *
 	 * @param string $id Variable name
 	 *

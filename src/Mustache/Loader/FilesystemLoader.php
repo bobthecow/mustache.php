@@ -9,10 +9,6 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Loader;
-
-use Mustache\Loader;
-
 /**
  * Mustache Template filesystem Loader implementation.
  *
@@ -30,7 +26,7 @@ use Mustache\Loader;
  *
  * @implements Loader
  */
-class FilesystemLoader implements Loader {
+class Mustache_Loader_FilesystemLoader implements Mustache_Loader {
 	private $baseDir;
 	private $extension = '.mustache';
 	private $templates = array();
@@ -45,7 +41,7 @@ class FilesystemLoader implements Loader {
 	 *         'extension' => '.ms',
 	 *     );
 	 *
-	 * @throws \RuntimeException if $baseDir does not exist.
+	 * @throws RuntimeException if $baseDir does not exist.
 	 *
 	 * @param string $baseDir Base directory containing Mustache template files.
 	 * @param array  $options Array of Loader options (default: array())
@@ -54,7 +50,7 @@ class FilesystemLoader implements Loader {
 		$this->baseDir = rtrim(realpath($baseDir), '/');
 
 		if (!is_dir($this->baseDir)) {
-			throw new \RuntimeException('FilesystemLoader baseDir must be a directory: '.$baseDir);
+			throw new RuntimeException('FilesystemLoader baseDir must be a directory: '.$baseDir);
 		}
 
 		if (isset($options['extension'])) {
@@ -83,7 +79,7 @@ class FilesystemLoader implements Loader {
 	/**
 	 * Helper function for loading a Mustache file by name.
 	 *
-	 * @throws \InvalidArgumentException if a template file is not found.
+	 * @throws InvalidArgumentException if a template file is not found.
 	 *
 	 * @param string $name
 	 *
@@ -93,7 +89,7 @@ class FilesystemLoader implements Loader {
 		$fileName = $this->getFileName($name);
 
 		if (!file_exists($fileName)) {
-			throw new \InvalidArgumentException('Template '.$name.' not found.');
+			throw new InvalidArgumentException('Template '.$name.' not found.');
 		}
 
 		return file_get_contents($fileName);

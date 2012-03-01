@@ -9,38 +9,34 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Test;
-
-use Mustache\Context;
-
 /**
  * @group unit
  */
-class ContextTest extends \PHPUnit_Framework_TestCase {
+class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase {
 	public function testConstructor() {
-		$one = new Context;
+		$one = new Mustache_Context;
 		$this->assertSame('', $one->find('foo'));
 		$this->assertSame('', $one->find('bar'));
 
-		$two = new Context(array(
+		$two = new Mustache_Context(array(
 			'foo' => 'FOO',
 			'bar' => '<BAR>'
 		));
 		$this->assertEquals('FOO', $two->find('foo'));
 		$this->assertEquals('<BAR>', $two->find('bar'));
 
-		$obj = new \StdClass;
+		$obj = new StdClass;
 		$obj->name = 'NAME';
-		$three = new Context($obj);
+		$three = new Mustache_Context($obj);
 		$this->assertSame($obj, $three->last());
 		$this->assertEquals('NAME', $three->find('name'));
 	}
 
 	public function testIsTruthy() {
-		$context = new Context;
+		$context = new Mustache_Context;
 
 		$this->assertTrue($context->isTruthy('string'));
-		$this->assertTrue($context->isTruthy(new \StdClass));
+		$this->assertTrue($context->isTruthy(new StdClass));
 		$this->assertTrue($context->isTruthy(1));
 		$this->assertTrue($context->isTruthy(array('a', 'b')));
 
@@ -51,19 +47,19 @@ class ContextTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testIsCallable() {
-		$dummy   = new TestDummy;
-		$context = new Context;
+		$dummy   = new Mustache_Test_TestDummy;
+		$context = new Mustache_Context;
 
 		$this->assertTrue($context->isCallable(function() {
 			return null;
 		}));
-		$this->assertTrue($context->isCallable(array('\Mustache\Test\TestDummy', 'foo')));
+		$this->assertTrue($context->isCallable(array('Mustache_Test_TestDummy', 'foo')));
 		$this->assertTrue($context->isCallable(array($dummy, 'bar')));
 		$this->assertTrue($context->isCallable($dummy));
 
 		$this->assertFalse($context->isCallable('count'));
 		$this->assertFalse($context->isCallable('TestDummy::foo'));
-		$this->assertFalse($context->isCallable(array('\Mustache\Test\TestDummy', 'name')));
+		$this->assertFalse($context->isCallable(array('Mustache_Test_TestDummy', 'name')));
 		$this->assertFalse($context->isCallable(array('NotReallyAClass', 'foo')));
 		$this->assertFalse($context->isCallable(array($dummy, 'name')));
 	}
@@ -72,7 +68,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase {
 	 * @dataProvider getIterables
 	 */
 	public function testIsIterable($value, $iterable) {
-		$context = new Context;
+		$context = new Mustache_Context;
 		$this->assertEquals($iterable, $context->isIterable($value));
 	}
 
@@ -83,21 +79,21 @@ class ContextTest extends \PHPUnit_Framework_TestCase {
 			array(array(1 => 'a', 2 => 'b'), false),
 			array(array('a' => 0, 'b' => 1), false),
 			array('some string',             false),
-			array(new \ArrayIterator,        true),
+			array(new ArrayIterator,         true),
 		);
 	}
 
 	public function testPushPopAndLast() {
-		$context = new Context;
+		$context = new Mustache_Context;
 		$this->assertFalse($context->last());
 
-		$dummy = new TestDummy;
+		$dummy = new Mustache_Test_TestDummy;
 		$context->push($dummy);
 		$this->assertSame($dummy, $context->last());
 		$this->assertSame($dummy, $context->pop());
 		$this->assertFalse($context->last());
 
-		$obj = new \StdClass;
+		$obj = new StdClass;
 		$context->push($dummy);
 		$this->assertSame($dummy, $context->last());
 		$context->push($obj);
@@ -108,11 +104,11 @@ class ContextTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testFind() {
-		$context = new Context;
+		$context = new Mustache_Context;
 
-		$dummy = new TestDummy;
+		$dummy = new Mustache_Test_TestDummy;
 
-		$obj = new \StdClass;
+		$obj = new StdClass;
 		$obj->name = 'obj';
 
 		$arr = array(
@@ -149,7 +145,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase {
 	}
 }
 
-class TestDummy {
+class Mustache_Test_TestDummy {
 	public $name = 'dummy';
 
 	public function __invoke() {

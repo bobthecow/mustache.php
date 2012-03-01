@@ -11,7 +11,7 @@ A quick example:
 
 ```php
 <?php
-$m = new Mustache;
+$m = new Mustache_Mustache;
 $tpl = $m->loadTemplate('Hello {{planet}}');
 echo $tpl->render(array('planet' => 'World!')); // "Hello World!"
 ```
@@ -49,7 +49,7 @@ And render it:
 
 ```php
 <?php
-$m = new Mustache;
+$m = new Mustache_Mustache;
 $tpl = $m->loadTemplate($template);
 $chris = new Chris;
 echo $template->render($chris);

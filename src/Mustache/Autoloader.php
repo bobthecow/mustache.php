@@ -9,12 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache;
-
 /**
  * Mustache class autoloader.
  */
-class Autoloader {
+class Mustache_Autoloader {
 
 	private $baseDir;
 
@@ -32,7 +30,7 @@ class Autoloader {
 	 *
 	 * @param string $baseDir Mustache library base directory (default: __DIR__.'/..')
 	 *
-	 * @return \Mustache\Autoloader Registered Autoloader instance
+	 * @return Mustache_Autoloader Registered Autoloader instance
 	 */
 	static public function register($baseDir = null) {
 		$loader = new self($baseDir);
@@ -55,7 +53,7 @@ class Autoloader {
 			return;
 		}
 
-		$file = sprintf('%s/%s.php', $this->baseDir, str_replace('\\', '/', $class));
+		$file = sprintf('%s/%s.php', $this->baseDir, str_replace('_', '/', $class));
 		if (is_file($file)) {
 			require $file;
 		}

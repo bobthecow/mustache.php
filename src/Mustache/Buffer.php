@@ -9,14 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache;
-
 /**
  * Mustache output Buffer class.
  *
  * Buffer instances are used by Mustache Templates for collecting output during rendering
  */
-class Buffer {
+class Mustache_Buffer {
 	private $buffer  = '';
 	private $indent  = '';
 	private $charset = 'UTF-8';
@@ -77,7 +75,7 @@ class Buffer {
 	/**
 	 * Output text to the Buffer.
 	 *
-	 * @see \Mustache\Buffer::write
+	 * @see Mustache_Buffer::write
 	 *
 	 * @param string $text
 	 * @param bool   $escape Escape this text with `htmlspecialchars()`? (default: false)

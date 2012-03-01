@@ -9,21 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Test;
-
-use Mustache\Mustache;
-use Mustache\Buffer;
-
 /**
  * @group unit
  */
-class BufferTest extends \PHPUnit_Framework_TestCase {
+class Mustache_Test_BufferTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @dataProvider getConstructorArgs
 	 */
 	public function testConstructor($indent, $charset) {
-		$buffer = new Buffer($indent, $charset);
+		$buffer = new Mustache_Buffer($indent, $charset);
 		$this->assertEquals($indent, $buffer->getIndent());
 		$this->assertEquals($charset, $buffer->getCharset());
 	}
@@ -37,7 +32,7 @@ class BufferTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testWrite() {
-		$buffer = new Buffer;
+		$buffer = new Mustache_Buffer;
 		$this->assertEquals('', $buffer->flush());
 
 		$buffer->writeLine();
@@ -66,7 +61,7 @@ class BufferTest extends \PHPUnit_Framework_TestCase {
 	 * @dataProvider getEscapeAndIndent
 	 */
 	public function testEscapingAndIndenting($text, $escape, $indent, $whitespace, $expected) {
-		$buffer = new Buffer;
+		$buffer = new Mustache_Buffer;
 		$buffer->setIndent($whitespace);
 
 		$buffer->write($text, $indent, $escape);
@@ -84,7 +79,7 @@ class BufferTest extends \PHPUnit_Framework_TestCase {
 
 	public function testChangeIndent() {
 		$indent = "\t\t";
-		$buffer = new Buffer($indent);
+		$buffer = new Mustache_Buffer($indent);
 		$this->assertEquals($indent, $buffer->getIndent());
 
 		$indent = "";

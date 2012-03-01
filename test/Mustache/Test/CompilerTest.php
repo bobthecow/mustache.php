@@ -9,21 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Test;
-
-use Mustache\Compiler;
-use Mustache\Tokenizer;
-
 /**
  * @group unit
  */
-class CompilerTest extends \PHPUnit_Framework_TestCase {
+class Mustache_Test_CompilerTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @dataProvider getCompileValues
 	 */
 	public function testCompile($source, array $tree, $name, $expected) {
-		$compiler = new Compiler;
+		$compiler = new Mustache_Compiler;
 
 		$compiled = $compiler->compile($source, $tree, $name);
 		foreach ($expected as $contains) {
@@ -34,12 +29,12 @@ class CompilerTest extends \PHPUnit_Framework_TestCase {
 	public function getCompileValues() {
 		return array(
 			array('', array(), 'Banana', array(
-				"\nclass Banana extends \Mustache\Template",
+				"\nclass Banana extends Mustache_Template",
 				'$buffer->flush();',
 			)),
 
 			array('', array('TEXT'), 'Monkey', array(
-				"\nclass Monkey extends \Mustache\Template",
+				"\nclass Monkey extends Mustache_Template",
 				'$buffer->writeText(\'TEXT\');',
 				'$buffer->flush();',
 			)),
@@ -50,18 +45,18 @@ class CompilerTest extends \PHPUnit_Framework_TestCase {
 					'foo',
 					"\n",
 					array(
-						Tokenizer::TAG  => '_v',
-						Tokenizer::NAME => 'name',
+						Mustache_Tokenizer::TAG  => '_v',
+						Mustache_Tokenizer::NAME => 'name',
 					),
 					array(
-						Tokenizer::TAG  => '_v',
-						Tokenizer::NAME => '.',
+						Mustache_Tokenizer::TAG  => '_v',
+						Mustache_Tokenizer::NAME => '.',
 					),
 					"'bar'",
 				),
 				'Monkey',
 				array(
-					"\nclass Monkey extends \Mustache\Template",
+					"\nclass Monkey extends Mustache_Template",
 					'$buffer->writeText(\'foo\');',
 					'$buffer->writeLine();',
 					'$value = $context->find(\'name\');',
@@ -78,7 +73,7 @@ class CompilerTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testCompilerThrowsUnknownNodeTypeException() {
-		$compiler = new Compiler;
-		$compiler->compile('', array(array(Tokenizer::TAG => 'invalid')), 'SomeClass');
+		$compiler = new Mustache_Compiler;
+		$compiler->compile('', array(array(Mustache_Tokenizer::TAG => 'invalid')), 'SomeClass');
 	}
 }

@@ -9,12 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache;
-
 /**
  * Mustache Template rendering Context.
  */
-class Context {
+class Mustache_Context {
 	private $stack = array();
 
 	/**
@@ -89,7 +87,7 @@ class Context {
 	 */
 	public function isIterable($value) {
 		if (is_object($value)) {
-			return $value instanceof \Traversable;
+			return $value instanceof Traversable;
 		} elseif (is_array($value)) {
 			return !array_diff_key($value, array_keys(array_keys($value)));
 		}
@@ -187,7 +185,7 @@ class Context {
 	/**
 	 * Helper function to find a variable in the Context stack.
 	 *
-	 * @see \Mustache\Context::find
+	 * @see Mustache_Context::find
 	 *
 	 * @param string $id    Variable name
 	 * @param array  $stack Context stack

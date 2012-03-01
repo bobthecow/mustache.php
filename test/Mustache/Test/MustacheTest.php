@@ -9,19 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Test;
-
-use Mustache\Compiler;
-use Mustache\Mustache;
-use Mustache\Loader\StringLoader;
-use Mustache\Loader\ArrayLoader;
-use Mustache\Parser;
-use Mustache\Tokenizer;
-
 /**
  * @group unit
  */
-class MustacheTest extends \PHPUnit_Framework_TestCase {
+class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 
 	private static $tempDir;
 
@@ -33,9 +24,9 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testConstructor() {
-		$loader         = new StringLoader;
-		$partialsLoader = new ArrayLoader;
-		$mustache       = new Mustache(array(
+		$loader         = new Mustache_Loader_StringLoader;
+		$partialsLoader = new Mustache_Loader_ArrayLoader;
+		$mustache       = new Mustache_Mustache(array(
 			'template_class_prefix' => '__whot__',
 			'cache' => self::$tempDir,
 			'loader' => $loader,
@@ -54,11 +45,11 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testSettingServices() {
-		$loader    = new StringLoader;
-		$tokenizer = new Tokenizer;
-		$parser    = new Parser;
-		$compiler  = new Compiler;
-		$mustache  = new Mustache;
+		$loader    = new Mustache_Loader_StringLoader;
+		$tokenizer = new Mustache_Tokenizer;
+		$parser    = new Mustache_Parser;
+		$compiler  = new Mustache_Compiler;
+		$mustache  = new Mustache_Mustache;
 
 		$this->assertNotSame($loader, $mustache->getLoader());
 		$mustache->setLoader($loader);
@@ -85,7 +76,7 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 	 * @group functional
 	 */
 	public function testCache() {
-		$mustache = new Mustache(array(
+		$mustache = new Mustache_Mustache(array(
 			'template_class_prefix' => '__whot__',
 			'cache' => self::$tempDir,
 		));
@@ -96,32 +87,20 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 		$fileName  = self::$tempDir . '/' . $className . '.php';
 		$this->assertInstanceOf($className, $template);
 		$this->assertFileExists($fileName);
-		$this->assertContains("\nclass $className extends \Mustache\Template", file_get_contents($fileName));
-	}
-
-	/**
-	 * @group functional
-	 * @expectedException \RuntimeException
-	 */
-	public function testCacheFailsThrowException() {
-		global $mustacheFilesystemRenameHax;
-
-		$mustacheFilesystemRenameHax = true;
-
-		$mustache = new Mustache(array('cache' => self::$tempDir));
-		$mustache->loadTemplate('{{ foo }}');
+		$this->assertContains("\nclass $className extends Mustache_Template", file_get_contents($fileName));
 	}
 
 	/**
 	 * @expectedException \RuntimeException
 	 */
 	public function testImmutablePartialsLoadersThrowException() {
-		$mustache = new Mustache(array(
-			'partials_loader' => new StringLoader,
+		$mustache = new Mustache_Mustache(array(
+			'partials_loader' => new Mustache_Loader_StringLoader,
 		));
 
 		$mustache->setPartials(array('foo' => '{{ foo }}'));
 	}
+
 	private static function rmdir($path) {
 		$path = rtrim($path, '/').'/';
 		$handle = opendir($path);
@@ -141,15 +120,4 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 		closedir($handle);
 		rmdir($path);
 	}
-}
-
-
-// It's prob'ly best if you ignore this bit.
-
-namespace Mustache;
-
-function rename($a, $b) {
-	global $mustacheFilesystemRenameHax;
-
-	return ($mustacheFilesystemRenameHax) ? false : \rename($a, $b);
 }

@@ -9,22 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Test;
-
-use Mustache\Parser;
-use Mustache\Tokenizer;
-
 /**
  * @group unit
  */
-class ParserTest extends \PHPUnit_Framework_TestCase {
+class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @dataProvider getTokenSets
 	 */
 	public function testParse($tokens, $expected)
 	{
-		$parser = new Parser;
+		$parser = new Mustache_Parser;
 		$this->assertEquals($expected, $parser->parse($tokens));
 	}
 
@@ -43,12 +38,12 @@ class ParserTest extends \PHPUnit_Framework_TestCase {
 
 			array(
 				array(array(
-					Tokenizer::TAG => '_v',
-					Tokenizer::NAME => 'name'
+					Mustache_Tokenizer::TAG => '_v',
+					Mustache_Tokenizer::NAME => 'name'
 				)),
 				array(array(
-					Tokenizer::TAG => '_v',
-					Tokenizer::NAME => 'name'
+					Mustache_Tokenizer::TAG => '_v',
+					Mustache_Tokenizer::NAME => 'name'
 				)),
 			),
 
@@ -56,32 +51,32 @@ class ParserTest extends \PHPUnit_Framework_TestCase {
 				array(
 					'foo',
 					array(
-						Tokenizer::TAG => '^',
-						Tokenizer::INDEX => 123,
-						Tokenizer::NAME => 'parent'
+						Mustache_Tokenizer::TAG => '^',
+						Mustache_Tokenizer::INDEX => 123,
+						Mustache_Tokenizer::NAME => 'parent'
 					),
 					array(
-						Tokenizer::TAG => '_v',
-						Tokenizer::NAME => 'name'
+						Mustache_Tokenizer::TAG => '_v',
+						Mustache_Tokenizer::NAME => 'name'
 					),
 					array(
-						Tokenizer::TAG => '/',
-						Tokenizer::INDEX => 456,
-						Tokenizer::NAME => 'parent'
+						Mustache_Tokenizer::TAG => '/',
+						Mustache_Tokenizer::INDEX => 456,
+						Mustache_Tokenizer::NAME => 'parent'
 					),
 					'bar',
 				),
 				array(
 					'foo',
 					array(
-						Tokenizer::TAG => '^',
-						Tokenizer::NAME => 'parent',
-						Tokenizer::INDEX => 123,
-						Tokenizer::END => 456,
-						Tokenizer::NODES => array(
+						Mustache_Tokenizer::TAG => '^',
+						Mustache_Tokenizer::NAME => 'parent',
+						Mustache_Tokenizer::INDEX => 123,
+						Mustache_Tokenizer::END => 456,
+						Mustache_Tokenizer::NODES => array(
 							array(
-								Tokenizer::TAG => '_v',
-								Tokenizer::NAME => 'name'
+								Mustache_Tokenizer::TAG => '_v',
+								Mustache_Tokenizer::NAME => 'name'
 							),
 						),
 					),
@@ -97,7 +92,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException \LogicException
 	 */
 	public function testParserThrowsExceptions($tokens) {
-		$parser = new Parser;
+		$parser = new Mustache_Parser;
 		$parser->parse($tokens);
 	}
 
@@ -107,9 +102,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase {
 			array(
 				array(
 					array(
-						Tokenizer::TAG => '#',
-						Tokenizer::INDEX => 123,
-						Tokenizer::NAME => 'parent'
+						Mustache_Tokenizer::TAG => '#',
+						Mustache_Tokenizer::INDEX => 123,
+						Mustache_Tokenizer::NAME => 'parent'
 					),
 				),
 			),
@@ -118,9 +113,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase {
 			array(
 				array(
 					array(
-						Tokenizer::TAG => '^',
-						Tokenizer::INDEX => 123,
-						Tokenizer::NAME => 'parent'
+						Mustache_Tokenizer::TAG => '^',
+						Mustache_Tokenizer::INDEX => 123,
+						Mustache_Tokenizer::NAME => 'parent'
 					),
 				),
 			),
@@ -129,9 +124,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase {
 			array(
 				array(
 					array(
-						Tokenizer::TAG => '/',
-						Tokenizer::INDEX => 123,
-						Tokenizer::NAME => 'parent'
+						Mustache_Tokenizer::TAG => '/',
+						Mustache_Tokenizer::INDEX => 123,
+						Mustache_Tokenizer::NAME => 'parent'
 					),
 				),
 			),
@@ -140,24 +135,24 @@ class ParserTest extends \PHPUnit_Framework_TestCase {
 			array(
 				array(
 					array(
-						Tokenizer::TAG => '#',
-						Tokenizer::INDEX => 123,
-						Tokenizer::NAME => 'parent'
+						Mustache_Tokenizer::TAG => '#',
+						Mustache_Tokenizer::INDEX => 123,
+						Mustache_Tokenizer::NAME => 'parent'
 					),
 					array(
-						Tokenizer::TAG => '#',
-						Tokenizer::INDEX => 123,
-						Tokenizer::NAME => 'child'
+						Mustache_Tokenizer::TAG => '#',
+						Mustache_Tokenizer::INDEX => 123,
+						Mustache_Tokenizer::NAME => 'child'
 					),
 					array(
-						Tokenizer::TAG => '/',
-						Tokenizer::INDEX => 123,
-						Tokenizer::NAME => 'parent'
+						Mustache_Tokenizer::TAG => '/',
+						Mustache_Tokenizer::INDEX => 123,
+						Mustache_Tokenizer::NAME => 'parent'
 					),
 					array(
-						Tokenizer::TAG => '/',
-						Tokenizer::INDEX => 123,
-						Tokenizer::NAME => 'child'
+						Mustache_Tokenizer::TAG => '/',
+						Mustache_Tokenizer::INDEX => 123,
+						Mustache_Tokenizer::NAME => 'child'
 					),
 				),
 			),

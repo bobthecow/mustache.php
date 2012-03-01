@@ -10,6 +10,6 @@
  */
 
 require __DIR__.'/../src/Mustache/Autoloader.php';
-\Mustache\Autoloader::register();
+Mustache_Autoloader::register();
 
 require __DIR__.'/../vendor/yaml/lib/sfYamlParser.php';

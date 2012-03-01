@@ -9,37 +9,35 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache;
-
 /**
  * Abstract Mustache Template class.
  *
  * @abstract
  */
-abstract class Template {
+abstract class Mustache_Template {
 
 	/**
-	 * @var \Mustache\Mustache
+	 * @var Mustache_Mustache
 	 */
 	protected $mustache;
 
 	/**
 	 * Mustache Template constructor.
 	 *
-	 * @param \Mustache\Mustache $mustache
+	 * @param Mustache_Mustache $mustache
 	 */
-	public function __construct(Mustache $mustache) {
+	public function __construct(Mustache_Mustache $mustache) {
 		$this->mustache = $mustache;
 	}
 
 	/**
 	 * Mustache Template instances can be treated as a function and rendered by simply calling them:
 	 *
-	 *     $m = new Mustache;
+	 *     $m = new Mustache_Mustache;
 	 *     $tpl = $m->loadTemplate('Hello, {{ name }}!');
 	 *     echo $tpl(array('name' => 'World')); // "Hello, World!"
 	 *
-	 * @see \Mustache\Template::render
+	 * @see Mustache_Template::render
 	 *
 	 * @param mixed $context Array or object rendering context (default: array())
 	 *
@@ -57,7 +55,7 @@ abstract class Template {
 	 * @return string Rendered template
 	 */
 	public function render($context = array()) {
-		return $this->renderInternal(new Context($context));
+		return $this->renderInternal(new Mustache_Context($context));
 	}
 
 	/**
@@ -67,9 +65,9 @@ abstract class Template {
 	 *
 	 * @abstract
 	 *
-	 * @param \Mustache\Context $context
+	 * @param Mustache_Context $context
 	 *
 	 * @return string Rendered template
 	 */
-	abstract public function renderInternal(Context $context);
+	abstract public function renderInternal(Mustache_Context $context);
 }
