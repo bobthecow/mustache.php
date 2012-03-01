@@ -1,6 +1,6 @@
 <?php
 
-class Comments extends Mustache {
+class Comments {
 	public function title() {
 		return 'A Comedy of Errors';
 	}

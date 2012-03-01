@@ -1,6 +1,6 @@
 <?php
 
-class InvertedDoubleSection extends Mustache {
+class InvertedDoubleSection {
 	public $t = false;
 	public $two = 'second';
 }

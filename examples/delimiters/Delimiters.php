@@ -1,6 +1,6 @@
 <?php
 
-class Delimiters extends Mustache {
+class Delimiters {
 	public $start = "It worked the first time.";
 
 	public function middle() {

@@ -7,10 +7,8 @@
  * tags should strip leading and trailing whitespace in key names.
  *
  * `{{> tag }}` and `{{> tag}}` and `{{>tag}}` should all be equivalent.
- *
- * @extends Mustache
  */
-class Whitespace extends Mustache {
+class Whitespace {
 	public $foo = 'alpha';
 
 	public $bar = 'beta';
@@ -30,8 +28,4 @@ class Whitespace extends Mustache {
 			array('key with space' => 'G'),
 		);
 	}
-
-	protected $_partials = array(
-		'alphabet' => " * {{.}}\n",
-	);
 }

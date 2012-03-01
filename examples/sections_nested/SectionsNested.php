@@ -1,6 +1,6 @@
 <?php
 
-class SectionsNested extends Mustache {
+class SectionsNested {
 	public $name = 'Little Mac';
 
 	public function enemies() {

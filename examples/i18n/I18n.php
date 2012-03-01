@@ -1,6 +1,6 @@
 <?php
 
-class I18n extends Mustache {
+class I18n {
 
     // Variable to be interpolated
     public $name = 'Bob';
@@ -9,12 +9,12 @@ class I18n extends Mustache {
     public $__ = array(__CLASS__, '__trans');
 
     // A *very* small i18n dictionary :)
-    private $dictionary = array(
+    private static $dictionary = array(
         'Hello.' => 'Hola.',
         'My name is {{ name }}.' => 'Me llamo {{ name }}.',
     );
 
     public function __trans($text) {
-        return isset($this->dictionary[$text]) ? $this->dictionary[$text] : $text;
+        return isset(self::$dictionary[$text]) ? self::$dictionary[$text] : $text;
     }
 }

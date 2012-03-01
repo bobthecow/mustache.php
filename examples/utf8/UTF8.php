@@ -1,5 +1,5 @@
 <?php
 
-class UTF8Unescaped extends Mustache {
+class UTF8 {
 	public $test = '中文又来啦';
 }

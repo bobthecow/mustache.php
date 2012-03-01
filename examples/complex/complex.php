@@ -1,6 +1,6 @@
 <?php
 
-class Complex extends Mustache {
+class Complex {
 	public $header = 'Colors';
 
 	public $item = array(
