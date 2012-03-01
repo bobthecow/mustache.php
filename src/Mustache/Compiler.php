@@ -253,7 +253,7 @@ class Compiler {
 	 * Prepare PHP source code snippet for output.
 	 *
 	 * @param string  $text
-	 * @param int     $bonus Additional indent level (default: 0)
+	 * @param int     $bonus          Additional indent level (default: 0)
 	 * @param boolean $prependNewline Prepend a newline to the snippet? (default: true)
 	 *
 	 * @return string PHP source code snippet

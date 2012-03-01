@@ -40,10 +40,10 @@ class HigherOrderSectionsTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testRuntimeSectionCallback() {
-		$tpl = $this->mustache->loadTemplate('{{#double_wrap}}{{name}}{{/double_wrap}}');
+		$tpl = $this->mustache->loadTemplate('{{#doublewrap}}{{name}}{{/doublewrap}}');
 
 		$foo = new Foo;
-		$foo->double_wrap = array($foo, 'wrapWithBoth');
+		$foo->doublewrap = array($foo, 'wrapWithBoth');
 
 		$this->assertEquals(sprintf('<strong><em>%s</em></strong>', $foo->name), $tpl->render($foo));
 	}
@@ -80,10 +80,7 @@ class HigherOrderSectionsTest extends \PHPUnit_Framework_TestCase {
 			}
 		);
 
-		$this->assertEquals(
-			sprintf('[[%s]]', $data['name']),
-			$tpl->render($data)
-		);
+		$this->assertEquals(sprintf('[[%s]]', $data['name']), $tpl->render($data));
 	}
 
 	public function testMonsters() {

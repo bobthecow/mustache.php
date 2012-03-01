@@ -71,7 +71,7 @@ class Buffer {
 	 * @see \Mustache\Buffer::write
 	 *
 	 * @param string $text
-	 * @param bool $escape Escape this text with `htmlspecialchars()`? (default: false)
+	 * @param bool   $escape Escape this text with `htmlspecialchars()`? (default: false)
 	 */
 	public function writeText($text, $escape = false) {
 		$this->write($text, true, $escape);
@@ -81,8 +81,8 @@ class Buffer {
 	 * Add output to the Buffer.
 	 *
 	 * @param string $text
-	 * @param bool $indent Indent this line? (default: false)
-	 * @param bool $escape Escape this text with `htmlspecialchars()`? (default: false)
+	 * @param bool   $indent Indent this line? (default: false)
+	 * @param bool   $escape Escape this text with `htmlspecialchars()`? (default: false)
 	 */
 	public function write($text, $indent = false, $escape = false) {
 		$text = (string) $text;

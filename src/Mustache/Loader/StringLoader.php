@@ -25,7 +25,7 @@ class StringLoader implements Loader {
 	/**
 	 * Load a Template by source.
 	 *
-	 * @param  string $name Mustache Template source
+	 * @param string $name Mustache Template source
 	 *
 	 * @return string Mustache Template source
 	 */

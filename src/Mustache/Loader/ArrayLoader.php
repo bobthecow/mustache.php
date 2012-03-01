@@ -37,7 +37,7 @@ class ArrayLoader implements Loader, MutableLoader {
 	/**
 	 * Load a Template.
 	 *
-	 * @param  string $name
+	 * @param string $name
 	 *
 	 * @return string Mustache Template source
 	 */

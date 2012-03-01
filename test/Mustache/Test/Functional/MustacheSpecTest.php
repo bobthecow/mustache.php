@@ -106,11 +106,14 @@ class MustacheSpecTest extends \PHPUnit_Framework_TestCase {
 				}
 
 				$func = $val['php'];
-				$data[$key] = function($text = null) use ($func) { return eval($func); };
+				$data[$key] = function($text = null) use ($func) {
+					return eval($func);
+				};
 			} else if (is_array($val)) {
 				$data[$key] = $this->prepareLambdasSpec($val);
 			}
 		}
+
 		return $data;
 	}
 

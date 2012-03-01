@@ -12,7 +12,7 @@ class Parser {
 	/**
 	 * Process an array of Mustache tokens and convert them into a parse tree.
 	 *
-	 * @param array $tree Set of Mustache tokens
+	 * @param array $tokens Set of Mustache tokens
 	 *
 	 * @return array Mustache token parse tree
 	 */
@@ -69,7 +69,7 @@ class Parser {
 				$nodes[] = $token;
 			}
 
-		} while($tokens->valid());
+		} while ($tokens->valid());
 
 		if (isset($parent)) {
 			throw new \LogicException('Missing closing tag: ' . $parent[Tokenizer::NAME]);

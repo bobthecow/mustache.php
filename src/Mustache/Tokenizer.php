@@ -53,7 +53,7 @@ class Tokenizer {
 	private $state;
 	private $tagType;
 	private $tag;
-	private $buf;
+	private $buffer;
 	private $tokens;
 	private $seenTag;
 	private $lineStart;

@@ -23,26 +23,6 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 		}
 	}
 
-	private static function rmdir($path) {
-		$path = rtrim($path, '/').'/';
-		$handle = opendir($path);
-		while (($file = readdir($handle)) !== false) {
-			if ($file == '.' || $file == '..') {
-				continue;
-			}
-
-			$fullpath = $path.$file;
-			if (is_dir($fullpath)) {
-				self::rmdir($fullpath);
-			} else {
-				unlink($fullpath);
-			}
-		}
-
-		closedir($handle);
-		rmdir($path);
-	}
-
 	public function testConstructor() {
 		$loader         = new StringLoader;
 		$partialsLoader = new ArrayLoader;
@@ -132,6 +112,25 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 		));
 
 		$mustache->setPartials(array('foo' => '{{ foo }}'));
+	}
+	private static function rmdir($path) {
+		$path = rtrim($path, '/').'/';
+		$handle = opendir($path);
+		while (($file = readdir($handle)) !== false) {
+			if ($file == '.' || $file == '..') {
+				continue;
+			}
+
+			$fullpath = $path.$file;
+			if (is_dir($fullpath)) {
+				self::rmdir($fullpath);
+			} else {
+				unlink($fullpath);
+			}
+		}
+
+		closedir($handle);
+		rmdir($path);
 	}
 }
 

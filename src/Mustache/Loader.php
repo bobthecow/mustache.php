@@ -10,7 +10,7 @@ interface Loader {
 	/**
 	 * Load a Template by name.
 	 *
-	 * @param  string $name
+	 * @param string $name
 	 *
 	 * @return string Mustache Template source
 	 */

@@ -59,7 +59,7 @@ class FilesystemLoader implements Loader {
 	 *     $loader = new FilesystemLoader(__DIR__.'/views');
 	 *     $loader->load('admin/dashboard'); // loads "./views/admin/dashboard.mustache";
 	 *
-	 * @param  string $name
+	 * @param string $name
 	 *
 	 * @return string Mustache Template source
 	 */

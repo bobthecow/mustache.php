@@ -105,7 +105,9 @@ class MustacheInjectionTest extends \PHPUnit_Framework_TestCase {
 		$tpl = $this->mustache->loadTemplate('{{ a }}');
 
 		$data = array(
-			'a' => function() { return '{{ b }}'; },
+			'a' => function() {
+				return '{{ b }}';
+			},
 			'b' => '{{ c }}',
 			'c' => 'FAIL'
 		);
@@ -117,7 +119,9 @@ class MustacheInjectionTest extends \PHPUnit_Framework_TestCase {
 		$tpl = $this->mustache->loadTemplate('{{# a }}b{{/ a }}');
 
 		$data = array(
-			'a' => function ($text) { return '{{ ' . $text . ' }}'; },
+			'a' => function ($text) {
+				return '{{ ' . $text . ' }}';
+			},
 			'b' => '{{ c }}',
 			'c' => 'FAIL'
 		);

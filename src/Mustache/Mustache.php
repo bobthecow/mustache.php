@@ -19,7 +19,7 @@ use Mustache\Loader\StringLoader;
  * @author Justin Hileman {@link http://justinhileman.com}
  */
 class Mustache {
-	const VERSION      = '2.0.0-a1';
+	const VERSION      = '2.0.0-dev';
 	const SPEC_VERSION = '1.1.2';
 
 	// Template cache
@@ -188,7 +188,7 @@ class Mustache {
 	/**
 	 * Set the Mustache Parser instance.
 	 *
-	 * @param \Mustache\Parser $tokenizer
+	 * @param \Mustache\Parser $parser
 	 */
 	public function setParser(Parser $parser) {
 		$this->parser = $parser;
@@ -212,7 +212,7 @@ class Mustache {
 	/**
 	 * Set the Mustache Compiler instance.
 	 *
-	 * @param \Mustache\Compiler $tokenizer
+	 * @param \Mustache\Compiler $compiler
 	 */
 	public function setCompiler(Compiler $compiler) {
 		$this->compiler = $compiler;

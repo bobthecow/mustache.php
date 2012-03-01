@@ -180,7 +180,7 @@ class Context {
 	 *
 	 * @see \Mustache\Context::find
 	 *
-	 * @param string $id Variable name
+	 * @param string $id    Variable name
 	 * @param array  $stack Context stack
 	 *
 	 * @return mixed Variable value, or '' if not found

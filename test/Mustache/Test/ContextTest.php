@@ -45,7 +45,9 @@ class ContextTest extends \PHPUnit_Framework_TestCase {
 		$dummy   = new TestDummy;
 		$context = new Context;
 
-		$this->assertTrue($context->isCallable(function() { return null; }));
+		$this->assertTrue($context->isCallable(function() {
+			return null;
+		}));
 		$this->assertTrue($context->isCallable(array('\Mustache\Test\TestDummy', 'foo')));
 		$this->assertTrue($context->isCallable(array($dummy, 'bar')));
 		$this->assertTrue($context->isCallable($dummy));
@@ -140,10 +142,15 @@ class ContextTest extends \PHPUnit_Framework_TestCase {
 
 class TestDummy {
 	public $name = 'dummy';
-	public function __invoke() {}
+
+	public function __invoke() {
+		// nothing
+	}
+
 	public static function foo() {
 		return '<foo>';
 	}
+
 	public function bar() {
 		return '<bar>';
 	}

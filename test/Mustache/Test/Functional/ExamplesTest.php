@@ -64,6 +64,7 @@ class ExamplesTest extends \PHPUnit_Framework_TestCase {
 	 * Helper method to load an example given the full path.
 	 *
 	 * @param string $path
+	 *
 	 * @return array arguments for testExamples
 	 */
 	private function loadExample($path) {
@@ -106,7 +107,7 @@ class ExamplesTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Helper method to load partials given an example directory.
 	 *
-	 * @param  string $path
+	 * @param string $path
 	 *
 	 * @return array  $partials
 	 */
