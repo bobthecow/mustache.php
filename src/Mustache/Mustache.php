@@ -47,17 +47,17 @@ class Mustache_Mustache {
 	 *         'template_class_prefix' => '__MyTemplates_',
 	 *
 	 *         // A cache directory for compiled templates. Mustache will not cache templates unless this is set
-	 *         'cache' => __DIR__.'/tmp/cache/mustache',
+	 *         'cache' => dirname(__FILE__).'/tmp/cache/mustache',
 	 *
 	 *         // A Mustache template loader instance. Uses a StringLoader if not specified
-	 *         'loader' => new Mustache_Loader_FilesystemLoader(__DIR__.'/views'),
+	 *         'loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/views'),
 	 *
 	 *         // A Mustache loader instance for partials.
-	 *         'partials_loader' => new Mustache_Loader_FilesystemLoader(__DIR__.'/views/partials'),
+	 *         'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/views/partials'),
 	 *
 	 *         // An array of Mustache partials. Useful for quick-and-dirty string template loading, but not as
 	 *         // efficient or lazy as a Filesystem (or database) loader.
-	 *         'partials' => array('foo' => file_get_contents(__DIR__.'/views/partials/foo.mustache')),
+	 *         'partials' => array('foo' => file_get_contents(dirname(__FILE__).'/views/partials/foo.mustache')),
 	 *
 	 *         // An array of 'helpers'. Helpers can be global variables or objects, closures (e.g. for higher order
 	 *         // sections), or any other valid Mustache context value. They will be prepended to the context stack,

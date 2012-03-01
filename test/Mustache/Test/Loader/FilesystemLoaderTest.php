@@ -14,14 +14,14 @@
  */
 class Mustache_Test_Loader_FilesystemLoaderTest extends PHPUnit_Framework_TestCase {
 	public function testConstructor() {
-		$baseDir = realpath(__DIR__.'/../../../fixtures/templates');
+		$baseDir = realpath(dirname(__FILE__).'/../../../fixtures/templates');
 		$loader = new Mustache_Loader_FilesystemLoader($baseDir, array('extension' => '.ms'));
 		$this->assertEquals('alpha contents', $loader->load('alpha'));
 		$this->assertEquals('beta contents', $loader->load('beta.ms'));
 	}
 
 	public function testLoadTemplates() {
-		$baseDir = realpath(__DIR__.'/../../../fixtures/templates');
+		$baseDir = realpath(dirname(__FILE__).'/../../../fixtures/templates');
 		$loader = new Mustache_Loader_FilesystemLoader($baseDir);
 		$this->assertEquals('one contents', $loader->load('one'));
 		$this->assertEquals('two contents', $loader->load('two.mustache'));
@@ -31,14 +31,14 @@ class Mustache_Test_Loader_FilesystemLoaderTest extends PHPUnit_Framework_TestCa
 	 * @expectedException \RuntimeException
 	 */
 	public function testMissingBaseDirThrowsException() {
-		$loader = new Mustache_Loader_FilesystemLoader(__DIR__.'/not_a_directory');
+		$loader = new Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/not_a_directory');
 	}
 
 	/**
 	 * @expectedException \InvalidArgumentException
 	 */
 	public function testMissingTemplateThrowsException() {
-		$baseDir = realpath(__DIR__.'/../../../fixtures/templates');
+		$baseDir = realpath(dirname(__FILE__).'/../../../fixtures/templates');
 		$loader = new Mustache_Loader_FilesystemLoader($baseDir);
 
 		$loader->load('fake');

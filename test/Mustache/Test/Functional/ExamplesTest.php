@@ -46,7 +46,7 @@ class Mustache_Test_Functional_ExamplesTest extends PHPUnit_Framework_TestCase {
 	 * @return array
 	 */
 	public function getExamples() {
-		$path     = realpath(__DIR__.'/../../../../examples');
+		$path     = realpath(dirname(__FILE__).'/../../../../examples');
 		$examples = array();
 
 		$handle   = opendir($path);
