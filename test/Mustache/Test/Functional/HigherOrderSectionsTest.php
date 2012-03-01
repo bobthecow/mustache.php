@@ -1,93 +1,115 @@
 <?php
 
-require_once '../Mustache.php';
+namespace Mustache\Test\Functional;
 
-class MustacheHigherOrderSectionsTest extends PHPUnit_Framework_TestCase {
+use Mustache\Mustache;
+
+/**
+ * @group lambdas
+ * @group functional
+ */
+class HigherOrderSectionsTest extends \PHPUnit_Framework_TestCase {
+
+	private $mustache;
 
 	public function setUp() {
-		$this->foo = new Foo();
+		$this->mustache = new Mustache;
 	}
 
 	public function testAnonymousFunctionSectionCallback() {
-		if (version_compare(PHP_VERSION, '5.3.0', '<')) {
-			$this->markTestSkipped('Unable to test anonymous function section callbacks in PHP < 5.3');
-			return;
-		}
+		$tpl = $this->mustache->loadTemplate('{{#wrapper}}{{name}}{{/wrapper}}');
 
-		$this->foo->wrapper = function($text) {
+		$foo = new Foo;
+		$foo->name = 'Mario';
+		$foo->wrapper = function($text) {
 			return sprintf('<div class="anonymous">%s</div>', $text);
 		};
 
-		$this->assertEquals(
-			sprintf('<div class="anonymous">%s</div>', $this->foo->name),
-			$this->foo->render('{{#wrapper}}{{name}}{{/wrapper}}')
-		);
+		$this->assertEquals(sprintf('<div class="anonymous">%s</div>', $foo->name), $tpl->render($foo));
 	}
 
 	public function testSectionCallback() {
-		$this->assertEquals(sprintf('%s', $this->foo->name), $this->foo->render('{{name}}'));
-		$this->assertEquals(sprintf('<em>%s</em>', $this->foo->name), $this->foo->render('{{#wrap}}{{name}}{{/wrap}}'));
+		$one = $this->mustache->loadTemplate('{{name}}');
+		$two = $this->mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
+
+		$foo = new Foo;
+		$foo->name = 'Luigi';
+
+		$this->assertEquals($foo->name, $one->render($foo));
+		$this->assertEquals(sprintf('<em>%s</em>', $foo->name), $two->render($foo));
 	}
 
 	public function testRuntimeSectionCallback() {
-		$this->foo->double_wrap = array($this->foo, 'wrapWithBoth');
-		$this->assertEquals(
-			sprintf('<strong><em>%s</em></strong>', $this->foo->name),
-			$this->foo->render('{{#double_wrap}}{{name}}{{/double_wrap}}')
-		);
+		$tpl = $this->mustache->loadTemplate('{{#double_wrap}}{{name}}{{/double_wrap}}');
+
+		$foo = new Foo;
+		$foo->double_wrap = array($foo, 'wrapWithBoth');
+
+		$this->assertEquals(sprintf('<strong><em>%s</em></strong>', $foo->name), $tpl->render($foo));
 	}
 
 	public function testStaticSectionCallback() {
-		$this->foo->trimmer = array(get_class($this->foo), 'staticTrim');
-		$this->assertEquals($this->foo->name, $this->foo->render('{{#trimmer}}    {{name}}    {{/trimmer}}'));
+		$tpl = $this->mustache->loadTemplate('{{#trimmer}}    {{name}}    {{/trimmer}}');
+
+		$foo = new Foo;
+		$foo->trimmer = array(get_class($foo), 'staticTrim');
+
+		$this->assertEquals($foo->name, $tpl->render($foo));
 	}
 
 	public function testViewArraySectionCallback() {
+		$tpl = $this->mustache->loadTemplate('{{#trim}}    {{name}}    {{/trim}}');
+
+		$foo = new Foo;
+
 		$data = array(
 			'name' => 'Bob',
-			'trim' => array(get_class($this->foo), 'staticTrim'),
+			'trim' => array(get_class($foo), 'staticTrim'),
 		);
-		$this->assertEquals($data['name'], $this->foo->render('{{#trim}}    {{name}}    {{/trim}}', $data));
+
+		$this->assertEquals($data['name'], $tpl->render($data));
 	}
 
 	public function testViewArrayAnonymousSectionCallback() {
-		if (version_compare(PHP_VERSION, '5.3.0', '<')) {
-			$this->markTestSkipped('Unable to test anonymous function section callbacks in PHP < 5.3');
-			return;
-		}
+		$tpl = $this->mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
+
 		$data = array(
 			'name' => 'Bob',
 			'wrap' => function($text) {
 				return sprintf('[[%s]]', $text);
 			}
 		);
+
 		$this->assertEquals(
 			sprintf('[[%s]]', $data['name']),
-			$this->foo->render('{{#wrap}}{{name}}{{/wrap}}', $data)
+			$tpl->render($data)
 		);
 	}
 
 	public function testMonsters() {
+		$tpl = $this->mustache->loadTemplate('{{#title}}{{title}} {{/title}}{{name}}');
+
 		$frank = new Monster();
 		$frank->title = 'Dr.';
 		$frank->name  = 'Frankenstein';
-		$this->assertEquals('Dr. Frankenstein', $frank->render());
+		$this->assertEquals('Dr. Frankenstein', $tpl->render($frank));
 
 		$dracula = new Monster();
 		$dracula->title = 'Count';
 		$dracula->name  = 'Dracula';
-		$this->assertEquals('Count Dracula', $dracula->render());
+		$this->assertEquals('Count Dracula', $tpl->render($dracula));
 	}
 }
 
-class Foo extends Mustache {
+class Foo {
 	public $name = 'Justin';
 	public $lorem = 'Lorem ipsum dolor sit amet,';
 	public $wrap;
 
-	public function __construct($template = null, $view = null, $partials = null) {
-		$this->wrap = array($this, 'wrapWithEm');
-		parent::__construct($template, $view, $partials);
+	public function __construct() {
+		$this->wrap = function($text) {
+			return sprintf('<em>%s</em>', $text);
+		};
 	}
 
 	public function wrapWithEm($text) {
@@ -107,8 +129,7 @@ class Foo extends Mustache {
 	}
 }
 
-class Monster extends Mustache {
-	public $_template = '{{#title}}{{title}} {{/title}}{{name}}';
+class Monster {
 	public $title;
 	public $name;
 }

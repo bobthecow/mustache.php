@@ -1,60 +1,41 @@
 <?php
 
-require_once '../Mustache.php';
-require_once '../MustacheLoader.php';
+namespace Mustache\Test\Loader;
+
+use Mustache\Loader\FilesystemLoader;
 
 /**
- * @group loader
+ * @group unit
  */
-class MustacheLoaderTest extends PHPUnit_Framework_TestCase {
-
-	public function testTheActualFilesystemLoader() {
-		$loader = new MustacheLoader(dirname(__FILE__).'/fixtures');
-		$this->assertEquals(file_get_contents(dirname(__FILE__).'/fixtures/foo.mustache'), $loader['foo']);
-		$this->assertEquals(file_get_contents(dirname(__FILE__).'/fixtures/bar.mustache'), $loader['bar']);
+class FilesystemLoaderTest extends \PHPUnit_Framework_TestCase {
+	public function testConstructor() {
+		$baseDir = realpath(__DIR__.'/../../../fixtures/templates');
+		$loader = new FilesystemLoader($baseDir, array('extension' => '.ms'));
+		$this->assertEquals('alpha contents', $loader->load('alpha'));
+		$this->assertEquals('beta contents', $loader->load('beta.ms'));
 	}
 
-	public function testMustacheUsesFilesystemLoader() {
-		$template = '{{> foo }} {{> bar }}';
-		$data = array(
-			'truthy' => true,
-			'foo'    => 'FOO',
-			'bar'    => 'BAR',
-		);
-		$output = 'FOO BAR';
-		$m = new Mustache();
-		$partials = new MustacheLoader(dirname(__FILE__).'/fixtures');
-		$this->assertEquals($output, $m->render($template, $data, $partials));
+	public function testLoadTemplates() {
+		$baseDir = realpath(__DIR__.'/../../../fixtures/templates');
+		$loader = new FilesystemLoader($baseDir);
+		$this->assertEquals('one contents', $loader->load('one'));
+		$this->assertEquals('two contents', $loader->load('two.mustache'));
 	}
 
-	public function testMustacheUsesDifferentLoadersToo() {
-		$template = '{{> foo }} {{> bar }}';
-		$data = array(
-			'truthy' => true,
-			'foo'    => 'FOO',
-			'bar'    => 'BAR',
-		);
-		$output = 'FOO BAR';
-		$m = new Mustache();
-		$partials = new DifferentMustacheLoader();
-		$this->assertEquals($output, $m->render($template, $data, $partials));
-	}
-}
-
-class DifferentMustacheLoader implements ArrayAccess {
-	protected $partials = array(
-		'foo' => '{{ foo }}',
-		'bar' => '{{# truthy }}{{ bar }}{{/ truthy }}',
-	);
-
-	public function offsetExists($offset) {
-		return isset($this->partials[$offset]);
+	/**
+	 * @expectedException \RuntimeException
+	 */
+	public function testMissingBaseDirThrowsException() {
+		$loader = new FilesystemLoader(__DIR__.'/not_a_directory');
 	}
 
-	public function offsetGet($offset) {
-		return $this->partials[$offset];
-	}
+	/**
+	 * @expectedException \InvalidArgumentException
+	 */
+	public function testMissingTemplateThrowsException() {
+		$baseDir = realpath(__DIR__.'/../../../fixtures/templates');
+		$loader = new FilesystemLoader($baseDir);
 
-	public function offsetSet($offset, $value) {}
-	public function offsetUnset($offset) {}
+		$loader->load('fake');
+	}
 }

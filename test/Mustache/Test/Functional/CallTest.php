@@ -1,18 +1,25 @@
 <?php
 
-require_once '../Mustache.php';
+namespace Mustache\Test\Functional;
 
-class MustacheCallTest extends PHPUnit_Framework_TestCase {
+use Mustache\Mustache;
+
+/**
+ * @group magic_methods
+ * @group functional
+ */
+class CallTest extends \PHPUnit_Framework_TestCase {
 
 	public function testCallEatsContext() {
+		$m = new Mustache;
+		$tpl = $m->loadTemplate('{{# foo }}{{ label }}: {{ name }}{{/ foo }}');
+
 		$foo = new ClassWithCall();
 		$foo->name = 'Bob';
 
-		$template = '{{# foo }}{{ label }}: {{ name }}{{/ foo }}';
 		$data = array('label' => 'name', 'foo' => $foo);
-		$m = new Mustache($template, $data);
 
-		$this->assertEquals('name: Bob', $m->render());
+		$this->assertEquals('name: Bob', $tpl->render($data));
 	}
 }
 

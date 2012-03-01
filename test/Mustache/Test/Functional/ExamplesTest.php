@@ -4,12 +4,15 @@ namespace Mustache\Test\Functional;
 
 use Mustache\Mustache;
 
+/**
+ * @group examples
+ * @group functional
+ */
 class ExamplesTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * Test everything in the `examples` directory.
 	 *
-	 * @group examples
 	 * @dataProvider getExamples
 	 *
 	 * @param string $context

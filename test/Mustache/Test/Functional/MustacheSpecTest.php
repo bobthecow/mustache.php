@@ -1,22 +1,30 @@
 <?php
 
-require_once '../Mustache.php';
-require_once './lib/yaml/lib/sfYamlParser.php';
+namespace Mustache\Test\Functional;
+
+use Mustache\Mustache;
+use Mustache\Loader\StringLoader;
 
 /**
  * A PHPUnit test case wrapping the Mustache Spec
  *
  * @group mustache-spec
+ * @group functional
  */
-class MustacheSpecTest extends PHPUnit_Framework_TestCase {
+class MustacheSpecTest extends \PHPUnit_Framework_TestCase {
+
+	private static $mustache;
+
+	public static function setUpBeforeClass() {
+		self::$mustache = new Mustache;
+	}
 
 	/**
 	 * For some reason data providers can't mark tests skipped, so this test exists
 	 * simply to provide a 'skipped' test if the `spec` submodule isn't initialized.
 	 */
 	public function testSpecInitialized() {
-		$spec_dir = dirname(__FILE__) . '/spec/specs/';
-		if (!file_exists($spec_dir)) {
+		if (!file_exists(__DIR__.'/../../../spec/specs/')) {
 			$this->markTestSkipped('Mustache spec submodule not initialized: run "git submodule update --init"');
 		}
 	}
@@ -25,56 +33,72 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	 * @group comments
 	 * @dataProvider loadCommentSpec
 	 */
-	public function testCommentSpec($desc, $template, $data, $partials, $expected) {
-		$m = new Mustache($template, $data, $partials);
-		$this->assertEquals($expected, $m->render(), $desc);
+	public function testCommentSpec($desc, $source, $partials, $data, $expected) {
+		$template = self::loadTemplate($source, $partials);
+		$this->assertEquals($expected, $template($data), $desc);
+	}
+
+	public function loadCommentSpec() {
+		return $this->loadSpec('comments');
 	}
 
 	/**
 	 * @group delimiters
 	 * @dataProvider loadDelimitersSpec
 	 */
-	public function testDelimitersSpec($desc, $template, $data, $partials, $expected) {
-		$m = new Mustache($template, $data, $partials);
-		$this->assertEquals($expected, $m->render(), $desc);
+	public function testDelimitersSpec($desc, $source, $partials, $data, $expected) {
+		$template = self::loadTemplate($source, $partials);
+		$this->assertEquals($expected, $template($data), $desc);
+	}
+
+	public function loadDelimitersSpec() {
+		return $this->loadSpec('delimiters');
 	}
 
 	/**
 	 * @group interpolation
 	 * @dataProvider loadInterpolationSpec
 	 */
-	public function testInterpolationSpec($desc, $template, $data, $partials, $expected) {
-		$m = new Mustache($template, $data, $partials);
-		$this->assertEquals($expected, $m->render(), $desc);
+	public function testInterpolationSpec($desc, $source, $partials, $data, $expected) {
+		$template = self::loadTemplate($source, $partials);
+		$this->assertEquals($expected, $template($data), $desc);
+	}
+
+	public function loadInterpolationSpec() {
+		return $this->loadSpec('interpolation');
 	}
 
 	/**
+	 * @group inverted
 	 * @group inverted-sections
 	 * @dataProvider loadInvertedSpec
 	 */
-	public function testInvertedSpec($desc, $template, $data, $partials, $expected) {
-		$m = new Mustache($template, $data, $partials);
-		$this->assertEquals($expected, $m->render(), $desc);
+	public function testInvertedSpec($desc, $source, $partials, $data, $expected) {
+		$template = self::loadTemplate($source, $partials);
+		$this->assertEquals($expected, $template($data), $desc);
+	}
+
+	public function loadInvertedSpec() {
+		return $this->loadSpec('inverted');
 	}
 
 	/**
 	 * @group lambdas
 	 * @dataProvider loadLambdasSpec
 	 */
-	public function testLambdasSpec($desc, $template, $data, $partials, $expected) {
-		if (!version_compare(PHP_VERSION, '5.3.0', '>=')) {
-			$this->markTestSkipped('Unable to test Lambdas spec with PHP < 5.3.');
-		}
+	public function testLambdasSpec($desc, $source, $partials, $data, $expected) {
+		$template = self::loadTemplate($source, $partials);
+		$this->assertEquals($expected, $template($this->prepareLambdasSpec($data)), $desc);
+	}
 
-		$data = $this->prepareLambdasSpec($data);
-		$m = new Mustache($template, $data, $partials);
-		$this->assertEquals($expected, $m->render(), $desc);
+	public function loadLambdasSpec() {
+		return $this->loadSpec('~lambdas');
 	}
 
 	/**
 	 * Extract and lambdafy any 'lambda' values found in the $data array.
 	 */
-	protected function prepareLambdasSpec($data) {
+	private function prepareLambdasSpec($data) {
 		foreach ($data as $key => $val) {
 			if ($key === 'lambda') {
 				if (!isset($val['php'])) {
@@ -94,42 +118,22 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	 * @group partials
 	 * @dataProvider loadPartialsSpec
 	 */
-	public function testPartialsSpec($desc, $template, $data, $partials, $expected) {
-		$m = new Mustache($template, $data, $partials);
-		$this->assertEquals($expected, $m->render(), $desc);
+	public function testPartialsSpec($desc, $source, $partials, $data, $expected) {
+		$template = self::loadTemplate($source, $partials);
+		$this->assertEquals($expected, $template($data), $desc);
+	}
+
+	public function loadPartialsSpec() {
+		return $this->loadSpec('partials');
 	}
 
 	/**
 	 * @group sections
 	 * @dataProvider loadSectionsSpec
 	 */
-	public function testSectionsSpec($desc, $template, $data, $partials, $expected) {
-		$m = new Mustache($template, $data, $partials);
-		$this->assertEquals($expected, $m->render(), $desc);
-	}
-
-	public function loadCommentSpec() {
-		return $this->loadSpec('comments');
-	}
-
-	public function loadDelimitersSpec() {
-		return $this->loadSpec('delimiters');
-	}
-
-	public function loadInterpolationSpec() {
-		return $this->loadSpec('interpolation');
-	}
-
-	public function loadInvertedSpec() {
-		return $this->loadSpec('inverted');
-	}
-
-	public function loadLambdasSpec() {
-		return $this->loadSpec('~lambdas');
-	}
-
-	public function loadPartialsSpec() {
-		return $this->loadSpec('partials');
+	public function testSectionsSpec($desc, $source, $partials, $data, $expected) {
+		$template = self::loadTemplate($source, $partials);
+		$this->assertEquals($expected, $template($data), $desc);
 	}
 
 	public function loadSectionsSpec() {
@@ -144,14 +148,14 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 	 * @access public
 	 * @return array
 	 */
-	protected function loadSpec($name) {
-		$filename = dirname(__FILE__) . '/spec/specs/' . $name . '.yml';
+	private function loadSpec($name) {
+		$filename = __DIR__ . '/../../../spec/specs/' . $name . '.yml';
 		if (!file_exists($filename)) {
 			return array();
 		}
 
 		$data = array();
-		$yaml = new sfYamlParser();
+		$yaml = new \sfYamlParser;
 		$file = file_get_contents($filename);
 
 		// @hack: pre-process the 'lambdas' spec so the Symfony YAML parser doesn't complain.
@@ -160,15 +164,23 @@ class MustacheSpecTest extends PHPUnit_Framework_TestCase {
 		}
 
 		$spec = $yaml->parse($file);
+
 		foreach ($spec['tests'] as $test) {
 			$data[] = array(
 				$test['name'] . ': ' . $test['desc'],
 				$test['template'],
-				$test['data'],
 				isset($test['partials']) ? $test['partials'] : array(),
+				$test['data'],
 				$test['expected'],
 			);
 		}
+
 		return $data;
+	}
+
+	private static function loadTemplate($source, $partials) {
+		self::$mustache->setPartials($partials);
+
+		return self::$mustache->loadTemplate($source);
 	}
 }

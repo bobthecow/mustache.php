@@ -1,48 +1,64 @@
 <?php
 
-require_once '../Mustache.php';
+namespace Mustache\Test\Functional;
+
+use Mustache\Mustache;
 
 /**
  * @group sections
+ * @group functional
  */
-class MustacheObjectSectionTest extends PHPUnit_Framework_TestCase {
+class ObjectSectionTest extends \PHPUnit_Framework_TestCase {
+	private $mustache;
+
+	public function setUp() {
+		$this->mustache = new Mustache;
+	}
+
 	public function testBasicObject() {
-		$alpha = new Alpha();
-		$this->assertEquals('Foo', $alpha->render('{{#foo}}{{name}}{{/foo}}'));
+		$tpl = $this->mustache->loadTemplate('{{#foo}}{{name}}{{/foo}}');
+		$this->assertEquals('Foo', $tpl->render(new Alpha));
 	}
 
+	/**
+	 * @group magic_methods
+	 */
 	public function testObjectWithGet() {
-		$beta = new Beta();
-		$this->assertEquals('Foo', $beta->render('{{#foo}}{{name}}{{/foo}}'));
+		$tpl = $this->mustache->loadTemplate('{{#foo}}{{name}}{{/foo}}');
+		$this->assertEquals('Foo', $tpl->render(new Beta));
 	}
 
+	/**
+	 * @group magic_methods
+	 */
 	public function testSectionObjectWithGet() {
-		$gamma = new Gamma();
-		$this->assertEquals('Foo', $gamma->render('{{#bar}}{{#foo}}{{name}}{{/foo}}{{/bar}}'));
+		$tpl = $this->mustache->loadTemplate('{{#bar}}{{#foo}}{{name}}{{/foo}}{{/bar}}');
+		$this->assertEquals('Foo', $tpl->render(new Gamma));
 	}
 
 	public function testSectionObjectWithFunction() {
-		$alpha = new Alpha();
-		$alpha->foo = new Delta();
-		$this->assertEquals('Foo', $alpha->render('{{#foo}}{{name}}{{/foo}}'));
+		$tpl = $this->mustache->loadTemplate('{{#foo}}{{name}}{{/foo}}');
+		$alpha = new Alpha;
+		$alpha->foo = new Delta;
+		$this->assertEquals('Foo', $tpl->render($alpha));
 	}
 }
 
-class Alpha extends Mustache {
+class Alpha {
 	public $foo;
 
 	public function __construct() {
-		$this->foo = new StdClass();
+		$this->foo = new \StdClass();
 		$this->foo->name = 'Foo';
 		$this->foo->number = 1;
 	}
 }
 
-class Beta extends Mustache {
+class Beta {
 	protected $_data = array();
 
 	public function __construct() {
-		$this->_data['foo'] = new StdClass();
+		$this->_data['foo'] = new \StdClass();
 		$this->_data['foo']->name = 'Foo';
 		$this->_data['foo']->number = 1;
 	}
@@ -56,7 +72,7 @@ class Beta extends Mustache {
 	}
 }
 
-class Gamma extends Mustache {
+class Gamma {
 	public $bar;
 
 	public function __construct() {
@@ -64,7 +80,7 @@ class Gamma extends Mustache {
 	}
 }
 
-class Delta extends Mustache {
+class Delta {
 	protected $_name = 'Foo';
 
 	public function name() {
