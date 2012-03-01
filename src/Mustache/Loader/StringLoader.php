@@ -9,10 +9,6 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Loader;
-
-use Mustache\Loader;
-
 /**
  * Mustache Template string Loader implementation.
  *
@@ -29,7 +25,7 @@ use Mustache\Loader;
  *
  * @implements Loader
  */
-class StringLoader implements Loader {
+class Mustache_Loader_StringLoader implements Mustache_Loader {
 
 	/**
 	 * Load a Template by source.

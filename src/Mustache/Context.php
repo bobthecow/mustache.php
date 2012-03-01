@@ -9,12 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache;
-
 /**
  * Mustache Template rendering Context.
  */
-class Context {
+class Mustache_Context {
 	private $stack = array();
 
 	/**
@@ -118,7 +116,7 @@ class Context {
 	/**
 	 * Helper function to find a variable in the Context stack.
 	 *
-	 * @see \Mustache\Context::find
+	 * @see Mustache_Context::find
 	 *
 	 * @param string $id    Variable name
 	 * @param array  $stack Context stack

@@ -9,12 +9,6 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache;
-
-use Mustache\Loader\ArrayLoader;
-use Mustache\Loader\MutableLoader;
-use Mustache\Loader\StringLoader;
-
 /**
  * A Mustache implementation in PHP.
  *
@@ -27,7 +21,7 @@ use Mustache\Loader\StringLoader;
  *
  * @author Justin Hileman {@link http://justinhileman.com}
  */
-class Mustache {
+class Mustache_Mustache {
 	const VERSION      = '2.0.0-dev';
 	const SPEC_VERSION = '1.1.2';
 
@@ -50,16 +44,16 @@ class Mustache {
 	 *
 	 *     $options = array(
 	 *         // The class prefix for compiled templates. Defaults to '__Mustache_'
-	 *         'template_class_prefix' => '\My\Namespace\Template\',
+	 *         'template_class_prefix' => '__MyTemplates_',
 	 *
 	 *         // A cache directory for compiled templates. Mustache will not cache templates unless this is set
 	 *         'cache' => __DIR__.'/tmp/cache/mustache',
 	 *
 	 *         // A Mustache template loader instance. Uses a StringLoader if not specified
-	 *         'loader' => new \Mustache\Loader\FilesystemLoader(__DIR__.'/views'),
+	 *         'loader' => new Mustache_Loader_FilesystemLoader(__DIR__.'/views'),
 	 *
 	 *         // A Mustache loader instance for partials.
-	 *         'partials_loader' => new \Mustache\Loader\FilesystemLoader(__DIR__.'/views/partials'),
+	 *         'partials_loader' => new Mustache_Loader_FilesystemLoader(__DIR__.'/views/partials'),
 	 *
 	 *         // An array of Mustache partials. Useful for quick-and-dirty string template loading, but not as
 	 *         // efficient or lazy as a Filesystem (or database) loader.
@@ -126,8 +120,8 @@ class Mustache {
 	 *
 	 * Equivalent to calling `$mustache->loadTemplate($template)->render($data);`
 	 *
-	 * @see \Mustache\Mustache::loadTemplate
-	 * @see \Mustache\Template::render
+	 * @see Mustache_Mustache::loadTemplate
+	 * @see Mustache_Template::render
 	 *
 	 * @param string $template
 	 * @param mixed  $data
@@ -159,9 +153,9 @@ class Mustache {
 	/**
 	 * Set the Mustache template Loader instance.
 	 *
-	 * @param \Mustache\Loader $loader
+	 * @param Mustache_Loader $loader
 	 */
-	public function setLoader(Loader $loader) {
+	public function setLoader(Mustache_Loader $loader) {
 		$this->loader = $loader;
 	}
 
@@ -171,11 +165,11 @@ class Mustache {
 	 * If no Loader instance has been explicitly specified, this method will instantiate and return
 	 * a StringLoader instance.
 	 *
-	 * @return \Mustache\Loader
+	 * @return Mustache_Loader
 	 */
 	public function getLoader() {
 		if (!isset($this->loader)) {
-			$this->loader = new StringLoader;
+			$this->loader = new Mustache_Loader_StringLoader;
 		}
 
 		return $this->loader;
@@ -184,9 +178,9 @@ class Mustache {
 	/**
 	 * Set the Mustache partials Loader instance.
 	 *
-	 * @param \Mustache\Loader $partialsLoader
+	 * @param Mustache_Loader $partialsLoader
 	 */
-	public function setPartialsLoader(Loader $partialsLoader) {
+	public function setPartialsLoader(Mustache_Loader $partialsLoader) {
 		$this->partialsLoader = $partialsLoader;
 	}
 
@@ -196,11 +190,11 @@ class Mustache {
 	 * If no Loader instance has been explicitly specified, this method will instantiate and return
 	 * an ArrayLoader instance.
 	 *
-	 * @return \Mustache\Loader
+	 * @return Mustache_Loader
 	 */
 	public function getPartialsLoader() {
 		if (!isset($this->partialsLoader)) {
-			$this->partialsLoader = new ArrayLoader;
+			$this->partialsLoader = new Mustache_Loader_ArrayLoader;
 		}
 
 		return $this->partialsLoader;
@@ -209,14 +203,14 @@ class Mustache {
 	/**
 	 * Set partials for the current partials Loader instance.
 	 *
-	 * @throws \RuntimeException If the current Loader instance is immutable
+	 * @throws RuntimeException If the current Loader instance is immutable
 	 *
 	 * @param array $partials (default: array())
 	 */
 	public function setPartials(array $partials = array()) {
 		$loader = $this->getPartialsLoader();
-		if (!$loader instanceof MutableLoader) {
-			throw new \RuntimeException('Unable to set partials on an immutable Mustache Loader instance');
+		if (!$loader instanceof Mustache_Loader_MutableLoader) {
+			throw new RuntimeException('Unable to set partials on an immutable Mustache Loader instance');
 		}
 
 		$loader->setTemplates($partials);
@@ -229,13 +223,13 @@ class Mustache {
 	 * any other valid Mustache context value. They will be prepended to the context stack, so they will be available in
 	 * any template loaded by this Mustache instance.
 	 *
-	 * @throws \InvalidArgumentException if $helpers is not an array or \Traversable
+	 * @throws InvalidArgumentException if $helpers is not an array or Traversable
 	 *
 	 * @param array|Traversable $helpers
 	 */
 	public function setHelpers($helpers) {
-		if (!is_array($helpers) && !$helpers instanceof \Traversable) {
-			throw new \InvalidArgumentException('setHelpers expects an array of helpers');
+		if (!is_array($helpers) && !$helpers instanceof Traversable) {
+			throw new InvalidArgumentException('setHelpers expects an array of helpers');
 		}
 
 		$this->getHelpers()->clear();
@@ -248,13 +242,13 @@ class Mustache {
 	/**
 	 * Get the current set of Mustache helpers.
 	 *
-	 * @see \Mustache\Mustache::setHelpers
+	 * @see Mustache_Mustache::setHelpers
 	 *
-	 * @return \Mustache\HelperCollection
+	 * @return Mustache_HelperCollection
 	 */
 	public function getHelpers() {
 		if (!isset($this->helpers)) {
-			$this->helpers = new HelperCollection;
+			$this->helpers = new Mustache_HelperCollection;
 		}
 
 		return $this->helpers;
@@ -263,7 +257,7 @@ class Mustache {
 	/**
 	 * Add a new Mustache helper.
 	 *
-	 * @see \Mustache\Mustache::setHelpers
+	 * @see Mustache_Mustache::setHelpers
 	 *
 	 * @param string $name
 	 * @param mixed  $helper
@@ -275,7 +269,7 @@ class Mustache {
 	/**
 	 * Get a Mustache helper by name.
 	 *
-	 * @see \Mustache\Mustache::setHelpers
+	 * @see Mustache_Mustache::setHelpers
 	 *
 	 * @param string $name
 	 *
@@ -288,7 +282,7 @@ class Mustache {
 	/**
 	 * Check whether this Mustache instance has a helper.
 	 *
-	 * @see \Mustache\Mustache::setHelpers
+	 * @see Mustache_Mustache::setHelpers
 	 *
 	 * @param string $name
 	 *
@@ -301,7 +295,7 @@ class Mustache {
 	/**
 	 * Remove a helper by name.
 	 *
-	 * @see \Mustache\Mustache::setHelpers
+	 * @see Mustache_Mustache::setHelpers
 	 *
 	 * @param string $name
 	 */
@@ -312,9 +306,9 @@ class Mustache {
 	/**
 	 * Set the Mustache Tokenizer instance.
 	 *
-	 * @param \Mustache\Tokenizer $tokenizer
+	 * @param Mustache_Tokenizer $tokenizer
 	 */
-	public function setTokenizer(Tokenizer $tokenizer) {
+	public function setTokenizer(Mustache_Tokenizer $tokenizer) {
 		$this->tokenizer = $tokenizer;
 	}
 
@@ -323,11 +317,11 @@ class Mustache {
 	 *
 	 * If no Tokenizer instance has been explicitly specified, this method will instantiate and return a new one.
 	 *
-	 * @return \Mustache\Tokenizer
+	 * @return Mustache_Tokenizer
 	 */
 	public function getTokenizer() {
 		if (!isset($this->tokenizer)) {
-			$this->tokenizer = new Tokenizer;
+			$this->tokenizer = new Mustache_Tokenizer;
 		}
 
 		return $this->tokenizer;
@@ -336,9 +330,9 @@ class Mustache {
 	/**
 	 * Set the Mustache Parser instance.
 	 *
-	 * @param \Mustache\Parser $parser
+	 * @param Mustache_Parser $parser
 	 */
-	public function setParser(Parser $parser) {
+	public function setParser(Mustache_Parser $parser) {
 		$this->parser = $parser;
 	}
 
@@ -347,11 +341,11 @@ class Mustache {
 	 *
 	 * If no Parser instance has been explicitly specified, this method will instantiate and return a new one.
 	 *
-	 * @return \Mustache\Parser
+	 * @return Mustache_Parser
 	 */
 	public function getParser() {
 		if (!isset($this->parser)) {
-			$this->parser = new Parser;
+			$this->parser = new Mustache_Parser;
 		}
 
 		return $this->parser;
@@ -360,9 +354,9 @@ class Mustache {
 	/**
 	 * Set the Mustache Compiler instance.
 	 *
-	 * @param \Mustache\Compiler $compiler
+	 * @param Mustache_Compiler $compiler
 	 */
-	public function setCompiler(Compiler $compiler) {
+	public function setCompiler(Mustache_Compiler $compiler) {
 		$this->compiler = $compiler;
 	}
 
@@ -371,11 +365,11 @@ class Mustache {
 	 *
 	 * If no Compiler instance has been explicitly specified, this method will instantiate and return a new one.
 	 *
-	 * @return \Mustache\Compiler
+	 * @return Mustache_Compiler
 	 */
 	public function getCompiler() {
 		if (!isset($this->compiler)) {
-			$this->compiler = new Compiler;
+			$this->compiler = new Mustache_Compiler;
 		}
 
 		return $this->compiler;
@@ -403,7 +397,7 @@ class Mustache {
 	 *
 	 * @param string $name
 	 *
-	 * @return \Mustache\Template
+	 * @return Mustache_Template
 	 */
 	public function loadTemplate($name) {
 		return $this->loadSource($this->getLoader()->load($name));
@@ -417,7 +411,7 @@ class Mustache {
 	 *
 	 * @param string $name
 	 *
-	 * @return \Mustache\Template
+	 * @return Mustache_Template
 	 */
 	public function loadPartial($name) {
 		return $this->loadSource($this->getPartialsLoader()->load($name));
@@ -432,7 +426,7 @@ class Mustache {
 	 * @param string $source
 	 * @param string $delims (default: null)
 	 *
-	 * @return \Mustache\Template
+	 * @return Mustache_Template
 	 */
 	public function loadLambda($source, $delims = null) {
 		if ($delims !== null) {
@@ -445,13 +439,13 @@ class Mustache {
 	/**
 	 * Instantiate and return a Mustache Template instance by source.
 	 *
-	 * @see \Mustache\Mustache::loadTemplate
-	 * @see \Mustache\Mustache::loadPartial
-	 * @see \Mustache\Mustache::loadLambda
+	 * @see Mustache_Mustache::loadTemplate
+	 * @see Mustache_Mustache::loadPartial
+	 * @see Mustache_Mustache::loadLambda
 	 *
 	 * @param string $source
 	 *
-	 * @return \Mustache\Template
+	 * @return Mustache_Template
 	 */
 	private function loadSource($source) {
 		$className = $this->getTemplateClassName($source);
@@ -478,7 +472,7 @@ class Mustache {
 	/**
 	 * Helper method to tokenize a Mustache template.
 	 *
-	 * @see \Mustache\Tokenizer::scan
+	 * @see Mustache_Tokenizer::scan
 	 *
 	 * @param string $source
 	 *
@@ -491,7 +485,7 @@ class Mustache {
 	/**
 	 * Helper method to parse a Mustache template.
 	 *
-	 * @see \Mustache\Parser::parse
+	 * @see Mustache_Parser::parse
 	 *
 	 * @param string $source
 	 *
@@ -504,7 +498,7 @@ class Mustache {
 	/**
 	 * Helper method to compile a Mustache template.
 	 *
-	 * @see \Mustache\Compiler::compile
+	 * @see Mustache_Compiler::compile
 	 *
 	 * @param string $source
 	 *
@@ -533,7 +527,7 @@ class Mustache {
 	/**
 	 * Helper method to dump a generated Mustache Template subclass to the file cache.
 	 *
-	 * @throws \RuntimeException if unable to write to $fileName.
+	 * @throws RuntimeException if unable to write to $fileName.
 	 *
 	 * @param string $fileName
 	 * @param string $source
@@ -552,6 +546,6 @@ class Mustache {
 			}
 		}
 
-		throw new \RuntimeException(sprintf('Failed to write cache file "%s".', $fileName));
+		throw new RuntimeException(sprintf('Failed to write cache file "%s".', $fileName));
 	}
 }
