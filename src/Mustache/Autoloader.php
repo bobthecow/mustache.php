@@ -19,16 +19,16 @@ class Mustache_Autoloader {
 	/**
 	 * Autoloader constructor.
 	 *
-	 * @param string $baseDir Mustache library base directory (default: __DIR__.'/..')
+	 * @param string $baseDir Mustache library base directory (default: dirname(__FILE__).'/..')
 	 */
 	public function __construct($baseDir = null) {
-		$this->baseDir = rtrim($baseDir, '/') ?: __DIR__.'/..';
+		$this->baseDir = rtrim($baseDir, '/') ?: dirname(__FILE__).'/..';
 	}
 
 	/**
 	 * Register a new instance as an SPL autoloader.
 	 *
-	 * @param string $baseDir Mustache library base directory (default: __DIR__.'/..')
+	 * @param string $baseDir Mustache library base directory (default: dirname(__FILE__).'/..')
 	 *
 	 * @return Mustache_Autoloader Registered Autoloader instance
 	 */
