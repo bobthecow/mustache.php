@@ -39,6 +39,7 @@ class Mustache {
 	private $cache = null;
 	private $loader;
 	private $partialsLoader;
+	private $helpers;
 	private $charset = 'UTF-8';
 
 	/**
@@ -62,6 +63,13 @@ class Mustache {
 	 *         // An array of Mustache partials. Useful for quick-and-dirty string template loading, but not as
 	 *         // efficient or lazy as a Filesystem (or database) loader.
 	 *         'partials' => array('foo' => file_get_contents(__DIR__.'/views/partials/foo.mustache')),
+	 *
+	 *         // An array of 'helpers'. Helpers can be global variables or objects, closures (e.g. for higher order
+	 *         // sections), or any other valid Mustache context value. They will be prepended to the context stack,
+	 *         // so they will be available in any template loaded by this Mustache instance.
+	 *         'helpers' => array('i18n' => function($text) {
+	 *              // do something translatey here...
+	 *          }),
 	 *
 	 *         // character set for `htmlspecialchars`. Defaults to 'UTF-8'
 	 *         'charset' => 'ISO-8859-1',
@@ -88,6 +96,10 @@ class Mustache {
 
 		if (isset($options['partials'])) {
 			$this->setPartials($options['partials']);
+		}
+
+		if (isset($options['helpers'])) {
+			$this->setHelpers($options['helpers']);
 		}
 
 		if (isset($options['charset'])) {
@@ -185,6 +197,93 @@ class Mustache {
 		}
 
 		$loader->setTemplates($partials);
+	}
+
+	/**
+	 * Set an array of Mustache helpers.
+	 *
+	 * An array of 'helpers'. Helpers can be global variables or objects, closures (e.g. for higher order sections), or
+	 * any other valid Mustache context value. They will be prepended to the context stack, so they will be available in
+	 * any template loaded by this Mustache instance.
+	 *
+	 * @throws \InvalidArgumentException if $helpers is not an array or \Traversable
+	 *
+	 * @param array|Traversable $helpers
+	 */
+	public function setHelpers($helpers) {
+		if (!is_array($helpers) && !$helpers instanceof \Traversable) {
+			throw new \InvalidArgumentException('setHelpers expects an array of helpers');
+		}
+
+		$this->getHelpers()->clear();
+
+		foreach ($helpers as $name => $helper) {
+			$this->addHelper($name, $helper);
+		}
+	}
+
+	/**
+	 * Get the current set of Mustache helpers.
+	 *
+	 * @see \Mustache\Mustache::setHelpers
+	 *
+	 * @return \Mustache\HelperCollection
+	 */
+	public function getHelpers() {
+		if (!isset($this->helpers)) {
+			$this->helpers = new HelperCollection;
+		}
+
+		return $this->helpers;
+	}
+
+	/**
+	 * Add a new Mustache helper.
+	 *
+	 * @see \Mustache\Mustache::setHelpers
+	 *
+	 * @param string $name
+	 * @param mixed  $helper
+	 */
+	public function addHelper($name, $helper) {
+		$this->getHelpers()->add($name, $helper);
+	}
+
+	/**
+	 * Get a Mustache helper by name.
+	 *
+	 * @see \Mustache\Mustache::setHelpers
+	 *
+	 * @param string $name
+	 *
+	 * @return mixed Helper
+	 */
+	public function getHelper($name) {
+		return $this->getHelpers()->get($name);
+	}
+
+	/**
+	 * Check whether this Mustache instance has a helper.
+	 *
+	 * @see \Mustache\Mustache::setHelpers
+	 *
+	 * @param string $name
+	 *
+	 * @return boolean True if the helper is present
+	 */
+	public function hasHelper($name) {
+		return $this->getHelpers()->has($name);
+	}
+
+	/**
+	 * Remove a helper by name.
+	 *
+	 * @see \Mustache\Mustache::setHelpers
+	 *
+	 * @param string $name
+	 */
+	public function removeHelper($name) {
+		$this->getHelpers()->remove($name);
 	}
 
 	/**

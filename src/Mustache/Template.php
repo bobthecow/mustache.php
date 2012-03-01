@@ -57,7 +57,7 @@ abstract class Template {
 	 * @return string Rendered template
 	 */
 	public function render($context = array()) {
-		return $this->renderInternal(new Context($context));
+		return $this->renderInternal($this->prepareContextStack($context));
 	}
 
 	/**
@@ -119,4 +119,27 @@ abstract class Template {
 		}
 	}
 
+	/**
+	 * Helper method to prepare the Context stack.
+	 *
+	 * Adds the Mustache HelperCollection to the stack's top context frame if helpers are present.
+	 *
+	 * @param mixed $context Optional first context frame (default: null)
+	 *
+	 * @return \Mustache\Context
+	 */
+	protected function prepareContextStack($context = null) {
+		$stack = new Context;
+
+		$helpers = $this->mustache->getHelpers();
+		if (!$helpers->isEmpty()) {
+			$stack->push($helpers);
+		}
+
+		if (!empty($context)) {
+			$stack->push($context);
+		}
+
+		return $stack;
+	}
 }
