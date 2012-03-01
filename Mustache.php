@@ -14,7 +14,7 @@
  */
 class Mustache {
 
-	const VERSION      = '0.9.0';
+	const VERSION      = '1.0.0';
 	const SPEC_VERSION = '1.1.2';
 
 	/**
@@ -94,6 +94,15 @@ class Mustache {
 	 *         'pragmas' => array(
 	 *             Mustache::PRAGMA_UNESCAPED => true
 	 *         ),
+	 *
+	 *         // an array of thrown exceptions to enable/disable
+	 *         'throws_exceptions' => array(
+	 *             MustacheException::UNKNOWN_VARIABLE         => false,
+	 *             MustacheException::UNCLOSED_SECTION         => true,
+	 *             MustacheException::UNEXPECTED_CLOSE_SECTION => true,
+	 *             MustacheException::UNKNOWN_PARTIAL          => false,
+	 *             MustacheException::UNKNOWN_PRAGMA           => true,
+	 *         ),
 	 *     );
 	 *
 	 * @access public
@@ -138,6 +147,12 @@ class Mustache {
 				}
 			}
 			$this->_pragmas = $options['pragmas'];
+		}
+
+		if (isset($options['throws_exceptions'])) {
+			foreach ($options['throws_exceptions'] as $exception => $value) {
+				$this->_throwsExceptions[$exception] = $value;
+			}
 		}
 	}
 
@@ -189,7 +204,7 @@ class Mustache {
 		}
 
 		$template = $this->_renderPragmas($template);
-		$template = $this->_renderTemplate($template, $this->_context);
+		$template = $this->_renderTemplate($template);
 
 		$this->_otag = $otag_orig;
 		$this->_ctag = $ctag_orig;
@@ -403,7 +418,11 @@ class Mustache {
 		$options_string = $matches['options_string'];
 
 		if (!in_array($pragma_name, $this->_pragmasImplemented)) {
-			throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
+			if ($this->_throwsException(MustacheException::UNKNOWN_PRAGMA)) {
+				throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
+			} else {
+				return '';
+			}
 		}
 
 		$options = array();
@@ -448,7 +467,9 @@ class Mustache {
 	 */
 	protected function _getPragmaOptions($pragma_name) {
 		if (!$this->_hasPragma($pragma_name)) {
-			throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
+			if ($this->_throwsException(MustacheException::UNKNOWN_PRAGMA)) {
+				throw new MustacheException('Unknown pragma: ' . $pragma_name, MustacheException::UNKNOWN_PRAGMA);
+			}
 		}
 
 		return (is_array($this->_localPragmas[$pragma_name])) ? $this->_localPragmas[$pragma_name] : array();
@@ -767,7 +788,7 @@ class Mustache {
 			$first = array_shift($chunks);
 
 			$ret = $this->_findVariableInContext($first, $this->_context);
-			while ($next = array_shift($chunks)) {
+			foreach ($chunks as $next) {
 				// Slice off a chunk of context for dot notation traversal.
 				$c = array($ret);
 				$ret = $this->_findVariableInContext($next, $c);
