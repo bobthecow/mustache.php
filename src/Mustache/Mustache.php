@@ -96,6 +96,23 @@ class Mustache {
 	}
 
 	/**
+	 * Shortcut 'render' invocation.
+	 *
+	 * Equivalent to calling `$mustache->loadTemplate($template)->render($data);`
+	 *
+	 * @see \Mustache\Mustache::loadTemplate
+	 * @see \Mustache\Template::render
+	 *
+	 * @param string $template
+	 * @param mixed  $data
+	 *
+	 * @return string Rendered template
+	 */
+	public function render($template, $data) {
+		return $this->loadTemplate($template)->render($data);
+	}
+
+	/**
 	 * Get the current Mustache character set.
 	 *
 	 * @return string

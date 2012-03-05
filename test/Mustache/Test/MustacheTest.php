@@ -53,6 +53,27 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('ISO-8859-1', $mustache->getCharset());
 	}
 
+	public function testRender() {
+		$source = '{{ foo }}';
+		$data   = array('bar' => 'baz');
+		$output = 'TEH OUTPUT';
+
+		$template = $this->getMockBuilder('Mustache\Template')
+			->disableOriginalConstructor()
+			->getMock();
+
+		$mustache = new MustacheStub;
+		$mustache->template = $template;
+
+		$template->expects($this->once())
+			->method('render')
+			->with($data)
+			->will($this->returnValue($output));
+
+		$this->assertEquals($output, $mustache->render($source, $data));
+		$this->assertEquals($source, $mustache->source);
+	}
+
 	public function testSettingServices() {
 		$loader    = new StringLoader;
 		$tokenizer = new Tokenizer;
@@ -122,6 +143,7 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 
 		$mustache->setPartials(array('foo' => '{{ foo }}'));
 	}
+
 	private static function rmdir($path) {
 		$path = rtrim($path, '/').'/';
 		$handle = opendir($path);
@@ -140,6 +162,16 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 
 		closedir($handle);
 		rmdir($path);
+	}
+}
+
+class MustacheStub extends Mustache {
+	public $source;
+	public $template;
+	public function loadTemplate($source) {
+		$this->source = $source;
+
+		return $this->template;
 	}
 }
 
