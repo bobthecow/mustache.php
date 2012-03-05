@@ -50,11 +50,11 @@ class CompilerTest extends \PHPUnit_Framework_TestCase {
 					'foo',
 					"\n",
 					array(
-						Tokenizer::TAG  => '_v',
+						Tokenizer::TYPE => Tokenizer::T_ESCAPED,
 						Tokenizer::NAME => 'name',
 					),
 					array(
-						Tokenizer::TAG  => '_v',
+						Tokenizer::TYPE => Tokenizer::T_ESCAPED,
 						Tokenizer::NAME => '.',
 					),
 					"'bar'",
@@ -79,6 +79,6 @@ class CompilerTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testCompilerThrowsUnknownNodeTypeException() {
 		$compiler = new Compiler;
-		$compiler->compile('', array(array(Tokenizer::TAG => 'invalid')), 'SomeClass');
+		$compiler->compile('', array(array(Tokenizer::TYPE => 'invalid')), 'SomeClass');
 	}
 }

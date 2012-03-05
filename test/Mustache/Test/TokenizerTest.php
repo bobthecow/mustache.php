@@ -45,7 +45,7 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase {
 				null,
 				array(
 					array(
-						Tokenizer::TAG   => '_v',
+						Tokenizer::TYPE  => Tokenizer::T_ESCAPED,
 						Tokenizer::NAME  => 'name',
 						Tokenizer::OTAG  => '{{',
 						Tokenizer::CTAG  => '}}',
@@ -65,7 +65,7 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase {
 				'<<< >>>',
 				array(
 					array(
-						Tokenizer::TAG   => '_v',
+						Tokenizer::TYPE  => Tokenizer::T_ESCAPED,
 						Tokenizer::NAME  => 'name',
 						Tokenizer::OTAG  => '<<<',
 						Tokenizer::CTAG  => '>>>',
@@ -79,7 +79,7 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase {
 				null,
 				array(
 					array(
-						Tokenizer::TAG   => '{',
+						Tokenizer::TYPE  => Tokenizer::T_UNESCAPED,
 						Tokenizer::NAME  => 'a',
 						Tokenizer::OTAG  => '{{',
 						Tokenizer::CTAG  => '}}',
@@ -87,7 +87,7 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase {
 					),
 					"\n",
 					array(
-						Tokenizer::TAG   => '#',
+						Tokenizer::TYPE  => Tokenizer::T_SECTION,
 						Tokenizer::NAME  => 'b',
 						Tokenizer::OTAG  => '{{',
 						Tokenizer::CTAG  => '}}',
@@ -95,14 +95,14 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase {
 					),
 					null,
 					array(
-						Tokenizer::TAG   => '_v',
+						Tokenizer::TYPE  => Tokenizer::T_ESCAPED,
 						Tokenizer::NAME  => 'c',
 						Tokenizer::OTAG  => '|',
 						Tokenizer::CTAG  => '|',
 						Tokenizer::INDEX => 37,
 					),
 					array(
-						Tokenizer::TAG   => '/',
+						Tokenizer::TYPE  => Tokenizer::T_END_SECTION,
 						Tokenizer::NAME  => 'b',
 						Tokenizer::OTAG  => '|',
 						Tokenizer::CTAG  => '|',
@@ -110,7 +110,7 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase {
 					),
 					"\n",
 					array(
-						Tokenizer::TAG   => '{',
+						Tokenizer::TYPE  => Tokenizer::T_UNESCAPED,
 						Tokenizer::NAME  => 'd',
 						Tokenizer::OTAG  => '|',
 						Tokenizer::CTAG  => '|',
@@ -119,8 +119,6 @@ class TokenizerTest extends \PHPUnit_Framework_TestCase {
 
 				)
 			),
-
-
 		);
 	}
 }

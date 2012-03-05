@@ -24,40 +24,47 @@ class Tokenizer {
 	const IN_TAG      = 2;
 
 	// Token types
-	const T_SECTION      = 1;
-	const T_INVERTED     = 2;
-	const T_END_SECTION  = 3;
-	const T_COMMENT      = 4;
-	const T_PARTIAL      = 5;
-	const T_PARTIAL_2    = 6;
-	const T_DELIM_CHANGE = 7;
-	const T_ESCAPED      = 8;
-	const T_UNESCAPED    = 9;
-	const T_UNESCAPED_2  = 10;
+	const T_SECTION      = '#';
+	const T_INVERTED     = '^';
+	const T_END_SECTION  = '/';
+	const T_COMMENT      = '!';
+	const T_PARTIAL      = '>';
+	const T_PARTIAL_2    = '<';
+	const T_DELIM_CHANGE = '=';
+	const T_ESCAPED      = '_v';
+	const T_UNESCAPED    = '{';
+	const T_UNESCAPED_2  = '&';
 
-	// Token types map
+	// Valid token types
 	private static $tagTypes = array(
-		'#'  => self::T_SECTION,
-		'^'  => self::T_INVERTED,
-		'/'  => self::T_END_SECTION,
-		'!'  => self::T_COMMENT,
-		'>'  => self::T_PARTIAL,
-		'<'  => self::T_PARTIAL_2,
-		'='  => self::T_DELIM_CHANGE,
-		'_v' => self::T_ESCAPED,
-		'{'  => self::T_UNESCAPED,
-		'&'  => self::T_UNESCAPED_2,
+		self::T_SECTION      => true,
+		self::T_INVERTED     => true,
+		self::T_END_SECTION  => true,
+		self::T_COMMENT      => true,
+		self::T_PARTIAL      => true,
+		self::T_PARTIAL_2    => true,
+		self::T_DELIM_CHANGE => true,
+		self::T_ESCAPED      => true,
+		self::T_UNESCAPED    => true,
+		self::T_UNESCAPED_2  => true,
+	);
+
+	// Interpolated tags
+	private static $interpolatedTags = array(
+		self::T_ESCAPED      => true,
+		self::T_UNESCAPED    => true,
+		self::T_UNESCAPED_2  => true,
 	);
 
 	// Token properties
-	const NODES  = 'nodes';
-	const TAG    = 'tag';
+	const TYPE   = 'type';
 	const NAME   = 'name';
 	const OTAG   = 'otag';
 	const CTAG   = 'ctag';
 	const INDEX  = 'index';
 	const END    = 'end';
 	const INDENT = 'indent';
+	const NODES  = 'nodes';
 
 	private $state;
 	private $tagType;
@@ -104,14 +111,21 @@ class Tokenizer {
 					break;
 
 				case self::IN_TAG_TYPE:
+
 					$i += strlen($this->otag) - 1;
-					$tag = isset(self::$tagTypes[$text[$i + 1]]) ? self::$tagTypes[$text[$i + 1]] : null;
-					$this->tagType = $tag ? $text[$i + 1] : '_v';
-					if ($this->tagType === '=') {
+					if (isset(self::$tagTypes[$text[$i + 1]])) {
+						$tag = $text[$i + 1];
+						$this->tagType = $tag;
+					} else {
+						$tag = null;
+						$this->tagType = self::T_ESCAPED;
+					}
+
+					if ($this->tagType === self::T_DELIM_CHANGE) {
 						$i = $this->changeDelimiters($text, $i);
 						$this->state = self::IN_TEXT;
 					} else {
-						if ($tag) {
+						if ($tag !== null) {
 							$i++;
 						}
 						$this->state = self::IN_TAG;
@@ -122,21 +136,25 @@ class Tokenizer {
 				default:
 					if ($this->tagChange($this->ctag, $text, $i)) {
 						$this->tokens[] = array(
-							self::TAG   => $this->tagType,
+							self::TYPE  => $this->tagType,
 							self::NAME  => trim($this->buffer),
 							self::OTAG  => $this->otag,
 							self::CTAG  => $this->ctag,
-							self::INDEX => ($this->tagType == '/') ? $this->seenTag - strlen($this->otag) : $i + strlen($this->ctag)
+							self::INDEX => ($this->tagType == self::T_END_SECTION) ? $this->seenTag - strlen($this->otag) : $i + strlen($this->ctag)
 						);
 
 						$this->buffer = '';
 						$i += strlen($this->ctag) - 1;
 						$this->state = self::IN_TEXT;
-						if ($this->tagType == '{') {
+						if ($this->tagType == self::T_UNESCAPED) {
 							if ($this->ctag == '}}') {
 								$i++;
 							} else {
-								$this->cleanTripleStache($this->tokens[count($this->tokens) - 1]);
+								// Clean up `{{{ tripleStache }}}` style tokens.
+								$lastName = $this->tokens[count($this->tokens) - 1][self::NAME];
+								if (substr($lastName, -1) === '}') {
+									$this->tokens[count($this->tokens) - 1][self::NAME] = trim(substr($lastName, 0, -1));
+								}
 							}
 						}
 					} else {
@@ -185,8 +203,8 @@ class Tokenizer {
 		$tokensCount = count($this->tokens);
 		for ($j = $this->lineStart; $j < $tokensCount; $j++) {
 			$token = $this->tokens[$j];
-			if (is_array($token) && isset(self::$tagTypes[$token[self::TAG]])) {
-				if (self::$tagTypes[$token[self::TAG]] >= self::T_ESCAPED) {
+			if (is_array($token) && isset(self::$tagTypes[$token[self::TYPE]])) {
+				if (isset(self::$interpolatedTags[$token[self::TYPE]])) {
 					return false;
 				}
 			} elseif (is_string($token)) {
@@ -210,7 +228,7 @@ class Tokenizer {
 			$tokensCount = count($this->tokens);
 			for ($j = $this->lineStart; $j < $tokensCount; $j++) {
 				if (!is_array($this->tokens[$j])) {
-					if (isset($this->tokens[$j+1]) && is_array($this->tokens[$j+1]) && $this->tokens[$j+1][self::TAG] == '>') {
+					if (isset($this->tokens[$j+1]) && is_array($this->tokens[$j+1]) && $this->tokens[$j+1][self::TYPE] == self::T_PARTIAL) {
 						$this->tokens[$j+1][self::INDENT] = (string) $this->tokens[$j];
 					}
 
@@ -243,17 +261,6 @@ class Tokenizer {
 		$this->ctag = $ctag;
 
 		return $closeIndex + strlen($close) - 1;
-	}
-
-	/**
-	 * Clean up `{{{ tripleStache }}}` style tokens.
-	 *
-	 * @param array &$token
-	 */
-	private function cleanTripleStache(&$token) {
-		if (substr($token[self::NAME], -1) === '}') {
-			$token[self::NAME] = trim(substr($token[self::NAME], 0, -1));
-		}
 	}
 
 	/**

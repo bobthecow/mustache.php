@@ -47,8 +47,8 @@ class Compiler {
 		$code = '';
 		$level++;
 		foreach ($tree as $node) {
-			switch (is_string($node) ? 'text' : $node[Tokenizer::TAG]) {
-				case '#':
+			switch (is_string($node) ? 'text' : $node[Tokenizer::TYPE]) {
+				case Tokenizer::T_SECTION:
 					$code .= $this->section(
 						$node[Tokenizer::NODES],
 						$node[Tokenizer::NAME],
@@ -60,7 +60,7 @@ class Compiler {
 					);
 					break;
 
-				case '^':
+				case Tokenizer::T_INVERTED:
 					$code .= $this->invertedSection(
 						$node[Tokenizer::NODES],
 						$node[Tokenizer::NAME],
@@ -68,8 +68,8 @@ class Compiler {
 					);
 					break;
 
-				case '<':
-				case '>':
+				case Tokenizer::T_PARTIAL:
+				case Tokenizer::T_PARTIAL_2:
 					$code .= $this->partial(
 						$node[Tokenizer::NAME],
 						isset($node[Tokenizer::INDENT]) ? $node[Tokenizer::INDENT] : '',
@@ -77,15 +77,15 @@ class Compiler {
 					);
 					break;
 
-				case '{':
-				case '&':
+				case Tokenizer::T_UNESCAPED:
+				case Tokenizer::T_UNESCAPED_2:
 					$code .= $this->variable($node[Tokenizer::NAME], false, $level);
 					break;
 
-				case '!':
+				case Tokenizer::T_COMMENT:
 					break;
 
-				case '_v':
+				case Tokenizer::T_ESCAPED:
 					$code .= $this->variable($node[Tokenizer::NAME], true, $level);
 					break;
 

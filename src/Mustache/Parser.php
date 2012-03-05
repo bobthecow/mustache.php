@@ -49,13 +49,13 @@ class Parser {
 			if ($token === null) {
 				continue;
 			} elseif (is_array($token)) {
-				switch ($token[Tokenizer::TAG]) {
-					case '#':
-					case '^':
+				switch ($token[Tokenizer::TYPE]) {
+					case Tokenizer::T_SECTION:
+					case Tokenizer::T_INVERTED:
 						$nodes[] = $this->buildTree($tokens, $token);
 						break;
 
-					case '/':
+					case Tokenizer::T_END_SECTION:
 						if (!isset($parent)) {
 							throw new \LogicException('Unexpected closing tag: /'. $token[Tokenizer::NAME]);
 						}

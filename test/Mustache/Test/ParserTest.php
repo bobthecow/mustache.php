@@ -43,11 +43,11 @@ class ParserTest extends \PHPUnit_Framework_TestCase {
 
 			array(
 				array(array(
-					Tokenizer::TAG => '_v',
+					Tokenizer::TYPE => Tokenizer::T_ESCAPED,
 					Tokenizer::NAME => 'name'
 				)),
 				array(array(
-					Tokenizer::TAG => '_v',
+					Tokenizer::TYPE => Tokenizer::T_ESCAPED,
 					Tokenizer::NAME => 'name'
 				)),
 			),
@@ -56,31 +56,31 @@ class ParserTest extends \PHPUnit_Framework_TestCase {
 				array(
 					'foo',
 					array(
-						Tokenizer::TAG => '^',
+						Tokenizer::TYPE  => Tokenizer::T_INVERTED,
 						Tokenizer::INDEX => 123,
-						Tokenizer::NAME => 'parent'
+						Tokenizer::NAME  => 'parent'
 					),
 					array(
-						Tokenizer::TAG => '_v',
-						Tokenizer::NAME => 'name'
+						Tokenizer::TYPE  => Tokenizer::T_ESCAPED,
+						Tokenizer::NAME  => 'name'
 					),
 					array(
-						Tokenizer::TAG => '/',
+						Tokenizer::TYPE  => Tokenizer::T_END_SECTION,
 						Tokenizer::INDEX => 456,
-						Tokenizer::NAME => 'parent'
+						Tokenizer::NAME  => 'parent'
 					),
 					'bar',
 				),
 				array(
 					'foo',
 					array(
-						Tokenizer::TAG => '^',
-						Tokenizer::NAME => 'parent',
+						Tokenizer::TYPE  => Tokenizer::T_INVERTED,
+						Tokenizer::NAME  => 'parent',
 						Tokenizer::INDEX => 123,
-						Tokenizer::END => 456,
+						Tokenizer::END   => 456,
 						Tokenizer::NODES => array(
 							array(
-								Tokenizer::TAG => '_v',
+								Tokenizer::TYPE => Tokenizer::T_ESCAPED,
 								Tokenizer::NAME => 'name'
 							),
 						),
@@ -107,9 +107,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase {
 			array(
 				array(
 					array(
-						Tokenizer::TAG => '#',
+						Tokenizer::TYPE  => Tokenizer::T_SECTION,
+						Tokenizer::NAME  => 'parent',
 						Tokenizer::INDEX => 123,
-						Tokenizer::NAME => 'parent'
 					),
 				),
 			),
@@ -118,9 +118,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase {
 			array(
 				array(
 					array(
-						Tokenizer::TAG => '^',
+						Tokenizer::TYPE  => Tokenizer::T_INVERTED,
+						Tokenizer::NAME  => 'parent',
 						Tokenizer::INDEX => 123,
-						Tokenizer::NAME => 'parent'
 					),
 				),
 			),
@@ -129,9 +129,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase {
 			array(
 				array(
 					array(
-						Tokenizer::TAG => '/',
+						Tokenizer::TYPE  => Tokenizer::T_END_SECTION,
+						Tokenizer::NAME  => 'parent',
 						Tokenizer::INDEX => 123,
-						Tokenizer::NAME => 'parent'
 					),
 				),
 			),
@@ -140,24 +140,24 @@ class ParserTest extends \PHPUnit_Framework_TestCase {
 			array(
 				array(
 					array(
-						Tokenizer::TAG => '#',
+						Tokenizer::TYPE  => Tokenizer::T_SECTION,
+						Tokenizer::NAME  => 'parent',
 						Tokenizer::INDEX => 123,
-						Tokenizer::NAME => 'parent'
 					),
 					array(
-						Tokenizer::TAG => '#',
+						Tokenizer::TYPE  => Tokenizer::T_SECTION,
+						Tokenizer::NAME  => 'child',
 						Tokenizer::INDEX => 123,
-						Tokenizer::NAME => 'child'
 					),
 					array(
-						Tokenizer::TAG => '/',
+						Tokenizer::TYPE  => Tokenizer::T_END_SECTION,
+						Tokenizer::NAME  => 'parent',
 						Tokenizer::INDEX => 123,
-						Tokenizer::NAME => 'parent'
 					),
 					array(
-						Tokenizer::TAG => '/',
+						Tokenizer::TYPE  => Tokenizer::T_END_SECTION,
+						Tokenizer::NAME  => 'child',
 						Tokenizer::INDEX => 123,
-						Tokenizer::NAME => 'child'
 					),
 				),
 			),
