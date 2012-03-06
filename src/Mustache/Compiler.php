@@ -18,6 +18,9 @@ namespace Mustache;
  */
 class Compiler {
 
+	private $sections;
+	private $source;
+
 	/**
 	 * Compile a Mustache token parse tree into PHP source code.
 	 *
@@ -28,7 +31,8 @@ class Compiler {
 	 * @return string Generated PHP source code
 	 */
 	public function compile($source, array $tree, $name) {
-		$this->source = $source;
+		$this->sections = array();
+		$this->source   = $source;
 
 		return $this->writeCode($tree, $name);
 	}
@@ -106,12 +110,12 @@ class Compiler {
 
 		class %s extends \Mustache\Template {
 			public function renderInternal(\Mustache\Context $context, $indent = \'\') {
-				$mustache = $this->mustache;
-				$buffer = new \Mustache\Buffer($indent, $mustache->getCharset());
+				$buffer = new \Mustache\Buffer($indent, $this->mustache->getCharset());
 		%s
 
 				return $buffer->flush();
 			}
+		%s
 		}';
 
 	/**
@@ -123,24 +127,32 @@ class Compiler {
 	 * @return string Generated PHP source code
 	 */
 	private function writeCode($tree, $name) {
-		return sprintf($this->prepare(self::KLASS, 0, false), $name, $this->walk($tree), $name);
+		$code     = $this->walk($tree);
+		$sections = implode("\n", $this->sections);
+
+		return sprintf($this->prepare(self::KLASS, 0, false), $name, $code, $sections);
 	}
 
-	const SECTION = '
+	const SECTION_CALL = '
 		// %s section
-		$value = $context->%s(%s);
-		if ($context->isCallable($value)) {
-			$source = %s;
-			$buffer->write(
-				$mustache
-					->loadLambda((string) call_user_func($value, $source)%s)
-					->renderInternal($context, $buffer->getIndent())
-			);
-		} elseif ($context->isTruthy($value)) {
-			$values = $context->isIterable($value) ? $value : array($value);
-			foreach ($values as $value) {
-				$context->push($value);%s
-				$context->pop();
+		$this->section%s($buffer, $context, $context->%s(%s));
+	';
+
+	const SECTION = '
+		private function section%s(\Mustache\Buffer $buffer, \Mustache\Context $context, $value) {
+			if ($context->isCallable($value)) {
+				$source = %s;
+				$buffer->write(
+					$this->mustache
+						->loadLambda((string) call_user_func($value, $source)%s)
+						->renderInternal($context, $buffer->getIndent())
+				);
+			} elseif ($context->isTruthy($value)) {
+				$values = $context->isIterable($value) ? $value : array($value);
+				foreach ($values as $value) {
+					$context->push($value);%s
+					$context->pop();
+				}
 			}
 		}';
 
@@ -168,7 +180,13 @@ class Compiler {
 			$delims = '';
 		}
 
-		return sprintf($this->prepare(self::SECTION, $level), $id, $method, $id, $source, $delims, $this->walk($nodes, $level + 1));
+		$key    = ucfirst(md5($delims."\n".$source));
+
+		if (!isset($this->sections[$key])) {
+			$this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $source, $delims, $this->walk($nodes, 2));
+		}
+
+		return sprintf($this->prepare(self::SECTION_CALL, $level), $id, $key, $method, $id);
 	}
 
 	const INVERTED_SECTION = '
@@ -193,7 +211,7 @@ class Compiler {
 		return sprintf($this->prepare(self::INVERTED_SECTION, $level), $id, $method, $id, $this->walk($nodes, $level));
 	}
 
-	const PARTIAL = '$buffer->write($mustache->loadPartial(%s)->renderInternal($context, %s));';
+	const PARTIAL = '$buffer->write($this->mustache->loadPartial(%s)->renderInternal($context, %s));';
 
 	/**
 	 * Generate Mustache Template partial call PHP source.
@@ -215,7 +233,7 @@ class Compiler {
 	const VARIABLE = '
 		$value = $context->%s(%s);
 		if ($context->isCallable($value)) {
-			$value = $mustache
+			$value = $this->mustache
 				->loadLambda((string) call_user_func($value))
 				->renderInternal($context, $buffer->getIndent());
 		}
