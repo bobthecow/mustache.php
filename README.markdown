@@ -12,8 +12,7 @@ A quick example:
 ```php
 <?php
 $m = new Mustache;
-$tpl = $m->loadTemplate('Hello {{planet}}');
-echo $tpl->render(array('planet' => 'World!')); // "Hello World!"
+echo $m->render('Hello {{planet}}', array('planet' => 'World!')); // "Hello World!"
 ```
 
 
@@ -50,14 +49,14 @@ And render it:
 ```php
 <?php
 $m = new Mustache;
-$tpl = $m->loadTemplate($template);
 $chris = new Chris;
-echo $template->render($chris);
+echo $m->render($template, $chris);
 ```
 
 
 See Also
 --------
 
+ * [Mustache.php wiki](https://github.com/bobthecow/mustache.php/wiki/Home).
  * [Readme for the Ruby Mustache implementation](http://github.com/defunkt/mustache/blob/master/README.md).
- * [mustache(1)](http://mustache.github.com/mustache.1.html) and [mustache(5)](http://mustache.github.com/mustache.5.html) man pages.
+ * [mustache(5)](http://mustache.github.com/mustache.5.html) man page.
