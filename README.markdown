@@ -18,7 +18,7 @@ echo $m->render('Hello {{planet}}', array('planet' => 'World!')); // "Hello Worl
 
 And a more in-depth example -- this is the canonical Mustache template:
 
-```
+```html+jinja
 Hello {{name}}
 You have just won ${{value}}!
 {{#in_ca}}
