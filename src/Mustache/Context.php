@@ -29,36 +29,6 @@ class Context {
 	}
 
 	/**
-	 * Helper function to test whether a value is 'truthy'.
-	 *
-	 * @param mixed $value
-	 *
-	 * @return boolean True if the value is 'truthy'
-	 */
-	public function isTruthy($value) {
-		return !empty($value);
-	}
-
-	/**
-	 * Higher order sections helper: tests whether a value is a valid callback.
-	 *
-	 * In Mustache.php, a variable is considered 'callable' if the variable is:
-	 *
-	 *  1. An anonymous function.
-	 *  2. An object and the name of a public function, e.g. `array($someObject, 'methodName')`
-	 *  3. A class name and the name of a public static function, e.g. `array('SomeClass', 'methodName')`
-	 *
-	 * Note that this specifically excludes strings, which PHP would normally consider 'callable'.
-	 *
-	 * @param mixed $value
-	 *
-	 * @return boolean True if the value is 'callable'
-	 */
-	public function isCallable($value) {
-		return !is_string($value) && is_callable($value);
-	}
-
-	/**
 	 * Tests whether a value should be iterated over (e.g. in a section context).
 	 *
 	 * In most languages there are two distinct array types: list and hash (or whatever you want to call them). Lists

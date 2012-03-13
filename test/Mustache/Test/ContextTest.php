@@ -36,57 +36,6 @@ class ContextTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('NAME', $three->find('name'));
 	}
 
-	public function testIsTruthy() {
-		$context = new Context;
-
-		$this->assertTrue($context->isTruthy('string'));
-		$this->assertTrue($context->isTruthy(new \StdClass));
-		$this->assertTrue($context->isTruthy(1));
-		$this->assertTrue($context->isTruthy(array('a', 'b')));
-
-		$this->assertFalse($context->isTruthy(null));
-		$this->assertFalse($context->isTruthy(''));
-		$this->assertFalse($context->isTruthy(0));
-		$this->assertFalse($context->isTruthy(array()));
-	}
-
-	public function testIsCallable() {
-		$dummy   = new TestDummy;
-		$context = new Context;
-
-		$this->assertTrue($context->isCallable(function() {
-			return null;
-		}));
-		$this->assertTrue($context->isCallable(array('\Mustache\Test\TestDummy', 'foo')));
-		$this->assertTrue($context->isCallable(array($dummy, 'bar')));
-		$this->assertTrue($context->isCallable($dummy));
-
-		$this->assertFalse($context->isCallable('count'));
-		$this->assertFalse($context->isCallable('TestDummy::foo'));
-		$this->assertFalse($context->isCallable(array('\Mustache\Test\TestDummy', 'name')));
-		$this->assertFalse($context->isCallable(array('NotReallyAClass', 'foo')));
-		$this->assertFalse($context->isCallable(array($dummy, 'name')));
-	}
-
-	/**
-	 * @dataProvider getIterables
-	 */
-	public function testIsIterable($value, $iterable) {
-		$context = new Context;
-		$this->assertEquals($iterable, $context->isIterable($value));
-	}
-
-	public function getIterables() {
-		return array(
-			array(array(0 => 'a', 1 => 'b'), true),
-			array(array(0 => 'a', 2 => 'b'), false),
-			array(array(1 => 'a', 2 => 'b'), false),
-			array(array('a' => 0, 'b' => 1), false),
-			array('some string',             false),
-			array(new \ArrayIterator,        true),
-		);
-	}
-
 	public function testPushPopAndLast() {
 		$context = new Context;
 		$this->assertFalse($context->last());

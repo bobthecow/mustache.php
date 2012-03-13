@@ -140,14 +140,14 @@ class Compiler {
 
 	const SECTION = '
 		private function section%s(\Mustache\Buffer $buffer, \Mustache\Context $context, $value) {
-			if ($context->isCallable($value)) {
+			if (!is_string($value) && is_callable($value)) {
 				$source = %s;
 				$buffer->write(
 					$this->mustache
 						->loadLambda((string) call_user_func($value, $source)%s)
 						->renderInternal($context, $buffer->getIndent())
 				);
-			} elseif ($context->isTruthy($value)) {
+			} elseif (!empty($value)) {
 				$values = $context->isIterable($value) ? $value : array($value);
 				foreach ($values as $value) {
 					$context->push($value);%s
@@ -191,7 +191,8 @@ class Compiler {
 
 	const INVERTED_SECTION = '
 		// %s inverted section
-		if (!$context->isTruthy($context->%s(%s))) {
+		$value = $context->%s(%s);
+		if (empty($value)) {
 			%s
 		}';
 
@@ -232,7 +233,7 @@ class Compiler {
 
 	const VARIABLE = '
 		$value = $context->%s(%s);
-		if ($context->isCallable($value)) {
+		if (!is_string($value) && is_callable($value)) {
 			$value = $this->mustache
 				->loadLambda((string) call_user_func($value))
 				->renderInternal($context, $buffer->getIndent());
