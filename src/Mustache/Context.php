@@ -61,10 +61,17 @@ class Context {
 		if (is_object($value)) {
 			return $value instanceof \Traversable;
 		} elseif (is_array($value)) {
-			return !array_diff_key($value, array_keys(array_keys($value)));
-		}
+			$i = 0;
+			foreach ($value as $k => $v) {
+				if ($k !== $i++) {
+					return false;
+				}
+			}
 
-		return false;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**
