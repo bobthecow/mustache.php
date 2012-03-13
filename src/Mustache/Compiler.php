@@ -148,7 +148,7 @@ class Compiler {
 						->renderInternal($context, $buffer->getIndent())
 				);
 			} elseif (!empty($value)) {
-				$values = $context->isIterable($value) ? $value : array($value);
+				$values = $this->isIterable($value) ? $value : array($value);
 				foreach ($values as $value) {
 					$context->push($value);%s
 					$context->pop();

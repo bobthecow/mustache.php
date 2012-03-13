@@ -72,4 +72,51 @@ abstract class Template {
 	 * @return string Rendered template
 	 */
 	abstract public function renderInternal(Context $context);
+
+	/**
+	 * Tests whether a value should be iterated over (e.g. in a section context).
+	 *
+	 * In most languages there are two distinct array types: list and hash (or whatever you want to call them). Lists
+	 * should be iterated, hashes should be treated as objects. Mustache follows this paradigm for Ruby, Javascript,
+	 * Java, Python, etc.
+	 *
+	 * PHP, however, treats lists and hashes as one primitive type: array. So Mustache.php needs a way to distinguish
+	 * between between a list of things (numeric, normalized array) and a set of variables to be used as section context
+	 * (associative array). In other words, this will be iterated over:
+	 *
+	 *     $items = array(
+	 *         array('name' => 'foo'),
+	 *         array('name' => 'bar'),
+	 *         array('name' => 'baz'),
+	 *     );
+	 *
+	 * ... but this will be used as a section context block:
+	 *
+	 *     $items = array(
+	 *         1        => array('name' => 'foo'),
+	 *         'banana' => array('name' => 'bar'),
+	 *         42       => array('name' => 'baz'),
+	 *     );
+	 *
+	 * @param mixed $value
+	 *
+	 * @return boolean True if the value is 'iterable'
+	 */
+	protected function isIterable($value) {
+		if (is_object($value)) {
+			return $value instanceof \Traversable;
+		} elseif (is_array($value)) {
+			$i = 0;
+			foreach ($value as $k => $v) {
+				if ($k !== $i++) {
+					return false;
+				}
+			}
+
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 }
