@@ -71,7 +71,7 @@ abstract class Template {
 	 *
 	 * @return string Rendered template
 	 */
-	abstract public function renderInternal(Context $context);
+	abstract public function renderInternal(Context $context, $indent = '', $escape = false);
 
 	/**
 	 * Tests whether a value should be iterated over (e.g. in a section context).

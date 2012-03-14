@@ -35,13 +35,13 @@ class CompilerTest extends \PHPUnit_Framework_TestCase {
 		return array(
 			array('', array(), 'Banana', array(
 				"\nclass Banana extends \Mustache\Template",
-				'$buffer->flush();',
+				'return $buffer;',
 			)),
 
 			array('', array('TEXT'), 'Monkey', array(
 				"\nclass Monkey extends \Mustache\Template",
-				'$buffer->writeText(\'TEXT\');',
-				'$buffer->flush();',
+				'$buffer .= $indent . \'TEXT\';',
+				'return $buffer;',
 			)),
 
 			array(
@@ -62,13 +62,13 @@ class CompilerTest extends \PHPUnit_Framework_TestCase {
 				'Monkey',
 				array(
 					"\nclass Monkey extends \Mustache\Template",
-					'$buffer->writeText(\'foo\');',
-					'$buffer->writeLine();',
+					'$buffer .= $indent . \'foo\'',
+					'$buffer .= "\n"',
 					'$value = $context->find(\'name\');',
-					'$buffer->writeText($value, true);',
+					'$buffer .= $indent . htmlspecialchars($value, ENT_COMPAT, $this->mustache->getCharset());',
 					'$value = $context->last();',
-					'$buffer->writeText(\'\\\'bar\\\'\');',
-					'$buffer->flush();',
+					'$buffer .= $indent . \'\\\'bar\\\'\';',
+					'return $buffer;',
 				)
 			),
 		);

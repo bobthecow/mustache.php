@@ -109,11 +109,15 @@ class Compiler {
 	const KLASS = '<?php
 
 		class %s extends \Mustache\Template {
-			public function renderInternal(\Mustache\Context $context, $indent = \'\') {
-				$buffer = new \Mustache\Buffer($indent, $this->mustache->getCharset());
+			public function renderInternal(\Mustache\Context $context, $indent = \'\', $escape = false) {
+				$buffer = \'\';
 		%s
 
-				return $buffer->flush();
+				if ($escape) {
+					return htmlspecialchars($buffer, ENT_COMPAT, $this->mustache->getCharset());
+				}
+
+				return $buffer;
 			}
 		%s
 		}';
@@ -135,18 +139,17 @@ class Compiler {
 
 	const SECTION_CALL = '
 		// %s section
-		$this->section%s($buffer, $context, $context->%s(%s));
+		$buffer .= $this->section%s($context, $indent, $context->%s(%s));
 	';
 
 	const SECTION = '
-		private function section%s(\Mustache\Buffer $buffer, \Mustache\Context $context, $value) {
+		private function section%s(\Mustache\Context $context, $indent, $value) {
+			$buffer = \'\';
 			if (!is_string($value) && is_callable($value)) {
 				$source = %s;
-				$buffer->write(
-					$this->mustache
-						->loadLambda((string) call_user_func($value, $source)%s)
-						->renderInternal($context, $buffer->getIndent())
-				);
+				$buffer .= $this->mustache
+					->loadLambda((string) call_user_func($value, $source)%s)
+					->renderInternal($context, $indent);
 			} elseif (!empty($value)) {
 				$values = $this->isIterable($value) ? $value : array($value);
 				foreach ($values as $value) {
@@ -154,6 +157,8 @@ class Compiler {
 					$context->pop();
 				}
 			}
+
+			return $buffer;
 		}';
 
 	/**
@@ -212,7 +217,7 @@ class Compiler {
 		return sprintf($this->prepare(self::INVERTED_SECTION, $level), $id, $method, $id, $this->walk($nodes, $level));
 	}
 
-	const PARTIAL = '$buffer->write($this->mustache->loadPartial(%s)->renderInternal($context, %s));';
+	const PARTIAL = '$buffer .= $this->mustache->loadPartial(%s)->renderInternal($context, %s);';
 
 	/**
 	 * Generate Mustache Template partial call PHP source.
@@ -236,10 +241,11 @@ class Compiler {
 		if (!is_string($value) && is_callable($value)) {
 			$value = $this->mustache
 				->loadLambda((string) call_user_func($value))
-				->renderInternal($context, $buffer->getIndent());
+				->renderInternal($context, $indent);
 		}
-		$buffer->writeText($value, %s);
+		$buffer .= $indent . %s;
 	';
+	const VARIABLE_ESCAPED = 'htmlspecialchars($value, ENT_COMPAT, $this->mustache->getCharset())';
 
 	/**
 	 * Generate Mustache Template variable interpolation PHP source.
@@ -253,13 +259,13 @@ class Compiler {
 	private function variable($id, $escape, $level) {
 		$method = $this->getFindMethod($id);
 		$id     = ($method !== 'last') ? var_export($id, true) : '';
-		$escape = $escape ? 'true' : 'false';
+		$escape = $escape ? self::VARIABLE_ESCAPED : '$value';
 
 		return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $escape);
 	}
 
-	const LINE = '$buffer->writeLine();';
-	const TEXT = '$buffer->writeText(%s);';
+	const LINE = '$buffer .= "\n";';
+	const TEXT = '$buffer .= $indent . %s;';
 
 	/**
 	 * Generate Mustache Template output Buffer call PHP source.
