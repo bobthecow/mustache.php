@@ -43,6 +43,10 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 			'partials' => array(
 				'foo' => '{{ foo }}',
 			),
+			'helpers' => array(
+				'foo' => function() { return 'foo'; },
+				'bar' => 'BAR',
+			),
 			'charset' => 'ISO-8859-1',
 		));
 
@@ -51,6 +55,9 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('{{ foo }}', $partialsLoader->load('foo'));
 		$this->assertContains('__whot__', $mustache->getTemplateClassName('{{ foo }}'));
 		$this->assertEquals('ISO-8859-1', $mustache->getCharset());
+		$this->assertTrue($mustache->hasHelper('foo'));
+		$this->assertTrue($mustache->hasHelper('bar'));
+		$this->assertFalse($mustache->hasHelper('baz'));
 	}
 
 	public function testRender() {
@@ -142,6 +149,49 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 		));
 
 		$mustache->setPartials(array('foo' => '{{ foo }}'));
+	}
+
+	public function testHelpers() {
+		$foo = function() { return 'foo'; };
+		$bar = 'BAR';
+		$mustache = new Mustache(array('helpers' => array(
+			'foo' => $foo,
+			'bar' => $bar,
+		)));
+
+		$helpers = $mustache->getHelpers();
+		$this->assertTrue($mustache->hasHelper('foo'));
+		$this->assertTrue($mustache->hasHelper('bar'));
+		$this->assertTrue($helpers->has('foo'));
+		$this->assertTrue($helpers->has('bar'));
+		$this->assertSame($foo, $mustache->getHelper('foo'));
+		$this->assertSame($bar, $mustache->getHelper('bar'));
+
+		$mustache->removeHelper('bar');
+		$this->assertFalse($mustache->hasHelper('bar'));
+		$mustache->addHelper('bar', $bar);
+		$this->assertSame($bar, $mustache->getHelper('bar'));
+
+		$baz = function($text) { return '__'.$text.'__'; };
+		$this->assertFalse($mustache->hasHelper('baz'));
+		$this->assertFalse($helpers->has('baz'));
+
+		$mustache->addHelper('baz', $baz);
+		$this->assertTrue($mustache->hasHelper('baz'));
+		$this->assertTrue($helpers->has('baz'));
+
+		// ... and a functional test
+		$tpl = $mustache->loadTemplate('{{foo}} - {{bar}} - {{#baz}}qux{{/baz}}');
+		$this->assertEquals('foo - BAR - __qux__', $tpl->render());
+		$this->assertEquals('foo - BAR - __qux__', $tpl->render(array('qux' => "won't mess things up")));
+	}
+
+	/**
+	 * @expectedException \InvalidArgumentException
+	 */
+	public function testSetHelpersThrowsExceptions() {
+		$mustache = new Mustache;
+		$mustache->setHelpers('monkeymonkeymonkey');
 	}
 
 	private static function rmdir($path) {
