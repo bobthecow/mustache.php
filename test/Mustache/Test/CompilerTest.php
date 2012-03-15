@@ -65,9 +65,9 @@ class CompilerTest extends \PHPUnit_Framework_TestCase {
 					'$buffer .= $indent . \'foo\'',
 					'$buffer .= "\n"',
 					'$value = $context->find(\'name\');',
-					'$buffer .= $indent . htmlspecialchars($value, ENT_COMPAT, $this->mustache->getCharset());',
+					'$buffer .= htmlspecialchars($value, ENT_COMPAT, $this->mustache->getCharset());',
 					'$value = $context->last();',
-					'$buffer .= $indent . \'\\\'bar\\\'\';',
+					'$buffer .= \'\\\'bar\\\'\';',
 					'return $buffer;',
 				)
 			),

@@ -20,6 +20,7 @@ class Compiler {
 
 	private $sections;
 	private $source;
+	private $indentNextLine;
 
 	/**
 	 * Compile a Mustache token parse tree into PHP source code.
@@ -31,8 +32,9 @@ class Compiler {
 	 * @return string Generated PHP source code
 	 */
 	public function compile($source, array $tree, $name) {
-		$this->sections = array();
-		$this->source   = $source;
+		$this->sections       = array();
+		$this->source         = $source;
+		$this->indentNextLine = true;
 
 		return $this->writeCode($tree, $name);
 	}
@@ -243,7 +245,7 @@ class Compiler {
 				->loadLambda((string) call_user_func($value))
 				->renderInternal($context, $indent);
 		}
-		$buffer .= $indent . %s;
+		$buffer .= %s%s;
 	';
 	const VARIABLE_ESCAPED = 'htmlspecialchars($value, ENT_COMPAT, $this->mustache->getCharset())';
 
@@ -259,13 +261,13 @@ class Compiler {
 	private function variable($id, $escape, $level) {
 		$method = $this->getFindMethod($id);
 		$id     = ($method !== 'last') ? var_export($id, true) : '';
-		$escape = $escape ? self::VARIABLE_ESCAPED : '$value';
+		$value  = $escape ? self::VARIABLE_ESCAPED : '$value';
 
-		return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $escape);
+		return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $this->flushIndent(), $value);
 	}
 
 	const LINE = '$buffer .= "\n";';
-	const TEXT = '$buffer .= $indent . %s;';
+	const TEXT = '$buffer .= %s%s;';
 
 	/**
 	 * Generate Mustache Template output Buffer call PHP source.
@@ -277,9 +279,11 @@ class Compiler {
 	 */
 	private function text($text, $level) {
 		if ($text === "\n") {
+			$this->indentNextLine = true;
+
 			return $this->prepare(self::LINE, $level);
 		} else {
-			return sprintf($this->prepare(self::TEXT, $level), var_export($text, true));
+			return sprintf($this->prepare(self::TEXT, $level), $this->flushIndent(), var_export($text, true));
 		}
 	}
 
@@ -321,6 +325,23 @@ class Compiler {
 			return 'find';
 		} else {
 			return 'findDot';
+		}
+	}
+
+	const LINE_INDENT = '$indent . ';
+
+	/**
+	 * Get the current $indent prefix to write to the buffer.
+	 *
+	 * @return string "$indent . " or ""
+	 */
+	private function flushIndent() {
+		if ($this->indentNextLine) {
+			$this->indentNextLine = false;
+
+			return self::LINE_INDENT;
+		} else {
+			return '';
 		}
 	}
 }
