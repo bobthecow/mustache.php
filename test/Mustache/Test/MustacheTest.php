@@ -47,6 +47,7 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 				'foo' => function() { return 'foo'; },
 				'bar' => 'BAR',
 			),
+			'escape'  => 'strtoupper',
 			'charset' => 'ISO-8859-1',
 		));
 
@@ -54,6 +55,7 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 		$this->assertSame($partialsLoader, $mustache->getPartialsLoader());
 		$this->assertEquals('{{ foo }}', $partialsLoader->load('foo'));
 		$this->assertContains('__whot__', $mustache->getTemplateClassName('{{ foo }}'));
+		$this->assertEquals('strtoupper', $mustache->getEscape());
 		$this->assertEquals('ISO-8859-1', $mustache->getCharset());
 		$this->assertTrue($mustache->hasHelper('foo'));
 		$this->assertTrue($mustache->hasHelper('bar'));
@@ -125,6 +127,21 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf($className, $template);
 		$this->assertFileExists($fileName);
 		$this->assertContains("\nclass $className extends \Mustache\Template", file_get_contents($fileName));
+	}
+
+	/**
+	 * @expectedException \InvalidArgumentException
+	 * @dataProvider getBadEscapers
+	 */
+	public function testNonCallableEscapeThrowsException($escape) {
+		new Mustache(array('escape' => $escape));
+	}
+
+	public function getBadEscapers() {
+		return array(
+			array('nothing'),
+			array('foo', 'bar'),
+		);
 	}
 
 	/**

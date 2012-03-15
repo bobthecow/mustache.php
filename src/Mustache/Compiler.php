@@ -21,6 +21,8 @@ class Compiler {
 	private $sections;
 	private $source;
 	private $indentNextLine;
+	private $customEscape;
+	private $charset;
 
 	/**
 	 * Compile a Mustache token parse tree into PHP source code.
@@ -31,10 +33,12 @@ class Compiler {
 	 *
 	 * @return string Generated PHP source code
 	 */
-	public function compile($source, array $tree, $name) {
+	public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8') {
 		$this->sections       = array();
 		$this->source         = $source;
 		$this->indentNextLine = true;
+		$this->customEscape   = $customEscape;
+		$this->charset        = $charset;
 
 		return $this->writeCode($tree, $name);
 	}
@@ -116,10 +120,10 @@ class Compiler {
 		%s
 
 				if ($escape) {
-					return htmlspecialchars($buffer, ENT_COMPAT, $this->mustache->getCharset());
+					return %s;
+				} else {
+					return $buffer;
 				}
-
-				return $buffer;
 			}
 		%s
 		}';
@@ -136,7 +140,7 @@ class Compiler {
 		$code     = $this->walk($tree);
 		$sections = implode("\n", $this->sections);
 
-		return sprintf($this->prepare(self::KLASS, 0, false), $name, $code, $sections);
+		return sprintf($this->prepare(self::KLASS, 0, false), $name, $code, $this->getEscape('$buffer'), $sections);
 	}
 
 	const SECTION_CALL = '
@@ -247,7 +251,6 @@ class Compiler {
 		}
 		$buffer .= %s%s;
 	';
-	const VARIABLE_ESCAPED = 'htmlspecialchars($value, ENT_COMPAT, $this->mustache->getCharset())';
 
 	/**
 	 * Generate Mustache Template variable interpolation PHP source.
@@ -261,7 +264,7 @@ class Compiler {
 	private function variable($id, $escape, $level) {
 		$method = $this->getFindMethod($id);
 		$id     = ($method !== 'last') ? var_export($id, true) : '';
-		$value  = $escape ? self::VARIABLE_ESCAPED : '$value';
+		$value  = $escape ? $this->getEscape() : '$value';
 
 		return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $this->flushIndent(), $value);
 	}
@@ -303,6 +306,22 @@ class Compiler {
 		}
 
 		return preg_replace("/\n(\t\t)?/", "\n".str_repeat("\t", $bonus), $text);
+	}
+
+	const DEFAULT_ESCAPE = 'htmlspecialchars(%s, ENT_COMPAT, %s)';
+	const CUSTOM_ESCAPE  = 'call_user_func($this->mustache->getEscape(), %s)';
+
+	/**
+	 * Get the current escaper.
+	 *
+	 * @return string Either a custom callback, or an inline call to `htmlspecialchars`
+	 */
+	private function getEscape($value = '$value') {
+		if ($this->customEscape) {
+			return sprintf(self::CUSTOM_ESCAPE, $value);
+		} else {
+			return sprintf(self::DEFAULT_ESCAPE, $value, var_export($this->charset, true));
+		}
 	}
 
 	/**
