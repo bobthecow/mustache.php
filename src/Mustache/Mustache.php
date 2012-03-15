@@ -40,6 +40,7 @@ class Mustache {
 	private $loader;
 	private $partialsLoader;
 	private $helpers;
+	private $escape;
 	private $charset = 'UTF-8';
 
 	/**
@@ -70,6 +71,11 @@ class Mustache {
 	 *         'helpers' => array('i18n' => function($text) {
 	 *              // do something translatey here...
 	 *          }),
+	 *
+	 *         // An 'escape' callback, responsible for escaping double-mustache variables.
+	 *         'escape' => function($value) {
+	 *             return htmlspecialchars($buffer, ENT_COMPAT, 'UTF-8');
+	 *         },
 	 *
 	 *         // character set for `htmlspecialchars`. Defaults to 'UTF-8'
 	 *         'charset' => 'ISO-8859-1',
@@ -102,6 +108,14 @@ class Mustache {
 			$this->setHelpers($options['helpers']);
 		}
 
+		if (isset($options['escape'])) {
+			if (!is_callable($options['escape'])) {
+				throw new \InvalidArgumentException('Mustache Constructor "escape" option must be callable');
+			}
+
+			$this->escape = $options['escape'];
+		}
+
 		if (isset($options['charset'])) {
 			$this->charset = $options['charset'];
 		}
@@ -122,6 +136,15 @@ class Mustache {
 	 */
 	public function render($template, $data) {
 		return $this->loadTemplate($template)->render($data);
+	}
+
+	/**
+	 * Get the current Mustache escape callback.
+	 *
+	 * @return mixed Callable or null
+	 */
+	public function getEscape() {
+		return $this->escape;
 	}
 
 	/**
@@ -366,7 +389,13 @@ class Mustache {
 	 * @return string Mustache Template class name
 	 */
 	public function getTemplateClassName($source) {
-		return $this->templateClassPrefix . md5(self::VERSION . ':' . $source);
+		return $this->templateClassPrefix . md5(sprintf(
+			'version:%s,escape:%s,charset:%s,source:%s',
+			self::VERSION,
+			isset($this->escape) ? 'custom' : 'default',
+			$this->charset,
+			$source
+		));
 	}
 
 	/**
@@ -482,7 +511,10 @@ class Mustache {
 	 * @return string generated Mustache template class code
 	 */
 	private function compile($source) {
-		return $this->getCompiler()->compile($source, $this->parse($source), $this->getTemplateClassName($source));
+		$tree = $this->parse($source);
+		$name = $this->getTemplateClassName($source);
+
+		return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset);
 	}
 
 	/**
