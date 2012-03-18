@@ -9,26 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Test\Functional;
-
-use Mustache\Mustache;
-
 /**
  * @group lambdas
  * @group functional
  */
-class HigherOrderSectionsTest extends \PHPUnit_Framework_TestCase {
+class Mustache_Test_Functional_HigherOrderSectionsTest extends PHPUnit_Framework_TestCase {
 
 	private $mustache;
 
 	public function setUp() {
-		$this->mustache = new Mustache;
+		$this->mustache = new Mustache_Mustache;
 	}
 
 	public function testAnonymousFunctionSectionCallback() {
 		$tpl = $this->mustache->loadTemplate('{{#wrapper}}{{name}}{{/wrapper}}');
 
-		$foo = new Foo;
+		$foo = new Mustache_Test_Functional_Foo;
 		$foo->name = 'Mario';
 		$foo->wrapper = function($text) {
 			return sprintf('<div class="anonymous">%s</div>', $text);
@@ -41,7 +37,7 @@ class HigherOrderSectionsTest extends \PHPUnit_Framework_TestCase {
 		$one = $this->mustache->loadTemplate('{{name}}');
 		$two = $this->mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
 
-		$foo = new Foo;
+		$foo = new Mustache_Test_Functional_Foo;
 		$foo->name = 'Luigi';
 
 		$this->assertEquals($foo->name, $one->render($foo));
@@ -51,7 +47,7 @@ class HigherOrderSectionsTest extends \PHPUnit_Framework_TestCase {
 	public function testRuntimeSectionCallback() {
 		$tpl = $this->mustache->loadTemplate('{{#doublewrap}}{{name}}{{/doublewrap}}');
 
-		$foo = new Foo;
+		$foo = new Mustache_Test_Functional_Foo;
 		$foo->doublewrap = array($foo, 'wrapWithBoth');
 
 		$this->assertEquals(sprintf('<strong><em>%s</em></strong>', $foo->name), $tpl->render($foo));
@@ -60,7 +56,7 @@ class HigherOrderSectionsTest extends \PHPUnit_Framework_TestCase {
 	public function testStaticSectionCallback() {
 		$tpl = $this->mustache->loadTemplate('{{#trimmer}}    {{name}}    {{/trimmer}}');
 
-		$foo = new Foo;
+		$foo = new Mustache_Test_Functional_Foo;
 		$foo->trimmer = array(get_class($foo), 'staticTrim');
 
 		$this->assertEquals($foo->name, $tpl->render($foo));
@@ -69,7 +65,7 @@ class HigherOrderSectionsTest extends \PHPUnit_Framework_TestCase {
 	public function testViewArraySectionCallback() {
 		$tpl = $this->mustache->loadTemplate('{{#trim}}    {{name}}    {{/trim}}');
 
-		$foo = new Foo;
+		$foo = new Mustache_Test_Functional_Foo;
 
 		$data = array(
 			'name' => 'Bob',
@@ -95,19 +91,19 @@ class HigherOrderSectionsTest extends \PHPUnit_Framework_TestCase {
 	public function testMonsters() {
 		$tpl = $this->mustache->loadTemplate('{{#title}}{{title}} {{/title}}{{name}}');
 
-		$frank = new Monster();
+		$frank = new Mustache_Test_Functional_Monster();
 		$frank->title = 'Dr.';
 		$frank->name  = 'Frankenstein';
 		$this->assertEquals('Dr. Frankenstein', $tpl->render($frank));
 
-		$dracula = new Monster();
+		$dracula = new Mustache_Test_Functional_Monster();
 		$dracula->title = 'Count';
 		$dracula->name  = 'Dracula';
 		$this->assertEquals('Count Dracula', $tpl->render($dracula));
 	}
 }
 
-class Foo {
+class Mustache_Test_Functional_Foo {
 	public $name = 'Justin';
 	public $lorem = 'Lorem ipsum dolor sit amet,';
 	public $wrap;
@@ -135,7 +131,7 @@ class Foo {
 	}
 }
 
-class Monster {
+class Mustache_Test_Functional_Monster {
 	public $title;
 	public $name;
 }

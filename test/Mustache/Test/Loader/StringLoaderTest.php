@@ -9,16 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Test\Loader;
-
-use Mustache\Loader\StringLoader;
-
 /**
  * @group unit
  */
-class StringLoaderTest extends \PHPUnit_Framework_TestCase {
+class Mustache_Test_Loader_StringLoaderTest extends PHPUnit_Framework_TestCase {
 	public function testLoadTemplates() {
-		$loader = new StringLoader;
+		$loader = new Mustache_Loader_StringLoader;
 
 		$this->assertEquals('foo', $loader->load('foo'));
 		$this->assertEquals('{{ bar }}', $loader->load('{{ bar }}'));

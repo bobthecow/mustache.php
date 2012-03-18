@@ -9,28 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Test;
-
-use Mustache\Context;
-use Mustache\Mustache;
-use Mustache\Template;
-
 /**
  * @group unit
  */
-class TemplateTest extends \PHPUnit_Framework_TestCase {
+class Mustache_Test_TemplateTest extends PHPUnit_Framework_TestCase {
 	public function testConstructor() {
-		$mustache = new Mustache;
-		$template = new TemplateStub($mustache);
+		$mustache = new Mustache_Mustache;
+		$template = new Mustache_Test_TemplateStub($mustache);
 		$this->assertSame($mustache, $template->getMustache());
 	}
 
 	public function testRendering() {
 		$rendered = '<< wheee >>';
-		$mustache = new Mustache;
-		$template = new TemplateStub($mustache);
+		$mustache = new Mustache_Mustache;
+		$template = new Mustache_Test_TemplateStub($mustache);
 		$template->rendered = $rendered;
-		$context  = new Context;
+		$context  = new Mustache_Context;
 
 		$this->assertEquals($rendered, $template());
 		$this->assertEquals($rendered, $template->render());
@@ -39,14 +33,14 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 	}
 }
 
-class TemplateStub extends Template {
+class Mustache_Test_TemplateStub extends Mustache_Template {
 	public $rendered;
 
 	public function getMustache() {
 		return $this->mustache;
 	}
 
-	public function renderInternal(Context $context, $indent = '', $escape = false) {
+	public function renderInternal(Mustache_Context $context, $indent = '', $escape = false) {
 		return $this->rendered;
 	}
 }

@@ -9,12 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache;
-
 /**
  * Mustache Template Loader interface.
  */
-interface Loader {
+interface Mustache_Loader {
 
 	/**
 	 * Load a Template by name.

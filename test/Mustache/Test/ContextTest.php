@@ -9,44 +9,40 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Test;
-
-use Mustache\Context;
-
 /**
  * @group unit
  */
-class ContextTest extends \PHPUnit_Framework_TestCase {
+class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase {
 	public function testConstructor() {
-		$one = new Context;
+		$one = new Mustache_Context;
 		$this->assertSame('', $one->find('foo'));
 		$this->assertSame('', $one->find('bar'));
 
-		$two = new Context(array(
+		$two = new Mustache_Context(array(
 			'foo' => 'FOO',
 			'bar' => '<BAR>'
 		));
 		$this->assertEquals('FOO', $two->find('foo'));
 		$this->assertEquals('<BAR>', $two->find('bar'));
 
-		$obj = new \StdClass;
+		$obj = new StdClass;
 		$obj->name = 'NAME';
-		$three = new Context($obj);
+		$three = new Mustache_Context($obj);
 		$this->assertSame($obj, $three->last());
 		$this->assertEquals('NAME', $three->find('name'));
 	}
 
 	public function testPushPopAndLast() {
-		$context = new Context;
+		$context = new Mustache_Context;
 		$this->assertFalse($context->last());
 
-		$dummy = new TestDummy;
+		$dummy = new Mustache_Test_TestDummy;
 		$context->push($dummy);
 		$this->assertSame($dummy, $context->last());
 		$this->assertSame($dummy, $context->pop());
 		$this->assertFalse($context->last());
 
-		$obj = new \StdClass;
+		$obj = new StdClass;
 		$context->push($dummy);
 		$this->assertSame($dummy, $context->last());
 		$context->push($obj);
@@ -57,11 +53,11 @@ class ContextTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testFind() {
-		$context = new Context;
+		$context = new Mustache_Context;
 
-		$dummy = new TestDummy;
+		$dummy = new Mustache_Test_TestDummy;
 
-		$obj = new \StdClass;
+		$obj = new StdClass;
 		$obj->name = 'obj';
 
 		$arr = array(
@@ -98,7 +94,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase {
 	}
 }
 
-class TestDummy {
+class Mustache_Test_TestDummy {
 	public $name = 'dummy';
 
 	public function __invoke() {
