@@ -9,21 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Test;
-
-use Mustache\Compiler;
-use Mustache\Tokenizer;
-
 /**
  * @group unit
  */
-class CompilerTest extends \PHPUnit_Framework_TestCase {
+class Mustache_Test_CompilerTest extends \PHPUnit_Framework_TestCase {
 
 	/**
 	 * @dataProvider getCompileValues
 	 */
 	public function testCompile($source, array $tree, $name, $customEscaper, $charset, $expected) {
-		$compiler = new Compiler;
+		$compiler = new Mustache_Compiler;
 
 		$compiled = $compiler->compile($source, $tree, $name, $customEscaper, $charset);
 		foreach ($expected as $contains) {
@@ -34,20 +29,20 @@ class CompilerTest extends \PHPUnit_Framework_TestCase {
 	public function getCompileValues() {
 		return array(
 			array('', array(), 'Banana', false, 'ISO-8859-1', array(
-				"\nclass Banana extends \Mustache\Template",
+				"\nclass Banana extends Mustache_Template",
 				'return htmlspecialchars($buffer, ENT_COMPAT, \'ISO-8859-1\');',
 				'return $buffer;',
 			)),
 
 			array('', array('TEXT'), 'Monkey', false, 'UTF-8', array(
-				"\nclass Monkey extends \Mustache\Template",
+				"\nclass Monkey extends Mustache_Template",
 				'return htmlspecialchars($buffer, ENT_COMPAT, \'UTF-8\');',
 				'$buffer .= $indent . \'TEXT\';',
 				'return $buffer;',
 			)),
 
 			array('', array('TEXT'), 'Monkey', true, 'ISO-8859-1', array(
-				"\nclass Monkey extends \Mustache\Template",
+				"\nclass Monkey extends Mustache_Template",
 				'$buffer .= $indent . \'TEXT\';',
 				'return call_user_func($this->mustache->getEscape(), $buffer);',
 				'return $buffer;',
@@ -59,12 +54,12 @@ class CompilerTest extends \PHPUnit_Framework_TestCase {
 					'foo',
 					"\n",
 					array(
-						Tokenizer::TYPE => Tokenizer::T_ESCAPED,
-						Tokenizer::NAME => 'name',
+						Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
+						Mustache_Tokenizer::NAME => 'name',
 					),
 					array(
-						Tokenizer::TYPE => Tokenizer::T_ESCAPED,
-						Tokenizer::NAME => '.',
+						Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
+						Mustache_Tokenizer::NAME => '.',
 					),
 					"'bar'",
 				),
@@ -72,7 +67,7 @@ class CompilerTest extends \PHPUnit_Framework_TestCase {
 				false,
 				'UTF-8',
 				array(
-					"\nclass Monkey extends \Mustache\Template",
+					"\nclass Monkey extends Mustache_Template",
 					'$buffer .= $indent . \'foo\'',
 					'$buffer .= "\n"',
 					'$value = $context->find(\'name\');',
@@ -90,7 +85,7 @@ class CompilerTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testCompilerThrowsUnknownNodeTypeException() {
-		$compiler = new Compiler;
-		$compiler->compile('', array(array(Tokenizer::TYPE => 'invalid')), 'SomeClass');
+		$compiler = new Mustache_Compiler;
+		$compiler->compile('', array(array(Mustache_Tokenizer::TYPE => 'invalid')), 'SomeClass');
 	}
 }

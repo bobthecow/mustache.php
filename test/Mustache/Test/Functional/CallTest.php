@@ -9,21 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Test\Functional;
-
-use Mustache\Mustache;
-
 /**
  * @group magic_methods
  * @group functional
  */
-class CallTest extends \PHPUnit_Framework_TestCase {
+class Mustache_Test_Functional_CallTest extends PHPUnit_Framework_TestCase {
 
 	public function testCallEatsContext() {
-		$m = new Mustache;
+		$m = new Mustache_Mustache;
 		$tpl = $m->loadTemplate('{{# foo }}{{ label }}: {{ name }}{{/ foo }}');
 
-		$foo = new ClassWithCall();
+		$foo = new Mustache_Test_Functional_ClassWithCall();
 		$foo->name = 'Bob';
 
 		$data = array('label' => 'name', 'foo' => $foo);
@@ -32,7 +28,7 @@ class CallTest extends \PHPUnit_Framework_TestCase {
 	}
 }
 
-class ClassWithCall {
+class Mustache_Test_Functional_ClassWithCall {
 	public $name;
 	public function __call($method, $args) {
 		return 'unknown value';

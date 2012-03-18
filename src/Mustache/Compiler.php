@@ -9,14 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache;
-
 /**
  * Mustache Compiler class.
  *
  * This class is responsible for turning a Mustache token parse tree into normal PHP source code.
  */
-class Compiler {
+class Mustache_Compiler {
 
 	private $sections;
 	private $source;
@@ -46,7 +44,7 @@ class Compiler {
 	/**
 	 * Helper function for walking the Mustache token parse tree.
 	 *
-	 * @throws \InvalidArgumentException upon encountering unknown token types.
+	 * @throws InvalidArgumentException upon encountering unknown token types.
 	 *
 	 * @param array $tree  Parse tree of Mustache tokens
 	 * @param int   $level (default: 0)
@@ -57,46 +55,46 @@ class Compiler {
 		$code = '';
 		$level++;
 		foreach ($tree as $node) {
-			switch (is_string($node) ? 'text' : $node[Tokenizer::TYPE]) {
-				case Tokenizer::T_SECTION:
+			switch (is_string($node) ? 'text' : $node[Mustache_Tokenizer::TYPE]) {
+				case Mustache_Tokenizer::T_SECTION:
 					$code .= $this->section(
-						$node[Tokenizer::NODES],
-						$node[Tokenizer::NAME],
-						$node[Tokenizer::INDEX],
-						$node[Tokenizer::END],
-						$node[Tokenizer::OTAG],
-						$node[Tokenizer::CTAG],
+						$node[Mustache_Tokenizer::NODES],
+						$node[Mustache_Tokenizer::NAME],
+						$node[Mustache_Tokenizer::INDEX],
+						$node[Mustache_Tokenizer::END],
+						$node[Mustache_Tokenizer::OTAG],
+						$node[Mustache_Tokenizer::CTAG],
 						$level
 					);
 					break;
 
-				case Tokenizer::T_INVERTED:
+				case Mustache_Tokenizer::T_INVERTED:
 					$code .= $this->invertedSection(
-						$node[Tokenizer::NODES],
-						$node[Tokenizer::NAME],
+						$node[Mustache_Tokenizer::NODES],
+						$node[Mustache_Tokenizer::NAME],
 						$level
 					);
 					break;
 
-				case Tokenizer::T_PARTIAL:
-				case Tokenizer::T_PARTIAL_2:
+				case Mustache_Tokenizer::T_PARTIAL:
+				case Mustache_Tokenizer::T_PARTIAL_2:
 					$code .= $this->partial(
-						$node[Tokenizer::NAME],
-						isset($node[Tokenizer::INDENT]) ? $node[Tokenizer::INDENT] : '',
+						$node[Mustache_Tokenizer::NAME],
+						isset($node[Mustache_Tokenizer::INDENT]) ? $node[Mustache_Tokenizer::INDENT] : '',
 						$level
 					);
 					break;
 
-				case Tokenizer::T_UNESCAPED:
-				case Tokenizer::T_UNESCAPED_2:
-					$code .= $this->variable($node[Tokenizer::NAME], false, $level);
+				case Mustache_Tokenizer::T_UNESCAPED:
+				case Mustache_Tokenizer::T_UNESCAPED_2:
+					$code .= $this->variable($node[Mustache_Tokenizer::NAME], false, $level);
 					break;
 
-				case Tokenizer::T_COMMENT:
+				case Mustache_Tokenizer::T_COMMENT:
 					break;
 
-				case Tokenizer::T_ESCAPED:
-					$code .= $this->variable($node[Tokenizer::NAME], true, $level);
+				case Mustache_Tokenizer::T_ESCAPED:
+					$code .= $this->variable($node[Mustache_Tokenizer::NAME], true, $level);
 					break;
 
 
@@ -105,7 +103,7 @@ class Compiler {
 					break;
 
 				default:
-					throw new \InvalidArgumentException('Unknown node type: '.json_encode($node));
+					throw new InvalidArgumentException('Unknown node type: '.json_encode($node));
 			}
 		}
 
@@ -114,8 +112,8 @@ class Compiler {
 
 	const KLASS = '<?php
 
-		class %s extends \Mustache\Template {
-			public function renderInternal(\Mustache\Context $context, $indent = \'\', $escape = false) {
+		class %s extends Mustache_Template {
+			public function renderInternal(Mustache_Context $context, $indent = \'\', $escape = false) {
 				$buffer = \'\';
 		%s
 
@@ -149,7 +147,7 @@ class Compiler {
 	';
 
 	const SECTION = '
-		private function section%s(\Mustache\Context $context, $indent, $value) {
+		private function section%s(Mustache_Context $context, $indent, $value) {
 			$buffer = \'\';
 			if (!is_string($value) && is_callable($value)) {
 				$source = %s;
@@ -329,9 +327,9 @@ class Compiler {
 	 *
 	 * The return value will be one of `find`, `findDot` or `last`.
 	 *
-	 * @see \Mustache\Context::find
-	 * @see \Mustache\Context::findDot
-	 * @see \Mustache\Context::last
+	 * @see Mustache_Context::find
+	 * @see Mustache_Context::findDot
+	 * @see Mustache_Context::last
 	 *
 	 * @param string $id Variable name
 	 *

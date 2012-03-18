@@ -9,19 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Test;
-
-use Mustache\Compiler;
-use Mustache\Mustache;
-use Mustache\Loader\StringLoader;
-use Mustache\Loader\ArrayLoader;
-use Mustache\Parser;
-use Mustache\Tokenizer;
-
 /**
  * @group unit
  */
-class MustacheTest extends \PHPUnit_Framework_TestCase {
+class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 
 	private static $tempDir;
 
@@ -33,9 +24,9 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testConstructor() {
-		$loader         = new StringLoader;
-		$partialsLoader = new ArrayLoader;
-		$mustache       = new Mustache(array(
+		$loader         = new Mustache_Loader_StringLoader;
+		$partialsLoader = new Mustache_Loader_ArrayLoader;
+		$mustache       = new Mustache_Mustache(array(
 			'template_class_prefix' => '__whot__',
 			'cache' => self::$tempDir,
 			'loader' => $loader,
@@ -67,7 +58,7 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 		$data   = array('bar' => 'baz');
 		$output = 'TEH OUTPUT';
 
-		$template = $this->getMockBuilder('Mustache\Template')
+		$template = $this->getMockBuilder('Mustache_Template')
 			->disableOriginalConstructor()
 			->getMock();
 
@@ -84,11 +75,11 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testSettingServices() {
-		$loader    = new StringLoader;
-		$tokenizer = new Tokenizer;
-		$parser    = new Parser;
-		$compiler  = new Compiler;
-		$mustache  = new Mustache;
+		$loader    = new Mustache_Loader_StringLoader;
+		$tokenizer = new Mustache_Tokenizer;
+		$parser    = new Mustache_Parser;
+		$compiler  = new Mustache_Compiler;
+		$mustache  = new Mustache_Mustache;
 
 		$this->assertNotSame($loader, $mustache->getLoader());
 		$mustache->setLoader($loader);
@@ -115,7 +106,7 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 	 * @group functional
 	 */
 	public function testCache() {
-		$mustache = new Mustache(array(
+		$mustache = new Mustache_Mustache(array(
 			'template_class_prefix' => '__whot__',
 			'cache' => self::$tempDir,
 		));
@@ -126,7 +117,7 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 		$fileName  = self::$tempDir . '/' . $className . '.php';
 		$this->assertInstanceOf($className, $template);
 		$this->assertFileExists($fileName);
-		$this->assertContains("\nclass $className extends \Mustache\Template", file_get_contents($fileName));
+		$this->assertContains("\nclass $className extends Mustache_Template", file_get_contents($fileName));
 	}
 
 	/**
@@ -134,7 +125,7 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 	 * @dataProvider getBadEscapers
 	 */
 	public function testNonCallableEscapeThrowsException($escape) {
-		new Mustache(array('escape' => $escape));
+		new Mustache_Mustache(array('escape' => $escape));
 	}
 
 	public function getBadEscapers() {
@@ -145,24 +136,11 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @group functional
-	 * @expectedException \RuntimeException
-	 */
-	public function testCacheFailsThrowException() {
-		global $mustacheFilesystemRenameHax;
-
-		$mustacheFilesystemRenameHax = true;
-
-		$mustache = new Mustache(array('cache' => self::$tempDir));
-		$mustache->loadTemplate('{{ foo }}');
-	}
-
-	/**
 	 * @expectedException \RuntimeException
 	 */
 	public function testImmutablePartialsLoadersThrowException() {
-		$mustache = new Mustache(array(
-			'partials_loader' => new StringLoader,
+		$mustache = new Mustache_Mustache(array(
+			'partials_loader' => new Mustache_Loader_StringLoader,
 		));
 
 		$mustache->setPartials(array('foo' => '{{ foo }}'));
@@ -171,7 +149,7 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 	public function testHelpers() {
 		$foo = function() { return 'foo'; };
 		$bar = 'BAR';
-		$mustache = new Mustache(array('helpers' => array(
+		$mustache = new Mustache_Mustache(array('helpers' => array(
 			'foo' => $foo,
 			'bar' => $bar,
 		)));
@@ -207,7 +185,7 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException \InvalidArgumentException
 	 */
 	public function testSetHelpersThrowsExceptions() {
-		$mustache = new Mustache;
+		$mustache = new Mustache_Mustache;
 		$mustache->setHelpers('monkeymonkeymonkey');
 	}
 
@@ -232,7 +210,7 @@ class MustacheTest extends \PHPUnit_Framework_TestCase {
 	}
 }
 
-class MustacheStub extends Mustache {
+class MustacheStub extends Mustache_Mustache {
 	public $source;
 	public $template;
 	public function loadTemplate($source) {
@@ -240,15 +218,4 @@ class MustacheStub extends Mustache {
 
 		return $this->template;
 	}
-}
-
-
-// It's prob'ly best if you ignore this bit.
-
-namespace Mustache;
-
-function rename($a, $b) {
-	global $mustacheFilesystemRenameHax;
-
-	return ($mustacheFilesystemRenameHax) ? false : \rename($a, $b);
 }

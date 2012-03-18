@@ -9,37 +9,35 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache;
-
 /**
  * Abstract Mustache Template class.
  *
  * @abstract
  */
-abstract class Template {
+abstract class Mustache_Template {
 
 	/**
-	 * @var \Mustache\Mustache
+	 * @var Mustache_Mustache
 	 */
 	protected $mustache;
 
 	/**
 	 * Mustache Template constructor.
 	 *
-	 * @param \Mustache\Mustache $mustache
+	 * @param Mustache_Mustache $mustache
 	 */
-	public function __construct(Mustache $mustache) {
+	public function __construct(Mustache_Mustache $mustache) {
 		$this->mustache = $mustache;
 	}
 
 	/**
 	 * Mustache Template instances can be treated as a function and rendered by simply calling them:
 	 *
-	 *     $m = new Mustache;
+	 *     $m = new Mustache_Mustache;
 	 *     $tpl = $m->loadTemplate('Hello, {{ name }}!');
 	 *     echo $tpl(array('name' => 'World')); // "Hello, World!"
 	 *
-	 * @see \Mustache\Template::render
+	 * @see Mustache_Template::render
 	 *
 	 * @param mixed $context Array or object rendering context (default: array())
 	 *
@@ -67,11 +65,11 @@ abstract class Template {
 	 *
 	 * @abstract
 	 *
-	 * @param \Mustache\Context $context
+	 * @param Mustache_Context $context
 	 *
 	 * @return string Rendered template
 	 */
-	abstract public function renderInternal(Context $context, $indent = '', $escape = false);
+	abstract public function renderInternal(Mustache_Context $context, $indent = '', $escape = false);
 
 	/**
 	 * Tests whether a value should be iterated over (e.g. in a section context).
@@ -104,7 +102,7 @@ abstract class Template {
 	 */
 	protected function isIterable($value) {
 		if (is_object($value)) {
-			return $value instanceof \Traversable;
+			return $value instanceof Traversable;
 		} elseif (is_array($value)) {
 			$i = 0;
 			foreach ($value as $k => $v) {
@@ -126,10 +124,10 @@ abstract class Template {
 	 *
 	 * @param mixed $context Optional first context frame (default: null)
 	 *
-	 * @return \Mustache\Context
+	 * @return Mustache_Context
 	 */
 	protected function prepareContextStack($context = null) {
-		$stack = new Context;
+		$stack = new Mustache_Context;
 
 		$helpers = $this->mustache->getHelpers();
 		if (!$helpers->isEmpty()) {

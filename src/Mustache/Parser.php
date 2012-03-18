@@ -9,14 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache;
-
 /**
  * Mustache Parser class.
  *
  * This class is responsible for turning a set of Mustache tokens into a parse tree.
  */
-class Parser {
+class Mustache_Parser {
 
 	/**
 	 * Process an array of Mustache tokens and convert them into a parse tree.
@@ -26,20 +24,20 @@ class Parser {
 	 * @return array Mustache token parse tree
 	 */
 	public function parse(array $tokens = array()) {
-		return $this->buildTree(new \ArrayIterator($tokens));
+		return $this->buildTree(new ArrayIterator($tokens));
 	}
 
 	/**
 	 * Helper method for recursively building a parse tree.
 	 *
-	 * @throws \LogicException when nesting errors or mismatched section tags are encountered.
+	 * @throws LogicException when nesting errors or mismatched section tags are encountered.
 	 *
-	 * @param \ArrayIterator $tokens Stream of Mustache tokens
+	 * @param ArrayIterator $tokens Stream of Mustache tokens
 	 * @param array          $parent Parent token (default: null)
 	 *
 	 * @return array Mustache Token parse tree
 	 */
-	private function buildTree(\ArrayIterator $tokens, array $parent = null) {
+	private function buildTree(ArrayIterator $tokens, array $parent = null) {
 		$nodes = array();
 
 		do {
@@ -49,23 +47,23 @@ class Parser {
 			if ($token === null) {
 				continue;
 			} elseif (is_array($token)) {
-				switch ($token[Tokenizer::TYPE]) {
-					case Tokenizer::T_SECTION:
-					case Tokenizer::T_INVERTED:
+				switch ($token[Mustache_Tokenizer::TYPE]) {
+					case Mustache_Tokenizer::T_SECTION:
+					case Mustache_Tokenizer::T_INVERTED:
 						$nodes[] = $this->buildTree($tokens, $token);
 						break;
 
-					case Tokenizer::T_END_SECTION:
+					case Mustache_Tokenizer::T_END_SECTION:
 						if (!isset($parent)) {
-							throw new \LogicException('Unexpected closing tag: /'. $token[Tokenizer::NAME]);
+							throw new LogicException('Unexpected closing tag: /'. $token[Mustache_Tokenizer::NAME]);
 						}
 
-						if ($token[Tokenizer::NAME] !== $parent[Tokenizer::NAME]) {
-							throw new \LogicException('Nesting error: ' . $parent[Tokenizer::NAME] . ' vs. ' . $token[Tokenizer::NAME]);
+						if ($token[Mustache_Tokenizer::NAME] !== $parent[Mustache_Tokenizer::NAME]) {
+							throw new LogicException('Nesting error: ' . $parent[Mustache_Tokenizer::NAME] . ' vs. ' . $token[Mustache_Tokenizer::NAME]);
 						}
 
-						$parent[Tokenizer::END]   = $token[Tokenizer::INDEX];
-						$parent[Tokenizer::NODES] = $nodes;
+						$parent[Mustache_Tokenizer::END]   = $token[Mustache_Tokenizer::INDEX];
+						$parent[Mustache_Tokenizer::NODES] = $nodes;
 
 						return $parent;
 						break;
@@ -81,7 +79,7 @@ class Parser {
 		} while ($tokens->valid());
 
 		if (isset($parent)) {
-			throw new \LogicException('Missing closing tag: ' . $parent[Tokenizer::NAME]);
+			throw new LogicException('Missing closing tag: ' . $parent[Mustache_Tokenizer::NAME]);
 		}
 
 		return $nodes;

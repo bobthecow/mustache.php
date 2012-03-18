@@ -9,30 +9,32 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache;
-
 /**
  * Mustache class autoloader.
  */
-class Autoloader {
+class Mustache_Autoloader {
 
 	private $baseDir;
 
 	/**
 	 * Autoloader constructor.
 	 *
-	 * @param string $baseDir Mustache library base directory (default: __DIR__.'/..')
+	 * @param string $baseDir Mustache library base directory (default: dirname(__FILE__).'/..')
 	 */
 	public function __construct($baseDir = null) {
-		$this->baseDir = rtrim($baseDir, '/') ?: __DIR__.'/..';
+		if ($baseDir === null) {
+			$this->baseDir = dirname(__FILE__).'/..';
+		} else {
+			$this->baseDir = rtrim($baseDir, '/');
+		}
 	}
 
 	/**
 	 * Register a new instance as an SPL autoloader.
 	 *
-	 * @param string $baseDir Mustache library base directory (default: __DIR__.'/..')
+	 * @param string $baseDir Mustache library base directory (default: dirname(__FILE__).'/..')
 	 *
-	 * @return \Mustache\Autoloader Registered Autoloader instance
+	 * @return Mustache_Autoloader Registered Autoloader instance
 	 */
 	static public function register($baseDir = null) {
 		$loader = new self($baseDir);
@@ -55,7 +57,7 @@ class Autoloader {
 			return;
 		}
 
-		$file = sprintf('%s/%s.php', $this->baseDir, str_replace('\\', '/', $class));
+		$file = sprintf('%s/%s.php', $this->baseDir, str_replace('_', '/', $class));
 		if (is_file($file)) {
 			require $file;
 		}

@@ -9,27 +9,25 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache;
-
 /**
  * A collection of helpers for a Mustache instance.
  */
-class HelperCollection {
+class Mustache_HelperCollection {
 	private $helpers = array();
 
 	/**
 	 * Helper Collection constructor.
 	 *
-	 * Optionally accepts an array (or \Traversable) of `$name => $helper` pairs.
+	 * Optionally accepts an array (or Traversable) of `$name => $helper` pairs.
 	 *
-	 * @throws \InvalidArgumentException if the $helpers argument isn't an array or \Traversable
+	 * @throws InvalidArgumentException if the $helpers argument isn't an array or Traversable
 	 *
 	 * @param array|Traversable $helpers (default: null)
 	 */
 	public function __construct($helpers = null) {
 		if ($helpers !== null) {
-			if (!is_array($helpers) && !$helpers instanceof \Traversable) {
-				throw new \InvalidArgumentException('HelperCollection constructor expects an array of helpers');
+			if (!is_array($helpers) && !$helpers instanceof Traversable) {
+				throw new InvalidArgumentException('HelperCollection constructor expects an array of helpers');
 			}
 
 			foreach ($helpers as $name => $helper) {
@@ -41,7 +39,7 @@ class HelperCollection {
 	/**
 	 * Magic mutator.
 	 *
-	 * @see \Mustache\HelperCollection::add
+	 * @see Mustache_HelperCollection::add
 	 *
 	 * @param string $name
 	 * @param mixed  $helper
@@ -63,7 +61,7 @@ class HelperCollection {
 	/**
 	 * Magic accessor.
 	 *
-	 * @see \Mustache\HelperCollection::get
+	 * @see Mustache_HelperCollection::get
 	 *
 	 * @param string $name
 	 *
@@ -82,7 +80,7 @@ class HelperCollection {
 	 */
 	public function get($name) {
 		if (!$this->has($name)) {
-			throw new \InvalidArgumentException('Unknown helper: '.$name);
+			throw new InvalidArgumentException('Unknown helper: '.$name);
 		}
 
 		return $this->helpers[$name];
@@ -91,7 +89,7 @@ class HelperCollection {
 	/**
 	 * Magic isset().
 	 *
-	 * @see \Mustache\HelperCollection::has
+	 * @see Mustache_HelperCollection::has
 	 *
 	 * @param string $name
 	 *
@@ -115,7 +113,7 @@ class HelperCollection {
 	/**
 	 * Magic unset().
 	 *
-	 * @see \Mustache\HelperCollection::remove
+	 * @see Mustache_HelperCollection::remove
 	 *
 	 * @param string $name
 	 */
@@ -126,13 +124,13 @@ class HelperCollection {
 	/**
 	 * Check whether a given helper is present in the collection.
 	 *
-	 * @throws \InvalidArgumentException if the requested helper is not present.
+	 * @throws InvalidArgumentException if the requested helper is not present.
 	 *
 	 * @param string $name
 	 */
 	public function remove($name) {
 		if (!$this->has($name)) {
-			throw new \InvalidArgumentException('Unknown helper: '.$name);
+			throw new InvalidArgumentException('Unknown helper: '.$name);
 		}
 
 		unset($this->helpers[$name]);

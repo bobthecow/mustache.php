@@ -9,15 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Test\Functional;
-
-use Mustache\Mustache;
-
 /**
  * @group examples
  * @group functional
  */
-class ExamplesTest extends \PHPUnit_Framework_TestCase {
+class Mustache_Test_Functional_ExamplesTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * Test everything in the `examples` directory.
@@ -30,7 +26,7 @@ class ExamplesTest extends \PHPUnit_Framework_TestCase {
 	 * @param string $expected
 	 */
 	public function testExamples($context, $source, $partials, $expected) {
-		$mustache = new Mustache(array(
+		$mustache = new Mustache_Mustache(array(
 			'partials' => $partials
 		));
 		$this->assertEquals($expected, $mustache->loadTemplate($source)->render($context));
@@ -50,7 +46,7 @@ class ExamplesTest extends \PHPUnit_Framework_TestCase {
 	 * @return array
 	 */
 	public function getExamples() {
-		$path     = realpath(__DIR__.'/../../../../examples');
+		$path     = realpath(dirname(__FILE__).'/../../../../examples');
 		$examples = array();
 
 		$handle   = opendir($path);

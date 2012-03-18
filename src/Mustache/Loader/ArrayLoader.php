@@ -9,11 +9,6 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Loader;
-
-use Mustache\Loader;
-use Mustache\Loader\MutableLoader;
-
 /**
  * Mustache Template array Loader implementation.
  *
@@ -26,13 +21,13 @@ use Mustache\Loader\MutableLoader;
  *
  *     $tpl = $loader->load('foo'); // '{{ bar }}'
  *
- * The ArrayLoader is used internally as a partials loader by \Mustache\Mustache instance when an array of partials
+ * The ArrayLoader is used internally as a partials loader by Mustache_Mustache instance when an array of partials
  * is set. It can also be used as a quick-and-dirty Template loader.
  *
  * @implements Loader
  * @implements MutableLoader
  */
-class ArrayLoader implements Loader, MutableLoader {
+class Mustache_Loader_ArrayLoader implements Mustache_Loader, Mustache_Loader_MutableLoader {
 
 	/**
 	 * ArrayLoader constructor.
@@ -52,7 +47,7 @@ class ArrayLoader implements Loader, MutableLoader {
 	 */
 	public function load($name) {
 		if (!isset($this->templates[$name])) {
-			throw new \InvalidArgumentException('Template '.$name.' not found.');
+			throw new InvalidArgumentException('Template '.$name.' not found.');
 		}
 
 		return $this->templates[$name];

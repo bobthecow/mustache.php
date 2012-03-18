@@ -9,23 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Mustache\Test\Functional;
-
-use Mustache\Mustache;
-use Mustache\Loader\StringLoader;
-
 /**
  * A PHPUnit test case wrapping the Mustache Spec
  *
  * @group mustache-spec
  * @group functional
  */
-class MustacheSpecTest extends \PHPUnit_Framework_TestCase {
+class Mustache_Test_Functional_MustacheSpecTest extends PHPUnit_Framework_TestCase {
 
 	private static $mustache;
 
 	public static function setUpBeforeClass() {
-		self::$mustache = new Mustache;
+		self::$mustache = new Mustache_Mustache;
 	}
 
 	/**
@@ -33,7 +28,7 @@ class MustacheSpecTest extends \PHPUnit_Framework_TestCase {
 	 * simply to provide a 'skipped' test if the `spec` submodule isn't initialized.
 	 */
 	public function testSpecInitialized() {
-		if (!file_exists(__DIR__.'/../../../../vendor/spec/specs/')) {
+		if (!file_exists(dirname(__FILE__).'/../../../../vendor/spec/specs/')) {
 			$this->markTestSkipped('Mustache spec submodule not initialized: run "git submodule update --init"');
 		}
 	}
@@ -161,13 +156,13 @@ class MustacheSpecTest extends \PHPUnit_Framework_TestCase {
 	 * @return array
 	 */
 	private function loadSpec($name) {
-		$filename = __DIR__ . '/../../../../vendor/spec/specs/' . $name . '.yml';
+		$filename = dirname(__FILE__) . '/../../../../vendor/spec/specs/' . $name . '.yml';
 		if (!file_exists($filename)) {
 			return array();
 		}
 
 		$data = array();
-		$yaml = new \sfYamlParser;
+		$yaml = new sfYamlParser;
 		$file = file_get_contents($filename);
 
 		// @hack: pre-process the 'lambdas' spec so the Symfony YAML parser doesn't complain.
