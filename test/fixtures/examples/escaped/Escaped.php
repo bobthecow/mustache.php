@@ -1,5 +1,6 @@
 <?php
 
-class Escaped {
-	public $title = '"Bear" > "Shark"';
+class Escaped
+{
+    public $title = '"Bear" > "Shark"';
 }

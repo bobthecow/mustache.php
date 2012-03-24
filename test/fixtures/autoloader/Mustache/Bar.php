@@ -9,6 +9,7 @@
  * file that was distributed with this source code.
  */
 
-class Mustache_Bar {
-	// nada
+class Mustache_Bar
+{
+    // nada
 }

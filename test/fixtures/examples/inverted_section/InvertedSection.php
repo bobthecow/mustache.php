@@ -1,5 +1,6 @@
 <?php
 
-class InvertedSection {
-	public $repo = array();
+class InvertedSection
+{
+    public $repo = array();
 }
