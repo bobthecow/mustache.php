@@ -146,6 +146,17 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 		$mustache->setPartials(array('foo' => '{{ foo }}'));
 	}
 
+	public function testMissingPartialsTreatedAsEmptyString() {
+		$mustache = new Mustache_Mustache(array(
+			'partials_loader' => new Mustache_Loader_ArrayLoader(array(
+				'foo' => 'FOO',
+				'baz' => 'BAZ',
+			))
+		));
+
+		$this->assertEquals('FOOBAZ', $mustache->render('{{>foo}}{{>bar}}{{>baz}}', array()));
+	}
+
 	public function testHelpers() {
 		$foo = function() { return 'foo'; };
 		$bar = 'BAR';

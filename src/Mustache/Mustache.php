@@ -414,7 +414,11 @@ class Mustache_Mustache {
 	 * @return Mustache_Template
 	 */
 	public function loadPartial($name) {
-		return $this->loadSource($this->getPartialsLoader()->load($name));
+		try {
+			return $this->loadSource($this->getPartialsLoader()->load($name));
+		} catch (InvalidArgumentException $e) {
+			// If the named partial cannot be found, return null.
+		}
 	}
 
 	/**

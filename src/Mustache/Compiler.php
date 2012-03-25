@@ -221,7 +221,11 @@ class Mustache_Compiler {
 		return sprintf($this->prepare(self::INVERTED_SECTION, $level), $id, $method, $id, $this->walk($nodes, $level));
 	}
 
-	const PARTIAL = '$buffer .= $this->mustache->loadPartial(%s)->renderInternal($context, %s);';
+	const PARTIAL = '
+		if ($partial = $this->mustache->loadPartial(%s)) {
+			$buffer .= $partial->renderInternal($context, %s);
+		}
+	';
 
 	/**
 	 * Generate Mustache Template partial call PHP source.
