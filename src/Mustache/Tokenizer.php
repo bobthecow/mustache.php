@@ -32,6 +32,7 @@ class Mustache_Tokenizer {
 	const T_ESCAPED      = '_v';
 	const T_UNESCAPED    = '{';
 	const T_UNESCAPED_2  = '&';
+	const T_TEXT         = '_t';
 
 	// Valid token types
 	private static $tagTypes = array(
@@ -63,6 +64,7 @@ class Mustache_Tokenizer {
 	const END    = 'end';
 	const INDENT = 'indent';
 	const NODES  = 'nodes';
+	const VALUE  = 'value';
 
 	private $state;
 	private $tagType;
@@ -187,7 +189,7 @@ class Mustache_Tokenizer {
 	 */
 	private function flushBuffer() {
 		if (!empty($this->buffer)) {
-			$this->tokens[] = $this->buffer;
+			$this->tokens[] = array(self::TYPE  => self::T_TEXT, self::VALUE => $this->buffer);
 			$this->buffer   = '';
 		}
 	}
@@ -201,12 +203,12 @@ class Mustache_Tokenizer {
 		$tokensCount = count($this->tokens);
 		for ($j = $this->lineStart; $j < $tokensCount; $j++) {
 			$token = $this->tokens[$j];
-			if (is_array($token) && isset(self::$tagTypes[$token[self::TYPE]])) {
+			if (isset(self::$tagTypes[$token[self::TYPE]])) {
 				if (isset(self::$interpolatedTags[$token[self::TYPE]])) {
 					return false;
 				}
-			} elseif (is_string($token)) {
-				if (preg_match('/\S/', $token)) {
+			} elseif ($token[self::TYPE] == self::T_TEXT) {
+				if (preg_match('/\S/', $token[self::VALUE])) {
 					return false;
 				}
 			}
@@ -225,16 +227,16 @@ class Mustache_Tokenizer {
 		if ($this->seenTag && $this->lineIsWhitespace()) {
 			$tokensCount = count($this->tokens);
 			for ($j = $this->lineStart; $j < $tokensCount; $j++) {
-				if (!is_array($this->tokens[$j])) {
-					if (isset($this->tokens[$j+1]) && is_array($this->tokens[$j+1]) && $this->tokens[$j+1][self::TYPE] == self::T_PARTIAL) {
-						$this->tokens[$j+1][self::INDENT] = (string) $this->tokens[$j];
+				if ($this->tokens[$j][self::TYPE] == self::T_TEXT) {
+					if (isset($this->tokens[$j+1]) && $this->tokens[$j+1][self::TYPE] == self::T_PARTIAL) {
+						$this->tokens[$j+1][self::INDENT] = $this->tokens[$j][self::VALUE];
 					}
 
 					$this->tokens[$j] = null;
 				}
 			}
 		} elseif (!$noNewLine) {
-			$this->tokens[] = "\n";
+			$this->tokens[] = array(self::TYPE => self::T_TEXT, self::VALUE => "\n");
 		}
 
 		$this->seenTag   = false;

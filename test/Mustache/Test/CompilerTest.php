@@ -34,14 +34,14 @@ class Mustache_Test_CompilerTest extends \PHPUnit_Framework_TestCase {
 				'return $buffer;',
 			)),
 
-			array('', array('TEXT'), 'Monkey', false, 'UTF-8', array(
+			array('', array($this->createTextToken('TEXT')), 'Monkey', false, 'UTF-8', array(
 				"\nclass Monkey extends Mustache_Template",
 				'return htmlspecialchars($buffer, ENT_COMPAT, \'UTF-8\');',
 				'$buffer .= $indent . \'TEXT\';',
 				'return $buffer;',
 			)),
 
-			array('', array('TEXT'), 'Monkey', true, 'ISO-8859-1', array(
+			array('', array($this->createTextToken('TEXT')), 'Monkey', true, 'ISO-8859-1', array(
 				"\nclass Monkey extends Mustache_Template",
 				'$buffer .= $indent . \'TEXT\';',
 				'return call_user_func($this->mustache->getEscape(), $buffer);',
@@ -51,8 +51,8 @@ class Mustache_Test_CompilerTest extends \PHPUnit_Framework_TestCase {
 			array(
 				'',
 				array(
-					'foo',
-					"\n",
+					$this->createTextToken('foo'),
+					$this->createTextToken("\n"),
 					array(
 						Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
 						Mustache_Tokenizer::NAME => 'name',
@@ -61,7 +61,7 @@ class Mustache_Test_CompilerTest extends \PHPUnit_Framework_TestCase {
 						Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
 						Mustache_Tokenizer::NAME => '.',
 					),
-					"'bar'",
+					$this->createTextToken("'bar'"),
 				),
 				'Monkey',
 				false,
@@ -87,5 +87,12 @@ class Mustache_Test_CompilerTest extends \PHPUnit_Framework_TestCase {
 	public function testCompilerThrowsUnknownNodeTypeException() {
 		$compiler = new Mustache_Compiler;
 		$compiler->compile('', array(array(Mustache_Tokenizer::TYPE => 'invalid')), 'SomeClass');
+	}
+
+	private function createTextToken($value) {
+		return array(
+			Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
+			Mustache_Tokenizer::VALUE => $value,
+		);
 	}
 }

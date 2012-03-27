@@ -55,7 +55,7 @@ class Mustache_Compiler {
 		$code = '';
 		$level++;
 		foreach ($tree as $node) {
-			switch (is_string($node) ? 'text' : $node[Mustache_Tokenizer::TYPE]) {
+			switch ($node[Mustache_Tokenizer::TYPE]) {
 				case Mustache_Tokenizer::T_SECTION:
 					$code .= $this->section(
 						$node[Mustache_Tokenizer::NODES],
@@ -98,8 +98,8 @@ class Mustache_Compiler {
 					break;
 
 
-				case 'text':
-					$code .= $this->text($node, $level);
+				case Mustache_Tokenizer::T_TEXT:
+					$code .= $this->text($node[Mustache_Tokenizer::VALUE], $level);
 					break;
 
 				default:

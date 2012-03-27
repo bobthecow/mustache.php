@@ -27,13 +27,23 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase {
 			array(
 				'text',
 				null,
-				array('text'),
+				array(
+					array(
+						Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
+						Mustache_Tokenizer::VALUE => 'text',
+					),
+				),
 			),
 
 			array(
 				'text',
 				'<<< >>>',
-				array('text'),
+				array(
+					array(
+						Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
+						Mustache_Tokenizer::VALUE => 'text',
+					),
+				),
 			),
 
 			array(
@@ -53,7 +63,12 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase {
 			array(
 				'{{ name }}',
 				'<<< >>>',
-				array('{{ name }}'),
+				array(
+					array(
+						Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
+						Mustache_Tokenizer::VALUE => '{{ name }}',
+					),
+				),
 			),
 
 			array(
@@ -81,7 +96,10 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase {
 						Mustache_Tokenizer::CTAG  => '}}',
 						Mustache_Tokenizer::INDEX => 8,
 					),
-					"\n",
+					array(
+						Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
+						Mustache_Tokenizer::VALUE => "\n",
+					),
 					array(
 						Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_SECTION,
 						Mustache_Tokenizer::NAME  => 'b',
@@ -104,7 +122,10 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase {
 						Mustache_Tokenizer::CTAG  => '|',
 						Mustache_Tokenizer::INDEX => 37,
 					),
-					"\n",
+					array(
+						Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
+						Mustache_Tokenizer::VALUE => "\n",
+					),
 					array(
 						Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_UNESCAPED,
 						Mustache_Tokenizer::NAME  => 'd',

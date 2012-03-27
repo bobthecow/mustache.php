@@ -46,7 +46,7 @@ class Mustache_Parser {
 
 			if ($token === null) {
 				continue;
-			} elseif (is_array($token)) {
+			} else {
 				switch ($token[Mustache_Tokenizer::TYPE]) {
 					case Mustache_Tokenizer::T_SECTION:
 					case Mustache_Tokenizer::T_INVERTED:
@@ -72,8 +72,6 @@ class Mustache_Parser {
 						$nodes[] = $token;
 						break;
 				}
-			} else {
-				$nodes[] = $token;
 			}
 
 		} while ($tokens->valid());
