@@ -35,18 +35,16 @@ class Mustache_Test_Functional_ExamplesTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Data provider for testExamples method.
 	 *
-	 * Assumes that an `examples` directory exists inside parent directory.
+	 * Loads examples from the test fixtures directory.
+	 *
 	 * This examples directory should contain any number of subdirectories, each of which contains
 	 * three files: one Mustache class (.php), one Mustache template (.mustache), and one output file
-	 * (.txt).
-	 *
-	 * This whole mess will be refined later to be more intuitive and less prescriptive, but it'll
-	 * do for now. Especially since it means we can have unit tests :)
+	 * (.txt). Optionally, the directory may contain a folder full of partials.
 	 *
 	 * @return array
 	 */
 	public function getExamples() {
-		$path     = realpath(dirname(__FILE__).'/../../../../examples');
+		$path     = realpath(dirname(__FILE__).'/../../../fixtures/examples');
 		$examples = array();
 
 		$handle   = opendir($path);

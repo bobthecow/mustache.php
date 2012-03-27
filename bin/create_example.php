@@ -22,8 +22,7 @@ This creates a new example and the corresponding files in the examples/ director
 USAGE
 );
 
-define('DS', DIRECTORY_SEPARATOR);
-define('EXAMPLE_PATH', realpath(dirname(__FILE__) . DS . ".." . DS . "examples"));
+define('EXAMPLE_PATH', realpath(dirname(__FILE__) . '/../test/fixtures/examples'));
 
 
 /**
@@ -90,8 +89,8 @@ function out($value) {
  * @return string
  */
 function buildPath($directory, $filename = null,  $extension = null) {
-	return out(EXAMPLE_PATH . DS . $directory.
-					($extension !== null && $filename !== null ? DS . $filename. "." . $extension : ""));
+	return out(EXAMPLE_PATH . '/' . $directory.
+					($extension !== null && $filename !== null ? '/' . $filename. "." . $extension : ""));
 }
 
 /**
