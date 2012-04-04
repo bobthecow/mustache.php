@@ -14,7 +14,7 @@
  */
 class Mustache {
 
-	const VERSION      = '1.0.0';
+	const VERSION      = '1.1.0';
 	const SPEC_VERSION = '1.1.2';
 
 	/**
@@ -29,6 +29,9 @@ class Mustache {
 		MustacheException::UNKNOWN_PARTIAL          => false,
 		MustacheException::UNKNOWN_PRAGMA           => true,
 	);
+
+	// Override the escaper function. Defaults to `htmlspecialchars`.
+	protected $_escape;
 
 	// Override charset passed to htmlentities() and htmlspecialchars(). Defaults to UTF-8.
 	protected $_charset = 'UTF-8';
@@ -84,6 +87,11 @@ class Mustache {
 	 * Passing an $options array allows overriding certain Mustache options during instantiation:
 	 *
 	 *     $options = array(
+	 *         // `escape` -- custom escaper callback; must be callable.
+	 *         'escape' => function($text) {
+	 *             return htmlspecialchars($text, ENT_COMPAT, 'UTF-8');
+	 *         },
+	 *
 	 *         // `charset` -- must be supported by `htmlspecialentities()`. defaults to 'UTF-8'
 	 *         'charset' => 'ISO-8859-1',
 	 *
@@ -127,6 +135,13 @@ class Mustache {
 	 * @return void
 	 */
 	protected function _setOptions(array $options) {
+		if (isset($options['escape'])) {
+			if (!is_callable($options['escape'])) {
+				throw new InvalidArgumentException('Mustache constructor "escape" option must be callable');
+			}
+			$this->_escape = $options['escape'];
+		}
+
 		if (isset($options['charset'])) {
 			$this->_charset = $options['charset'];
 		}
@@ -640,7 +655,13 @@ class Mustache {
 	 * @return string
 	 */
 	protected function _renderEscaped($tag_name, $leading, $trailing) {
-		$rendered = htmlentities($this->_renderUnescaped($tag_name, '', ''), ENT_COMPAT, $this->_charset);
+		$value = $this->_renderUnescaped($tag_name, '', '');
+		if (isset($this->_escape)) {
+			$rendered = call_user_func($this->_escape, $value);
+		} else {
+			$rendered = htmlentities($value, ENT_COMPAT, $this->_charset);
+		}
+
 		return $leading . $rendered . $trailing;
 	}
 
