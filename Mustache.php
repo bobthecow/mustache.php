@@ -899,6 +899,61 @@ class Mustache {
 	protected function _varIsCallable($var) {
 	  return !is_string($var) && is_callable($var);
 	}
+	
+	/**
+	 * Generate a hash of expected values from a given template
+	 *
+	 * @access public
+	 * @param string $template (default: null)
+	 * @return array hash of expected variables
+	 */
+	public function generateHash($template = null) {
+		$template = ($template)?
+			$template :
+			$this->_template;
+    
+		//Extract all variables from the template
+		preg_match_all('/{{([^}]+)/',$template,$matches);
+    $tags = $matches[1];
+    
+    //Turn the resulting flat array into a multidimensional one
+    $i = 0;
+    return $this->_tagsToHash($tags, $i);
+	}
+
+  /**
+  * Private helper function for generateHash
+  * Turns flat array of tags into multidimensional array
+  *
+  * @author Philip Schweiger <pschwei1@gmail.com>, with assistance on 
+  * recursion logic from khael on SO (http://stackoverflow.com/users/926474/)
+  * @access private
+  * @param array $tags flat array of tags
+  * @param int &$i current index value as function loops through $tags
+  * @param string $current_tag
+  */
+  private function _tagsToHash($tags, &$i, $current_tag = '') {
+    $nested = array();
+    $tot = count($tags);	
+    while ($i < $tot):
+      $tag = $tags[$i];
+		
+      if ($tag[0] === '/') {
+        $i++;
+        return $nested;
+      } elseif ($tag[0] === '#') {
+        $tag = str_replace('#','',$tag);
+        $i++;
+        $nested[$tag] = $this->_tagsToHash($tags, $i, $tag);
+      } else {
+        $nested[$tag] = '';
+        $i++;
+      }
+    endwhile;
+    return $nested;
+  }
+
+
 }
 
 
