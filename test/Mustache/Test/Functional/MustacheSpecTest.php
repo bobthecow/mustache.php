@@ -87,41 +87,6 @@ class Mustache_Test_Functional_MustacheSpecTest extends PHPUnit_Framework_TestCa
 	}
 
 	/**
-	 * @group lambdas
-	 * @dataProvider loadLambdasSpec
-	 */
-	public function testLambdasSpec($desc, $source, $partials, $data, $expected) {
-		$template = self::loadTemplate($source, $partials);
-		$this->assertEquals($expected, $template($this->prepareLambdasSpec($data)), $desc);
-	}
-
-	public function loadLambdasSpec() {
-		return $this->loadSpec('~lambdas');
-	}
-
-	/**
-	 * Extract and lambdafy any 'lambda' values found in the $data array.
-	 */
-	private function prepareLambdasSpec($data) {
-		foreach ($data as $key => $val) {
-			if ($key === 'lambda') {
-				if (!isset($val['php'])) {
-					$this->markTestSkipped(sprintf('PHP lambda test not implemented for this test.'));
-				}
-
-				$func = $val['php'];
-				$data[$key] = function($text = null) use ($func) {
-					return eval($func);
-				};
-			} else if (is_array($val)) {
-				$data[$key] = $this->prepareLambdasSpec($val);
-			}
-		}
-
-		return $data;
-	}
-
-	/**
 	 * @group partials
 	 * @dataProvider loadPartialsSpec
 	 */

@@ -21,34 +21,6 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends PHPUnit_Framework
 		$this->mustache = new Mustache_Mustache;
 	}
 
-	public function testAnonymousFunctionSectionCallback() {
-		if (version_compare(PHP_VERSION, '5.3.0', '<')) {
-			$this->markTestSkipped('Unable to test anonymous function section callbacks in PHP < 5.3');
-			return;
-		}
-
-		$tpl = $this->mustache->loadTemplate('{{#wrapper}}{{name}}{{/wrapper}}');
-
-		$foo = new Mustache_Test_Functional_Foo;
-		$foo->name = 'Mario';
-		$foo->wrapper = function($text) {
-			return sprintf('<div class="anonymous">%s</div>', $text);
-		};
-
-		$this->assertEquals(sprintf('<div class="anonymous">%s</div>', $foo->name), $tpl->render($foo));
-	}
-
-	public function testSectionCallback() {
-		$one = $this->mustache->loadTemplate('{{name}}');
-		$two = $this->mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
-
-		$foo = new Mustache_Test_Functional_Foo;
-		$foo->name = 'Luigi';
-
-		$this->assertEquals($foo->name, $one->render($foo));
-		$this->assertEquals(sprintf('<em>%s</em>', $foo->name), $two->render($foo));
-	}
-
 	public function testRuntimeSectionCallback() {
 		$tpl = $this->mustache->loadTemplate('{{#doublewrap}}{{name}}{{/doublewrap}}');
 
@@ -80,19 +52,6 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends PHPUnit_Framework
 		$this->assertEquals($data['name'], $tpl->render($data));
 	}
 
-	public function testViewArrayAnonymousSectionCallback() {
-		$tpl = $this->mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
-
-		$data = array(
-			'name' => 'Bob',
-			'wrap' => function($text) {
-				return sprintf('[[%s]]', $text);
-			}
-		);
-
-		$this->assertEquals(sprintf('[[%s]]', $data['name']), $tpl->render($data));
-	}
-
 	public function testMonsters() {
 		$tpl = $this->mustache->loadTemplate('{{#title}}{{title}} {{/title}}{{name}}');
 
@@ -111,13 +70,6 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends PHPUnit_Framework
 class Mustache_Test_Functional_Foo {
 	public $name = 'Justin';
 	public $lorem = 'Lorem ipsum dolor sit amet,';
-	public $wrap;
-
-	public function __construct() {
-		$this->wrap = function($text) {
-			return sprintf('<em>%s</em>', $text);
-		};
-	}
 
 	public function wrapWithEm($text) {
 		return sprintf('<em>%s</em>', $text);

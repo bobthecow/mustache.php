@@ -11,7 +11,7 @@
 
 class Mustache_Test_HelperCollectionTest extends PHPUnit_Framework_TestCase {
 	public function testConstructor() {
-		$foo = function() { echo 'foo'; };
+		$foo = array($this, 'getFoo');
 		$bar = 'BAR';
 
 		$helpers = new Mustache_HelperCollection(array(
@@ -23,8 +23,12 @@ class Mustache_Test_HelperCollectionTest extends PHPUnit_Framework_TestCase {
 		$this->assertSame($bar, $helpers->get('bar'));
 	}
 
+    public static function getFoo() {
+        echo 'foo';
+    }
+
 	public function testAccessorsAndMutators() {
-		$foo = function() { echo 'foo'; };
+		$foo = array($this, 'getFoo');
 		$bar = 'BAR';
 
         $helpers = new Mustache_HelperCollection;
@@ -49,7 +53,7 @@ class Mustache_Test_HelperCollectionTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testMagicMethods() {
-        $foo = function() { echo 'foo'; };
+        $foo = array($this, 'getFoo');
         $bar = 'BAR';
 
         $helpers = new Mustache_HelperCollection;

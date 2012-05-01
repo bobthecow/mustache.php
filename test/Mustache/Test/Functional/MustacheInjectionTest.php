@@ -110,9 +110,7 @@ class Mustache_Test_Functional_MustacheInjectionTest extends PHPUnit_Framework_T
 		$tpl = $this->mustache->loadTemplate('{{ a }}');
 
 		$data = array(
-			'a' => function() {
-				return '{{ b }}';
-			},
+			'a' => array($this, 'lambdaInterpolationCallback'),
 			'b' => '{{ c }}',
 			'c' => 'FAIL'
 		);
@@ -120,17 +118,23 @@ class Mustache_Test_Functional_MustacheInjectionTest extends PHPUnit_Framework_T
 		$this->assertEquals('{{ c }}', $tpl->render($data));
 	}
 
+	public static function lambdaInterpolationCallback() {
+		return '{{ b }}';
+	}
+
 	public function testLambdaSectionInjection() {
 		$tpl = $this->mustache->loadTemplate('{{# a }}b{{/ a }}');
 
 		$data = array(
-			'a' => function ($text) {
-				return '{{ ' . $text . ' }}';
-			},
+			'a' => array($this, 'lambdaSectionCallback'),
 			'b' => '{{ c }}',
 			'c' => 'FAIL'
 		);
 
 		$this->assertEquals('{{ c }}', $tpl->render($data));
+	}
+
+	public static function lambdaSectionCallback($text) {
+		return '{{ ' . $text . ' }}';
 	}
 }

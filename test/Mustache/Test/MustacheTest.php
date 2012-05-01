@@ -35,7 +35,7 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 				'foo' => '{{ foo }}',
 			),
 			'helpers' => array(
-				'foo' => function() { return 'foo'; },
+				'foo' => array($this, 'getFoo'),
 				'bar' => 'BAR',
 			),
 			'escape'  => 'strtoupper',
@@ -51,6 +51,10 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($mustache->hasHelper('foo'));
 		$this->assertTrue($mustache->hasHelper('bar'));
 		$this->assertFalse($mustache->hasHelper('baz'));
+	}
+
+	public static function getFoo() {
+		return 'foo';
 	}
 
 	public function testRender() {
@@ -158,7 +162,7 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testHelpers() {
-		$foo = function() { return 'foo'; };
+		$foo = array($this, 'getFoo');
 		$bar = 'BAR';
 		$mustache = new Mustache_Mustache(array('helpers' => array(
 			'foo' => $foo,
@@ -178,7 +182,7 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 		$mustache->addHelper('bar', $bar);
 		$this->assertSame($bar, $mustache->getHelper('bar'));
 
-		$baz = function($text) { return '__'.$text.'__'; };
+		$baz = array($this, 'wrapWithUnderscores');
 		$this->assertFalse($mustache->hasHelper('baz'));
 		$this->assertFalse($helpers->has('baz'));
 
@@ -190,6 +194,10 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 		$tpl = $mustache->loadTemplate('{{foo}} - {{bar}} - {{#baz}}qux{{/baz}}');
 		$this->assertEquals('foo - BAR - __qux__', $tpl->render());
 		$this->assertEquals('foo - BAR - __qux__', $tpl->render(array('qux' => "won't mess things up")));
+	}
+
+	public static function wrapWithUnderscores($text) {
+		return '__'.$text.'__';
 	}
 
 	/**
