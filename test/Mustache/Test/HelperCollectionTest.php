@@ -105,12 +105,12 @@ class Mustache_Test_HelperCollectionTest extends PHPUnit_Framework_TestCase {
             array(
                 'not helpers',
                 array(),
-                '\InvalidArgumentException',
+                'InvalidArgumentException',
             ),
             array(
                 array(),
                 array('get' => array('foo')),
-                '\InvalidArgumentException',
+                'InvalidArgumentException',
             ),
             array(
                 array('foo' => 'FOO'),
@@ -120,7 +120,7 @@ class Mustache_Test_HelperCollectionTest extends PHPUnit_Framework_TestCase {
             array(
                 array('foo' => 'FOO'),
                 array('get' => array('bar')),
-                '\InvalidArgumentException',
+                'InvalidArgumentException',
             ),
             array(
                 array('foo' => 'FOO'),
@@ -144,12 +144,12 @@ class Mustache_Test_HelperCollectionTest extends PHPUnit_Framework_TestCase {
                     'remove' => array('foo'),
                     'get'    => array('foo'),
                 ),
-                '\InvalidArgumentException',
+                'InvalidArgumentException',
             ),
             array(
                 array(),
                 array('remove' => array('foo')),
-                '\InvalidArgumentException',
+                'InvalidArgumentException',
             ),
         );
     }

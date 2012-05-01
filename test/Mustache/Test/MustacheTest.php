@@ -125,7 +125,7 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @expectedException \InvalidArgumentException
+	 * @expectedException InvalidArgumentException
 	 * @dataProvider getBadEscapers
 	 */
 	public function testNonCallableEscapeThrowsException($escape) {
@@ -140,7 +140,7 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @expectedException \RuntimeException
+	 * @expectedException RuntimeException
 	 */
 	public function testImmutablePartialsLoadersThrowException() {
 		$mustache = new Mustache_Mustache(array(
@@ -201,7 +201,7 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @expectedException \InvalidArgumentException
+	 * @expectedException InvalidArgumentException
 	 */
 	public function testSetHelpersThrowsExceptions() {
 		$mustache = new Mustache_Mustache;

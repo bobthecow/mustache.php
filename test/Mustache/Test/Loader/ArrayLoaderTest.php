@@ -39,7 +39,7 @@ class Mustache_Test_Loader_ArrayLoaderTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @expectedException \InvalidArgumentException
+	 * @expectedException InvalidArgumentException
 	 */
 	public function testMissingTemplatesThrowExceptions() {
 		$loader = new Mustache_Loader_ArrayLoader;

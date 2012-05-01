@@ -28,14 +28,14 @@ class Mustache_Test_Loader_FilesystemLoaderTest extends PHPUnit_Framework_TestCa
 	}
 
 	/**
-	 * @expectedException \RuntimeException
+	 * @expectedException RuntimeException
 	 */
 	public function testMissingBaseDirThrowsException() {
 		$loader = new Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/not_a_directory');
 	}
 
 	/**
-	 * @expectedException \InvalidArgumentException
+	 * @expectedException InvalidArgumentException
 	 */
 	public function testMissingTemplateThrowsException() {
 		$baseDir = realpath(dirname(__FILE__).'/../../../fixtures/templates');
