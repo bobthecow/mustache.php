@@ -39,7 +39,7 @@ class Mustache_Test_Functional_MustacheSpecTest extends PHPUnit_Framework_TestCa
 	 */
 	public function testCommentSpec($desc, $source, $partials, $data, $expected) {
 		$template = self::loadTemplate($source, $partials);
-		$this->assertEquals($expected, $template($data), $desc);
+		$this->assertEquals($expected, $template->render($data), $desc);
 	}
 
 	public function loadCommentSpec() {
@@ -52,7 +52,7 @@ class Mustache_Test_Functional_MustacheSpecTest extends PHPUnit_Framework_TestCa
 	 */
 	public function testDelimitersSpec($desc, $source, $partials, $data, $expected) {
 		$template = self::loadTemplate($source, $partials);
-		$this->assertEquals($expected, $template($data), $desc);
+		$this->assertEquals($expected, $template->render($data), $desc);
 	}
 
 	public function loadDelimitersSpec() {
@@ -65,7 +65,7 @@ class Mustache_Test_Functional_MustacheSpecTest extends PHPUnit_Framework_TestCa
 	 */
 	public function testInterpolationSpec($desc, $source, $partials, $data, $expected) {
 		$template = self::loadTemplate($source, $partials);
-		$this->assertEquals($expected, $template($data), $desc);
+		$this->assertEquals($expected, $template->render($data), $desc);
 	}
 
 	public function loadInterpolationSpec() {
@@ -79,7 +79,7 @@ class Mustache_Test_Functional_MustacheSpecTest extends PHPUnit_Framework_TestCa
 	 */
 	public function testInvertedSpec($desc, $source, $partials, $data, $expected) {
 		$template = self::loadTemplate($source, $partials);
-		$this->assertEquals($expected, $template($data), $desc);
+		$this->assertEquals($expected, $template->render($data), $desc);
 	}
 
 	public function loadInvertedSpec() {
@@ -92,7 +92,7 @@ class Mustache_Test_Functional_MustacheSpecTest extends PHPUnit_Framework_TestCa
 	 */
 	public function testPartialsSpec($desc, $source, $partials, $data, $expected) {
 		$template = self::loadTemplate($source, $partials);
-		$this->assertEquals($expected, $template($data), $desc);
+		$this->assertEquals($expected, $template->render($data), $desc);
 	}
 
 	public function loadPartialsSpec() {
@@ -105,7 +105,7 @@ class Mustache_Test_Functional_MustacheSpecTest extends PHPUnit_Framework_TestCa
 	 */
 	public function testSectionsSpec($desc, $source, $partials, $data, $expected) {
 		$template = self::loadTemplate($source, $partials);
-		$this->assertEquals($expected, $template($data), $desc);
+		$this->assertEquals($expected, $template->render($data), $desc);
 	}
 
 	public function loadSectionsSpec() {
