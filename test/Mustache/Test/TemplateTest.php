@@ -26,7 +26,10 @@ class Mustache_Test_TemplateTest extends PHPUnit_Framework_TestCase {
 		$template->rendered = $rendered;
 		$context  = new Mustache_Context;
 
-		$this->assertEquals($rendered, $template());
+		if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
+			$this->assertEquals($rendered, $template());
+		}
+
 		$this->assertEquals($rendered, $template->render());
 		$this->assertEquals($rendered, $template->renderInternal($context));
 		$this->assertEquals($rendered, $template->render(array('foo' => 'bar')));
