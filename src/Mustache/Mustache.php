@@ -104,7 +104,7 @@ class Mustache_Mustache {
 
 		if (isset($options['escape'])) {
 			if (!is_callable($options['escape'])) {
-				throw new \InvalidArgumentException('Mustache Constructor "escape" option must be callable');
+				throw new InvalidArgumentException('Mustache Constructor "escape" option must be callable');
 			}
 
 			$this->escape = $options['escape'];
