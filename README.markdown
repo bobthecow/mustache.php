@@ -3,6 +3,7 @@ Mustache.php
 
 A [Mustache](http://defunkt.github.com/mustache/) implementation in PHP.
 
+[![Build Status](https://secure.travis-ci.org/bobthecow/mustache.php.png?branch=dev)](http://travis-ci.org/bobthecow/mustache.php)
 
 Usage
 -----
