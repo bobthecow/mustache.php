@@ -22,6 +22,11 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends PHPUnit_Framework
 	}
 
 	public function testAnonymousFunctionSectionCallback() {
+		if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+			$this->markTestSkipped('Unable to test anonymous function section callbacks in PHP < 5.3');
+			return;
+		}
+
 		$tpl = $this->mustache->loadTemplate('{{#wrapper}}{{name}}{{/wrapper}}');
 
 		$foo = new Mustache_Test_Functional_Foo;

@@ -12,7 +12,7 @@
 /**
  * @group unit
  */
-class Mustache_Test_CompilerTest extends \PHPUnit_Framework_TestCase {
+class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @dataProvider getCompileValues
