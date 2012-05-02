@@ -25,16 +25,18 @@
  *
  * @implements Loader
  */
-class Mustache_Loader_StringLoader implements Mustache_Loader {
+class Mustache_Loader_StringLoader implements Mustache_Loader
+{
 
-	/**
-	 * Load a Template by source.
-	 *
-	 * @param string $name Mustache Template source
-	 *
-	 * @return string Mustache Template source
-	 */
-	public function load($name) {
-		return $name;
-	}
+    /**
+     * Load a Template by source.
+     *
+     * @param string $name Mustache Template source
+     *
+     * @return string Mustache Template source
+     */
+    public function load($name)
+    {
+        return $name;
+    }
 }

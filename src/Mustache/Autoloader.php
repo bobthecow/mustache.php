@@ -12,54 +12,58 @@
 /**
  * Mustache class autoloader.
  */
-class Mustache_Autoloader {
+class Mustache_Autoloader
+{
 
-	private $baseDir;
+    private $baseDir;
 
-	/**
-	 * Autoloader constructor.
-	 *
-	 * @param string $baseDir Mustache library base directory (default: dirname(__FILE__).'/..')
-	 */
-	public function __construct($baseDir = null) {
-		if ($baseDir === null) {
-			$this->baseDir = dirname(__FILE__).'/..';
-		} else {
-			$this->baseDir = rtrim($baseDir, '/');
-		}
-	}
+    /**
+     * Autoloader constructor.
+     *
+     * @param string $baseDir Mustache library base directory (default: dirname(__FILE__).'/..')
+     */
+    public function __construct($baseDir = null)
+    {
+        if ($baseDir === null) {
+            $this->baseDir = dirname(__FILE__).'/..';
+        } else {
+            $this->baseDir = rtrim($baseDir, '/');
+        }
+    }
 
-	/**
-	 * Register a new instance as an SPL autoloader.
-	 *
-	 * @param string $baseDir Mustache library base directory (default: dirname(__FILE__).'/..')
-	 *
-	 * @return Mustache_Autoloader Registered Autoloader instance
-	 */
-	static public function register($baseDir = null) {
-		$loader = new self($baseDir);
-		spl_autoload_register(array($loader, 'autoload'));
+    /**
+     * Register a new instance as an SPL autoloader.
+     *
+     * @param string $baseDir Mustache library base directory (default: dirname(__FILE__).'/..')
+     *
+     * @return Mustache_Autoloader Registered Autoloader instance
+     */
+    static public function register($baseDir = null)
+    {
+        $loader = new self($baseDir);
+        spl_autoload_register(array($loader, 'autoload'));
 
-		return $loader;
-	}
+        return $loader;
+    }
 
-	/**
-	 * Autoload Mustache classes.
-	 *
-	 * @param string $class
-	 */
-	public function autoload($class) {
-		if ($class[0] === '\\') {
-			$class = substr($class, 1);
-		}
+    /**
+     * Autoload Mustache classes.
+     *
+     * @param string $class
+     */
+    public function autoload($class)
+    {
+        if ($class[0] === '\\') {
+            $class = substr($class, 1);
+        }
 
-		if (strpos($class, 'Mustache') !== 0) {
-			return;
-		}
+        if (strpos($class, 'Mustache') !== 0) {
+            return;
+        }
 
-		$file = sprintf('%s/%s.php', $this->baseDir, str_replace('_', '/', $class));
-		if (is_file($file)) {
-			require $file;
-		}
-	}
+        $file = sprintf('%s/%s.php', $this->baseDir, str_replace('_', '/', $class));
+        if (is_file($file)) {
+            require $file;
+        }
+    }
 }

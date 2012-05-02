@@ -27,48 +27,53 @@
  * @implements Loader
  * @implements MutableLoader
  */
-class Mustache_Loader_ArrayLoader implements Mustache_Loader, Mustache_Loader_MutableLoader {
+class Mustache_Loader_ArrayLoader implements Mustache_Loader, Mustache_Loader_MutableLoader
+{
 
-	/**
-	 * ArrayLoader constructor.
-	 *
-	 * @param array $templates Associative array of Template source (default: array())
-	 */
-	public function __construct(array $templates = array()) {
-		$this->templates = $templates;
-	}
+    /**
+     * ArrayLoader constructor.
+     *
+     * @param array $templates Associative array of Template source (default: array())
+     */
+    public function __construct(array $templates = array())
+    {
+        $this->templates = $templates;
+    }
 
-	/**
-	 * Load a Template.
-	 *
-	 * @param string $name
-	 *
-	 * @return string Mustache Template source
-	 */
-	public function load($name) {
-		if (!isset($this->templates[$name])) {
-			throw new InvalidArgumentException('Template '.$name.' not found.');
-		}
+    /**
+     * Load a Template.
+     *
+     * @param string $name
+     *
+     * @return string Mustache Template source
+     */
+    public function load($name)
+    {
+        if (!isset($this->templates[$name])) {
+            throw new InvalidArgumentException('Template '.$name.' not found.');
+        }
 
-		return $this->templates[$name];
-	}
+        return $this->templates[$name];
+    }
 
-	/**
-	 * Set an associative array of Template sources for this loader.
-	 *
-	 * @param array $templates
-	 */
-	public function setTemplates(array $templates) {
-		$this->templates = $templates;
-	}
+    /**
+     * Set an associative array of Template sources for this loader.
+     *
+     * @param array $templates
+     */
+    public function setTemplates(array $templates)
+    {
+        $this->templates = $templates;
+    }
 
-	/**
-	 * Set a Template source by name.
-	 *
-	 * @param string $name
-	 * @param string $template Mustache Template source
-	 */
-	public function setTemplate($name, $template) {
-		$this->templates[$name] = $template;
-	}
+    /**
+     * Set a Template source by name.
+     *
+     * @param string $name
+     * @param string $template Mustache Template source
+     */
+    public function setTemplate($name, $template)
+    {
+        $this->templates[$name] = $template;
+    }
 }
