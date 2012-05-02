@@ -1,16 +1,19 @@
 <?php
 
-class SectionObjects {
-	public $start = "It worked the first time.";
+class SectionObjects
+{
+    public $start = "It worked the first time.";
 
-	public function middle() {
-		return new SectionObject;
-	}
+    public function middle()
+    {
+        return new SectionObject;
+    }
 
-	public $final = "Then, surprisingly, it worked the final time.";
+    public $final = "Then, surprisingly, it worked the final time.";
 }
 
-class SectionObject {
-	public $foo = 'And it worked the second time.';
-	public $bar = 'As well as the third.';
+class SectionObject
+{
+    public $foo = 'And it worked the second time.';
+    public $bar = 'As well as the third.';
 }

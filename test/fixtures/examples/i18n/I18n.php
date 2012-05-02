@@ -1,6 +1,7 @@
 <?php
 
-class I18n {
+class I18n
+{
 
     // Variable to be interpolated
     public $name = 'Bob';
@@ -14,7 +15,8 @@ class I18n {
         'My name is {{ name }}.' => 'Me llamo {{ name }}.',
     );
 
-    public static function __trans($text) {
+    public static function __trans($text)
+    {
         return isset(self::$dictionary[$text]) ? self::$dictionary[$text] : $text;
     }
 }

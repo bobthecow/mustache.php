@@ -9,6 +9,7 @@
  * file that was distributed with this source code.
  */
 
-class NonMustacheClass {
-	// noop
+class NonMustacheClass
+{
+    // noop
 }

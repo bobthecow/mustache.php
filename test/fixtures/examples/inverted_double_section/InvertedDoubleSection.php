@@ -1,6 +1,7 @@
 <?php
 
-class InvertedDoubleSection {
-	public $t = false;
-	public $two = 'second';
+class InvertedDoubleSection
+{
+    public $t = false;
+    public $two = 'second';
 }

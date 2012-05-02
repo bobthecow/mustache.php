@@ -13,128 +13,140 @@
  * @group mustache_injection
  * @group functional
  */
-class Mustache_Test_Functional_MustacheInjectionTest extends PHPUnit_Framework_TestCase {
+class Mustache_Test_Functional_MustacheInjectionTest extends PHPUnit_Framework_TestCase
+{
 
-	private $mustache;
+    private $mustache;
 
-	public function setUp() {
-		$this->mustache = new Mustache_Engine;
-	}
+    public function setUp()
+    {
+        $this->mustache = new Mustache_Engine;
+    }
 
-	// interpolation
+    // interpolation
 
-	public function testInterpolationInjection() {
-		$tpl = $this->mustache->loadTemplate('{{ a }}');
+    public function testInterpolationInjection()
+    {
+        $tpl = $this->mustache->loadTemplate('{{ a }}');
 
-		$data = array(
-			'a' => '{{ b }}',
-			'b' => 'FAIL'
-		);
+        $data = array(
+            'a' => '{{ b }}',
+            'b' => 'FAIL'
+        );
 
-		$this->assertEquals('{{ b }}', $tpl->render($data));
-	}
+        $this->assertEquals('{{ b }}', $tpl->render($data));
+    }
 
-	public function testUnescapedInterpolationInjection() {
-		$tpl = $this->mustache->loadTemplate('{{{ a }}}');
+    public function testUnescapedInterpolationInjection()
+    {
+        $tpl = $this->mustache->loadTemplate('{{{ a }}}');
 
-		$data = array(
-			'a' => '{{ b }}',
-			'b' => 'FAIL'
-		);
+        $data = array(
+            'a' => '{{ b }}',
+            'b' => 'FAIL'
+        );
 
-		$this->assertEquals('{{ b }}', $tpl->render($data));
-	}
-
-
-	// sections
-
-	public function testSectionInjection() {
-		$tpl = $this->mustache->loadTemplate('{{# a }}{{ b }}{{/ a }}');
-
-		$data = array(
-			'a' => true,
-			'b' => '{{ c }}',
-			'c' => 'FAIL'
-		);
-
-		$this->assertEquals('{{ c }}', $tpl->render($data));
-	}
-
-	public function testUnescapedSectionInjection() {
-		$tpl = $this->mustache->loadTemplate('{{# a }}{{{ b }}}{{/ a }}');
-
-		$data = array(
-			'a' => true,
-			'b' => '{{ c }}',
-			'c' => 'FAIL'
-		);
-
-		$this->assertEquals('{{ c }}', $tpl->render($data));
-	}
+        $this->assertEquals('{{ b }}', $tpl->render($data));
+    }
 
 
-	// partials
+    // sections
 
-	public function testPartialInjection() {
-		$tpl = $this->mustache->loadTemplate('{{> partial }}');
-		$this->mustache->setPartials(array(
-			'partial' => '{{ a }}',
-		));
+    public function testSectionInjection()
+    {
+        $tpl = $this->mustache->loadTemplate('{{# a }}{{ b }}{{/ a }}');
 
-		$data = array(
-			'a' => '{{ b }}',
-			'b' => 'FAIL'
-		);
+        $data = array(
+            'a' => true,
+            'b' => '{{ c }}',
+            'c' => 'FAIL'
+        );
 
-		$this->assertEquals('{{ b }}', $tpl->render($data));
-	}
+        $this->assertEquals('{{ c }}', $tpl->render($data));
+    }
 
-	public function testPartialUnescapedInjection() {
-		$tpl = $this->mustache->loadTemplate('{{> partial }}');
-		$this->mustache->setPartials(array(
-			'partial' => '{{{ a }}}',
-		));
+    public function testUnescapedSectionInjection()
+    {
+        $tpl = $this->mustache->loadTemplate('{{# a }}{{{ b }}}{{/ a }}');
 
-		$data = array(
-			'a' => '{{ b }}',
-			'b' => 'FAIL'
-		);
+        $data = array(
+            'a' => true,
+            'b' => '{{ c }}',
+            'c' => 'FAIL'
+        );
 
-		$this->assertEquals('{{ b }}', $tpl->render($data));
-	}
+        $this->assertEquals('{{ c }}', $tpl->render($data));
+    }
 
 
-	// lambdas
+    // partials
 
-	public function testLambdaInterpolationInjection() {
-		$tpl = $this->mustache->loadTemplate('{{ a }}');
+    public function testPartialInjection()
+    {
+        $tpl = $this->mustache->loadTemplate('{{> partial }}');
+        $this->mustache->setPartials(array(
+            'partial' => '{{ a }}',
+        ));
 
-		$data = array(
-			'a' => array($this, 'lambdaInterpolationCallback'),
-			'b' => '{{ c }}',
-			'c' => 'FAIL'
-		);
+        $data = array(
+            'a' => '{{ b }}',
+            'b' => 'FAIL'
+        );
 
-		$this->assertEquals('{{ c }}', $tpl->render($data));
-	}
+        $this->assertEquals('{{ b }}', $tpl->render($data));
+    }
 
-	public static function lambdaInterpolationCallback() {
-		return '{{ b }}';
-	}
+    public function testPartialUnescapedInjection()
+    {
+        $tpl = $this->mustache->loadTemplate('{{> partial }}');
+        $this->mustache->setPartials(array(
+            'partial' => '{{{ a }}}',
+        ));
 
-	public function testLambdaSectionInjection() {
-		$tpl = $this->mustache->loadTemplate('{{# a }}b{{/ a }}');
+        $data = array(
+            'a' => '{{ b }}',
+            'b' => 'FAIL'
+        );
 
-		$data = array(
-			'a' => array($this, 'lambdaSectionCallback'),
-			'b' => '{{ c }}',
-			'c' => 'FAIL'
-		);
+        $this->assertEquals('{{ b }}', $tpl->render($data));
+    }
 
-		$this->assertEquals('{{ c }}', $tpl->render($data));
-	}
 
-	public static function lambdaSectionCallback($text) {
-		return '{{ ' . $text . ' }}';
-	}
+    // lambdas
+
+    public function testLambdaInterpolationInjection()
+    {
+        $tpl = $this->mustache->loadTemplate('{{ a }}');
+
+        $data = array(
+            'a' => array($this, 'lambdaInterpolationCallback'),
+            'b' => '{{ c }}',
+            'c' => 'FAIL'
+        );
+
+        $this->assertEquals('{{ c }}', $tpl->render($data));
+    }
+
+    public static function lambdaInterpolationCallback()
+    {
+        return '{{ b }}';
+    }
+
+    public function testLambdaSectionInjection()
+    {
+        $tpl = $this->mustache->loadTemplate('{{# a }}b{{/ a }}');
+
+        $data = array(
+            'a' => array($this, 'lambdaSectionCallback'),
+            'b' => '{{ c }}',
+            'c' => 'FAIL'
+        );
+
+        $this->assertEquals('{{ c }}', $tpl->render($data));
+    }
+
+    public static function lambdaSectionCallback($text)
+    {
+        return '{{ ' . $text . ' }}';
+    }
 }
