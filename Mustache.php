@@ -252,6 +252,10 @@ class Mustache {
 	 * @return string Rendered Mustache template.
 	 */
 	protected function _renderTemplate($template) {
+		// Template already escaped since inside MustacheEscaped class
+		if($template instanceof MustacheEscaped) {
+			return $template;
+		}
 		if ($section = $this->_findSection($template)) {
 			list($before, $type, $tag_name, $content, $after) = $section;
 
@@ -928,4 +932,26 @@ class MustacheException extends Exception {
 	// which can't be handled by this Mustache instance.
 	const UNKNOWN_PRAGMA           = 4;
 
+}
+
+
+/**
+ * MustacheEscaped class.
+ * 
+ * Returns an object that is already escaped.
+ */
+class MustacheEscaped {
+	
+	// Content that has been already escaped
+	private $_content;
+	// Load the content into the constructor
+	public function __construct($content)
+	{
+		$this->_content = $content;
+	}
+	
+	// Echo content when printed to the template
+	public function __toString() {
+		return $this->_content;
+	}
 }
