@@ -20,7 +20,7 @@ class Mustache_Test_FiveThree_Functional_MustacheSpecTest extends PHPUnit_Framew
 	private static $mustache;
 
 	public static function setUpBeforeClass() {
-		self::$mustache = new Mustache_Mustache;
+		self::$mustache = new Mustache_Engine;
 	}
 
 	/**

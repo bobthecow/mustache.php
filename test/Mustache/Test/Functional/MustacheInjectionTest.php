@@ -18,7 +18,7 @@ class Mustache_Test_Functional_MustacheInjectionTest extends PHPUnit_Framework_T
 	private $mustache;
 
 	public function setUp() {
-		$this->mustache = new Mustache_Mustache;
+		$this->mustache = new Mustache_Engine;
 	}
 
 	// interpolation

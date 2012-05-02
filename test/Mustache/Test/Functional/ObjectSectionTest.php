@@ -17,7 +17,7 @@ class Mustache_Test_Functional_ObjectSectionTest extends PHPUnit_Framework_TestC
 	private $mustache;
 
 	public function setUp() {
-		$this->mustache = new Mustache_Mustache;
+		$this->mustache = new Mustache_Engine;
 	}
 
 	public function testBasicObject() {

@@ -12,7 +12,7 @@ A quick example:
 
 ```php
 <?php
-$m = new Mustache_Mustache;
+$m = new Mustache_Engine;
 echo $m->render('Hello {{planet}}', array('planet' => 'World!')); // "Hello World!"
 ```
 
@@ -49,7 +49,7 @@ And render it:
 
 ```php
 <?php
-$m = new Mustache_Mustache;
+$m = new Mustache_Engine;
 $chris = new Chris;
 echo $m->render($template, $chris);
 ```

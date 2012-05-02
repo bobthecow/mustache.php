@@ -26,7 +26,7 @@ class Mustache_Test_Functional_ExamplesTest extends PHPUnit_Framework_TestCase {
 	 * @param string $expected
 	 */
 	public function testExamples($context, $source, $partials, $expected) {
-		$mustache = new Mustache_Mustache(array(
+		$mustache = new Mustache_Engine(array(
 			'partials' => $partials
 		));
 		$this->assertEquals($expected, $mustache->loadTemplate($source)->render($context));

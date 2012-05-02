@@ -17,23 +17,23 @@
 abstract class Mustache_Template {
 
 	/**
-	 * @var Mustache_Mustache
+	 * @var Mustache_Engine
 	 */
 	protected $mustache;
 
 	/**
 	 * Mustache Template constructor.
 	 *
-	 * @param Mustache_Mustache $mustache
+	 * @param Mustache_Engine $mustache
 	 */
-	public function __construct(Mustache_Mustache $mustache) {
+	public function __construct(Mustache_Engine $mustache) {
 		$this->mustache = $mustache;
 	}
 
 	/**
 	 * Mustache Template instances can be treated as a function and rendered by simply calling them:
 	 *
-	 *     $m = new Mustache_Mustache;
+	 *     $m = new Mustache_Engine;
 	 *     $tpl = $m->loadTemplate('Hello, {{ name }}!');
 	 *     echo $tpl(array('name' => 'World')); // "Hello, World!"
 	 *

@@ -21,7 +21,7 @@
  *
  * @author Justin Hileman {@link http://justinhileman.com}
  */
-class Mustache_Mustache {
+class Mustache_Engine {
 	const VERSION      = '2.0.0-dev';
 	const SPEC_VERSION = '1.1.2';
 
@@ -120,7 +120,7 @@ class Mustache_Mustache {
 	 *
 	 * Equivalent to calling `$mustache->loadTemplate($template)->render($data);`
 	 *
-	 * @see Mustache_Mustache::loadTemplate
+	 * @see Mustache_Engine::loadTemplate
 	 * @see Mustache_Template::render
 	 *
 	 * @param string $template
@@ -242,7 +242,7 @@ class Mustache_Mustache {
 	/**
 	 * Get the current set of Mustache helpers.
 	 *
-	 * @see Mustache_Mustache::setHelpers
+	 * @see Mustache_Engine::setHelpers
 	 *
 	 * @return Mustache_HelperCollection
 	 */
@@ -257,7 +257,7 @@ class Mustache_Mustache {
 	/**
 	 * Add a new Mustache helper.
 	 *
-	 * @see Mustache_Mustache::setHelpers
+	 * @see Mustache_Engine::setHelpers
 	 *
 	 * @param string $name
 	 * @param mixed  $helper
@@ -269,7 +269,7 @@ class Mustache_Mustache {
 	/**
 	 * Get a Mustache helper by name.
 	 *
-	 * @see Mustache_Mustache::setHelpers
+	 * @see Mustache_Engine::setHelpers
 	 *
 	 * @param string $name
 	 *
@@ -282,7 +282,7 @@ class Mustache_Mustache {
 	/**
 	 * Check whether this Mustache instance has a helper.
 	 *
-	 * @see Mustache_Mustache::setHelpers
+	 * @see Mustache_Engine::setHelpers
 	 *
 	 * @param string $name
 	 *
@@ -295,7 +295,7 @@ class Mustache_Mustache {
 	/**
 	 * Remove a helper by name.
 	 *
-	 * @see Mustache_Mustache::setHelpers
+	 * @see Mustache_Engine::setHelpers
 	 *
 	 * @param string $name
 	 */
@@ -443,9 +443,9 @@ class Mustache_Mustache {
 	/**
 	 * Instantiate and return a Mustache Template instance by source.
 	 *
-	 * @see Mustache_Mustache::loadTemplate
-	 * @see Mustache_Mustache::loadPartial
-	 * @see Mustache_Mustache::loadLambda
+	 * @see Mustache_Engine::loadTemplate
+	 * @see Mustache_Engine::loadPartial
+	 * @see Mustache_Engine::loadLambda
 	 *
 	 * @param string $source
 	 *

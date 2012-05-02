@@ -12,7 +12,7 @@
 /**
  * @group unit
  */
-class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
+class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase {
 
 	private static $tempDir;
 
@@ -26,7 +26,7 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 	public function testConstructor() {
 		$loader         = new Mustache_Loader_StringLoader;
 		$partialsLoader = new Mustache_Loader_ArrayLoader;
-		$mustache       = new Mustache_Mustache(array(
+		$mustache       = new Mustache_Engine(array(
 			'template_class_prefix' => '__whot__',
 			'cache' => self::$tempDir,
 			'loader' => $loader,
@@ -83,7 +83,7 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 		$tokenizer = new Mustache_Tokenizer;
 		$parser    = new Mustache_Parser;
 		$compiler  = new Mustache_Compiler;
-		$mustache  = new Mustache_Mustache;
+		$mustache  = new Mustache_Engine;
 
 		$this->assertNotSame($loader, $mustache->getLoader());
 		$mustache->setLoader($loader);
@@ -110,7 +110,7 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 	 * @group functional
 	 */
 	public function testCache() {
-		$mustache = new Mustache_Mustache(array(
+		$mustache = new Mustache_Engine(array(
 			'template_class_prefix' => '__whot__',
 			'cache' => self::$tempDir,
 		));
@@ -129,7 +129,7 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 	 * @dataProvider getBadEscapers
 	 */
 	public function testNonCallableEscapeThrowsException($escape) {
-		new Mustache_Mustache(array('escape' => $escape));
+		new Mustache_Engine(array('escape' => $escape));
 	}
 
 	public function getBadEscapers() {
@@ -143,7 +143,7 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 	 * @expectedException RuntimeException
 	 */
 	public function testImmutablePartialsLoadersThrowException() {
-		$mustache = new Mustache_Mustache(array(
+		$mustache = new Mustache_Engine(array(
 			'partials_loader' => new Mustache_Loader_StringLoader,
 		));
 
@@ -151,7 +151,7 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testMissingPartialsTreatedAsEmptyString() {
-		$mustache = new Mustache_Mustache(array(
+		$mustache = new Mustache_Engine(array(
 			'partials_loader' => new Mustache_Loader_ArrayLoader(array(
 				'foo' => 'FOO',
 				'baz' => 'BAZ',
@@ -164,7 +164,7 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 	public function testHelpers() {
 		$foo = array($this, 'getFoo');
 		$bar = 'BAR';
-		$mustache = new Mustache_Mustache(array('helpers' => array(
+		$mustache = new Mustache_Engine(array('helpers' => array(
 			'foo' => $foo,
 			'bar' => $bar,
 		)));
@@ -204,7 +204,7 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 	 * @expectedException InvalidArgumentException
 	 */
 	public function testSetHelpersThrowsExceptions() {
-		$mustache = new Mustache_Mustache;
+		$mustache = new Mustache_Engine;
 		$mustache->setHelpers('monkeymonkeymonkey');
 	}
 
@@ -229,7 +229,7 @@ class Mustache_Test_MustacheTest extends PHPUnit_Framework_TestCase {
 	}
 }
 
-class MustacheStub extends Mustache_Mustache {
+class MustacheStub extends Mustache_Engine {
 	public $source;
 	public $template;
 	public function loadTemplate($source) {

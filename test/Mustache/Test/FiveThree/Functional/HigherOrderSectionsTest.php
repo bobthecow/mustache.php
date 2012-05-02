@@ -18,7 +18,7 @@ class Mustache_Test_FiveThree_Functional_HigherOrderSectionsTest extends PHPUnit
 	private $mustache;
 
 	public function setUp() {
-		$this->mustache = new Mustache_Mustache;
+		$this->mustache = new Mustache_Engine;
 	}
 
 	public function testAnonymousFunctionSectionCallback() {

@@ -14,14 +14,14 @@
  */
 class Mustache_Test_TemplateTest extends PHPUnit_Framework_TestCase {
 	public function testConstructor() {
-		$mustache = new Mustache_Mustache;
+		$mustache = new Mustache_Engine;
 		$template = new Mustache_Test_TemplateStub($mustache);
 		$this->assertSame($mustache, $template->getMustache());
 	}
 
 	public function testRendering() {
 		$rendered = '<< wheee >>';
-		$mustache = new Mustache_Mustache;
+		$mustache = new Mustache_Engine;
 		$template = new Mustache_Test_TemplateStub($mustache);
 		$template->rendered = $rendered;
 		$context  = new Mustache_Context;

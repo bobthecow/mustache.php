@@ -21,7 +21,7 @@
  *
  *     $tpl = $loader->load('foo'); // '{{ bar }}'
  *
- * The ArrayLoader is used internally as a partials loader by Mustache_Mustache instance when an array of partials
+ * The ArrayLoader is used internally as a partials loader by Mustache_Engine instance when an array of partials
  * is set. It can also be used as a quick-and-dirty Template loader.
  *
  * @implements Loader
