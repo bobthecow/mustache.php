@@ -29,6 +29,8 @@ class Mustache_Compiler
      * @param string $source Mustache Template source code
      * @param string $tree   Parse tree of Mustache tokens
      * @param string $name   Mustache Template class name
+     * @param bool   $customEscape (default: false)
+     * @param string $charset (default: 'UTF-8')
      *
      * @return string Generated PHP source code
      */
@@ -327,6 +329,8 @@ class Mustache_Compiler
 
     /**
      * Get the current escaper.
+     *
+     * @param string $value (default: '$value')
      *
      * @return string Either a custom callback, or an inline call to `htmlspecialchars`
      */

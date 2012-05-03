@@ -14,7 +14,8 @@
  *
  * This class is responsible for turning raw template source into a set of Mustache tokens.
  */
-class Mustache_Tokenizer {
+class Mustache_Tokenizer
+{
 
     // Finite state machine states
     const IN_TEXT     = 0;

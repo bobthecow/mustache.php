@@ -32,12 +32,12 @@ class Mustache_Parser
     /**
      * Helper method for recursively building a parse tree.
      *
-     * @throws LogicException when nesting errors or mismatched section tags are encountered.
-     *
      * @param ArrayIterator $tokens Stream of Mustache tokens
-     * @param array          $parent Parent token (default: null)
+     * @param array         $parent Parent token (default: null)
      *
      * @return array Mustache Token parse tree
+     *
+     * @throws LogicException when nesting errors or mismatched section tags are encountered.
      */
     private function buildTree(ArrayIterator $tokens, array $parent = null)
     {
