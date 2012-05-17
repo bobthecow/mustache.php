@@ -566,6 +566,8 @@ class Mustache_Engine
      *
      * @param string $fileName
      * @param string $source
+     *
+     * @codeCoverageIgnore
      */
     private function writeCacheFile($fileName, $source)
     {
