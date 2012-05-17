@@ -1,5 +1,5 @@
 {
-    "name": "bobthecow/mustache",
+    "name": "mustache/mustache",
     "description": "A Mustache implementation in PHP.",
     "keywords": ["templating", "mustache"],
     "homepage": "https://github.com/bobthecow/mustache.php",
