@@ -26,11 +26,11 @@ class Mustache_Compiler
     /**
      * Compile a Mustache token parse tree into PHP source code.
      *
-     * @param string $source Mustache Template source code
-     * @param string $tree   Parse tree of Mustache tokens
-     * @param string $name   Mustache Template class name
+     * @param string $source       Mustache Template source code
+     * @param string $tree         Parse tree of Mustache tokens
+     * @param string $name         Mustache Template class name
      * @param bool   $customEscape (default: false)
-     * @param string $charset (default: 'UTF-8')
+     * @param string $charset      (default: 'UTF-8')
      *
      * @return string Generated PHP source code
      */
@@ -53,7 +53,7 @@ class Mustache_Compiler
      * @param array $tree  Parse tree of Mustache tokens
      * @param int   $level (default: 0)
      *
-     * @return string Generated PHP source code;
+     * @return string Generated PHP source code
      */
     private function walk(array $tree, $level = 0)
     {
