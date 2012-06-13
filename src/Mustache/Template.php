@@ -68,8 +68,8 @@ abstract class Mustache_Template
      * This is where the magic happens :)
      *
      * @param Mustache_Context $context
-     * @param string           $indent (default: '')
-     * @param bool             $escape (default: false)
+     * @param string           $indent  (default: '')
+     * @param bool             $escape  (default: false)
      *
      * @return string Rendered template
      */

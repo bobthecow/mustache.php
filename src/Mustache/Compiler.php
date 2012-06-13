@@ -102,7 +102,6 @@ class Mustache_Compiler
                     $code .= $this->variable($node[Mustache_Tokenizer::NAME], true, $level);
                     break;
 
-
                 case Mustache_Tokenizer::T_TEXT:
                     $code .= $this->text($node[Mustache_Tokenizer::VALUE], $level);
                     break;
