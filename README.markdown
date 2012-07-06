@@ -1,7 +1,7 @@
 Mustache.php
 ============
 
-A [Mustache](http://defunkt.github.com/mustache/) implementation in PHP.
+A [Mustache](http://mustache.github.com/) implementation in PHP.
 
 
 Usage
