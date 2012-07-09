@@ -1,8 +1,9 @@
 Mustache.php
 ============
 
-A [Mustache](http://defunkt.github.com/mustache/) implementation in PHP.
+A [Mustache](http://mustache.github.com/) implementation in PHP.
 
+[![Build Status](https://secure.travis-ci.org/bobthecow/mustache.php.png?branch=dev)](http://travis-ci.org/bobthecow/mustache.php)
 
 Usage
 -----
@@ -11,16 +12,14 @@ A quick example:
 
 ```php
 <?php
-include('Mustache.php');
-$m = new Mustache;
-echo $m->render('Hello {{planet}}', array('planet' => 'World!'));
-// "Hello World!"
+$m = new Mustache_Engine;
+echo $m->render('Hello {{planet}}', array('planet' => 'World!')); // "Hello World!"
 ```
 
 
-And a more in-depth example--this is the canonical Mustache template:
+And a more in-depth example -- this is the canonical Mustache template:
 
-```
+```html+jinja
 Hello {{name}}
 You have just won ${{value}}!
 {{#in_ca}}
@@ -29,40 +28,12 @@ Well, ${{taxed_value}}, after taxes.
 ```
 
 
-Along with the associated Mustache class:
-
-```php
-<?php
-class Chris extends Mustache {
-    public $name = "Chris";
-    public $value = 10000;
-    
-    public function taxed_value() {
-        return $this->value - ($this->value * 0.4);
-    }
-
-    public $in_ca = true;
-}
-```
-
-
-Render it like so:
-
-```php
-<?php
-$chris = new Chris;
-echo $chris->render($template);
-```
-
-
-Here's the same thing, a different way:
-
-Create a view object--which could also be an associative array, but those don't do functions quite as well:
+Create a view "context" object -- which could also be an associative array, but those don't do functions quite as well:
 
 ```php
 <?php
 class Chris {
-    public $name = "Chris";
+    public $name  = "Chris";
     public $value = 10000;
 
     public function taxed_value() {
@@ -78,21 +49,15 @@ And render it:
 
 ```php
 <?php
+$m = new Mustache_Engine;
 $chris = new Chris;
-$m = new Mustache;
 echo $m->render($template, $chris);
 ```
-
-
-Known Issues
-------------
-
- * As of Mustache spec v1.1.2, there are a couple of whitespace bugs around section tags... Despite these failing tests, this
-   version is actually *closer* to correct than previous releases.
 
 
 See Also
 --------
 
+ * [Mustache.php wiki](https://github.com/bobthecow/mustache.php/wiki/Home).
  * [Readme for the Ruby Mustache implementation](http://github.com/defunkt/mustache/blob/master/README.md).
- * [mustache(1)](http://mustache.github.com/mustache.1.html) and [mustache(5)](http://mustache.github.com/mustache.5.html) man pages.
+ * [mustache(5)](http://mustache.github.com/mustache.5.html) man page.

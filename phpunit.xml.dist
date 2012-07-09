@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit backupGlobals="false" colors="true" bootstrap="./test/bootstrap.php">
+	<testsuite name="Mustache">
+		<directory suffix="Test.php">./test</directory>
+		<exclude>./test/Mustache/Test/FiveThree</exclude>
+	</testsuite>
+
+	<testsuite name="Mustache FiveThree">
+		<directory suffix="Test.php" phpVersion="5.3.0" phpVersionOperator=">=">./test/Mustache/Test/FiveThree</directory>
+	</testsuite>
+
+	<filter>
+		<whitelist>
+			<directory suffix=".php">./src/Mustache</directory>
+		</whitelist>
+	</filter>
+</phpunit>

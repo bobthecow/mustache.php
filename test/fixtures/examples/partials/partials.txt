@@ -1,0 +1,8 @@
+<div>
+    <h1>Page Title</h1>
+    <h2>Page Subtitle</h2>
+
+    <div>
+        Lorem ipsum dolor sit amet.
+    </div>
+</div>
