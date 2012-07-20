@@ -119,6 +119,49 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('win', $context->find('baz'), 'ArrayAccess stands alone');
         $this->assertEquals('win', $context->find('qux'), 'ArrayAccess beats private property');
     }
+
+    public function testAnchoredDotNotation()
+    {
+        $context = new Mustache_Context();
+
+        $a = array(
+            'name'   => 'a',
+            'number' => 1,
+        );
+
+        $b = array(
+            'number' => 2,
+            'child'  => array(
+                'name' => 'baby bee',
+            ),
+        );
+
+        $c = array(
+            'name' => 'cee',
+        );
+
+        $context->push($a);
+        $this->assertEquals('a', $context->find('name'));
+        $this->assertEquals('a', $context->findDot('.name'));
+        $this->assertEquals(1, $context->find('number'));
+        $this->assertEquals(1, $context->findDot('.number'));
+
+        $context->push($b);
+        $this->assertEquals('a', $context->find('name'));
+        $this->assertEquals(2, $context->find('number'));
+        $this->assertEquals('', $context->findDot('.name'));
+        $this->assertEquals(2, $context->findDot('.number'));
+        $this->assertEquals('baby bee', $context->findDot('child.name'));
+        $this->assertEquals('baby bee', $context->findDot('.child.name'));
+
+        $context->push($c);
+        $this->assertEquals('cee', $context->find('name'));
+        $this->assertEquals('cee', $context->findDot('.name'));
+        $this->assertEquals(2, $context->find('number'));
+        $this->assertEquals('', $context->findDot('.number'));
+        $this->assertEquals('baby bee', $context->findDot('child.name'));
+        $this->assertEquals('', $context->findDot('.child.name'));
+    }
 }
 
 class Mustache_Test_TestDummy
