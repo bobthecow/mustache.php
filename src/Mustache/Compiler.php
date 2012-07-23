@@ -118,8 +118,11 @@ class Mustache_Compiler
 
         class %s extends Mustache_Template
         {
+            private $lambdaHelper;
+
             public function renderInternal(Mustache_Context $context, $indent = \'\', $escape = false)
             {
+                $this->lambdaHelper = new Mustache_LambdaHelper($this->mustache, $context);
                 $buffer = \'\';
         %s
 
@@ -159,7 +162,7 @@ class Mustache_Compiler
             if (!is_string($value) && is_callable($value)) {
                 $source = %s;
                 $buffer .= $this->mustache
-                    ->loadLambda((string) call_user_func($value, $source)%s)
+                    ->loadLambda((string) call_user_func($value, $source, $this->lambdaHelper)%s)
                     ->renderInternal($context, $indent);
             } elseif (!empty($value)) {
                 $values = $this->isIterable($value) ? $value : array($value);
