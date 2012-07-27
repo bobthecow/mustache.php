@@ -298,8 +298,10 @@ class Mustache_Compiler
     }
 
     const FILTER = '
-        $filter = $context->%s(%s);
-        $value = (is_string($filter) || !is_callable($filter)) ? "" : call_user_func($filter, $value);
+        if (!empty($value)) {
+            $filter = $context->%s(%s);
+            $value = (is_string($filter) || !is_callable($filter)) ? "" : call_user_func($filter, $value);
+        }
     ';
 
     /**
