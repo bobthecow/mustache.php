@@ -72,4 +72,14 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
             'baz' => function($value) { return 'BAZ'; },
         )));
     }
+
+    public function testInterpolateFirst() {
+        $tpl = $this->mustache->loadTemplate('{{% FILTERS }}{{ foo | bar }}');
+        $this->assertEquals('win!', $tpl->render(array(
+            'foo' => 'FOO',
+            'bar' => function($value) {
+                return ($value === 'FOO') ? 'win!' : 'fail :(';
+            },
+        )));
+    }
 }

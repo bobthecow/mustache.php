@@ -264,12 +264,12 @@ class Mustache_Compiler
     }
 
     const VARIABLE = '
-        $value = $context->%s(%s);%s
+        $value = $context->%s(%s);
         if (!is_string($value) && is_callable($value)) {
             $value = $this->mustache
                 ->loadLambda((string) call_user_func($value))
                 ->renderInternal($context, $indent);
-        }
+        }%s
         $buffer .= %s%s;
     ';
 
