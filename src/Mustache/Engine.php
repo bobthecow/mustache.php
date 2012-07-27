@@ -23,8 +23,10 @@
  */
 class Mustache_Engine
 {
-    const VERSION      = '2.0.2';
-    const SPEC_VERSION = '1.1.2';
+    const VERSION        = '2.0.2';
+    const SPEC_VERSION   = '1.1.2';
+
+    const PRAGMA_FILTERS = 'FILTERS';
 
     // Template cache
     private $templates = array();

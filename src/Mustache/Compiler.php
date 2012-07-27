@@ -264,7 +264,7 @@ class Mustache_Compiler
     }
 
     const VARIABLE = '
-        $value = $context->%s(%s);
+        $value = $context->%s(%s);%s
         if (!is_string($value) && is_callable($value)) {
             $value = $this->mustache
                 ->loadLambda((string) call_user_func($value))
@@ -284,11 +284,45 @@ class Mustache_Compiler
      */
     private function variable($id, $escape, $level)
     {
+        $filters = '';
+
+        if (isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS])) {
+            list($id, $filters) = $this->getFilters($id, $level);
+        }
+
         $method = $this->getFindMethod($id);
         $id     = ($method !== 'last') ? var_export($id, true) : '';
         $value  = $escape ? $this->getEscape() : '$value';
 
-        return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $this->flushIndent(), $value);
+        return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $filters, $this->flushIndent(), $value);
+    }
+
+    const FILTER = '
+        $filter = $context->%s(%s);
+        $value = (is_string($filter) || !is_callable($filter)) ? "" : call_user_func($filter, $value);
+    ';
+
+    /**
+     * Generate Mustache Template variable filtering PHP source.
+     *
+     * @param string $id    Variable name
+     * @param int    $level
+     *
+     * @return string Generated variable filtering PHP source
+     */
+    private function getFilters($id, $level)
+    {
+        $chunks  = array_map('trim', explode('|', $id));
+        $id      = array_shift($chunks);
+        $filters = '';
+
+        foreach ($chunks as $filter) {
+            $method  = $this->getFindMethod($filter);
+            $filter  = ($method !== 'last') ? var_export($filter, true) : '';
+            $filters .= sprintf($this->prepare(self::FILTER, $level), $method, $filter);
+        }
+
+        return array($id, $filters);
     }
 
     const LINE = '$buffer .= "\n";';
