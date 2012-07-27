@@ -22,6 +22,7 @@ class Mustache_Compiler
     private $indentNextLine;
     private $customEscape;
     private $charset;
+    private $pragmas;
 
     /**
      * Compile a Mustache token parse tree into PHP source code.
@@ -36,6 +37,7 @@ class Mustache_Compiler
      */
     public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8')
     {
+        $this->pragmas        = array();
         $this->sections       = array();
         $this->source         = $source;
         $this->indentNextLine = true;
@@ -61,6 +63,10 @@ class Mustache_Compiler
         $level++;
         foreach ($tree as $node) {
             switch ($node[Mustache_Tokenizer::TYPE]) {
+                case Mustache_Tokenizer::T_PRAGMA:
+                    $this->pragmas[$node[Mustache_Tokenizer::NAME]] = true;
+                    break;
+
                 case Mustache_Tokenizer::T_SECTION:
                     $code .= $this->section(
                         $node[Mustache_Tokenizer::NODES],

@@ -34,6 +34,7 @@ class Mustache_Tokenizer
     const T_UNESCAPED    = '{';
     const T_UNESCAPED_2  = '&';
     const T_TEXT         = '_t';
+    const T_PRAGMA       = '%';
 
     // Valid token types
     private static $tagTypes = array(
@@ -47,6 +48,7 @@ class Mustache_Tokenizer
         self::T_ESCAPED      => true,
         self::T_UNESCAPED    => true,
         self::T_UNESCAPED_2  => true,
+        self::T_PRAGMA       => true,
     );
 
     // Interpolated tags
@@ -67,6 +69,7 @@ class Mustache_Tokenizer
     const NODES  = 'nodes';
     const VALUE  = 'value';
 
+    private $pragmas;
     private $state;
     private $tagType;
     private $tag;
@@ -126,6 +129,9 @@ class Mustache_Tokenizer
                     if ($this->tagType === self::T_DELIM_CHANGE) {
                         $i = $this->changeDelimiters($text, $i);
                         $this->state = self::IN_TEXT;
+                    } elseif ($this->tagType === self::T_PRAGMA) {
+                        $i = $this->addPragma($text, $i);
+                        $this->state = self::IN_TEXT;
                     } else {
                         if ($tag !== null) {
                             $i++;
@@ -168,6 +174,13 @@ class Mustache_Tokenizer
 
         $this->filterLine(true);
 
+        foreach ($this->pragmas as $pragma) {
+            array_unshift($this->tokens, array(
+                self::TYPE => self::T_PRAGMA,
+                self::NAME => $pragma,
+            ));
+        }
+
         return $this->tokens;
     }
 
@@ -185,6 +198,7 @@ class Mustache_Tokenizer
         $this->lineStart = 0;
         $this->otag      = '{{';
         $this->ctag      = '}}';
+        $this->pragmas   = array();
     }
 
     /**
@@ -268,6 +282,14 @@ class Mustache_Tokenizer
         $this->ctag = $ctag;
 
         return $closeIndex + strlen($close) - 1;
+    }
+
+    private function addPragma($text, $index)
+    {
+        $end = strpos($text, $this->ctag, $index);
+        $this->pragmas[] = trim(substr($text, $index + 2, $end - $index - 2));
+
+        return $end + strlen($this->ctag) - 1;
     }
 
     /**
