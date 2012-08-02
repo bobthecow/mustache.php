@@ -315,11 +315,10 @@ class Mustache_Compiler
 
     const FILTER = '
         $filter = $context->%s(%s);
-        if (!is_string($filter) && is_callable($filter)) {
-            $value = call_user_func($filter, $value);%s
-        } else {
+        if (is_string($filter) || !is_callable($filter)) {
             throw new UnexpectedValueException(%s);
         }
+        $value = call_user_func($filter, $value);%s
     ';
 
     /**
@@ -341,7 +340,7 @@ class Mustache_Compiler
         $filter = ($method !== 'last') ? var_export($name, true) : '';
         $msg    = var_export(sprintf('Filter not found: %s', $name), true);
 
-        return sprintf($this->prepare(self::FILTER, $level), $method, $filter, $this->getFilter($filters, $level + 1), $msg);
+        return sprintf($this->prepare(self::FILTER, $level), $method, $filter, $msg, $this->getFilter($filters, $level));
     }
 
     const LINE = '$buffer .= "\n";';
