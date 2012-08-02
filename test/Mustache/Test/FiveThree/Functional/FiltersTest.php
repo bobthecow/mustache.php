@@ -83,6 +83,7 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
             array('foo | bar', array()),
             array('foo | bar', array('foo' => 'FOO')),
             array('foo | bar', array('foo' => 'FOO', 'bar' => 'BAR')),
+            array('foo | bar', array('foo' => 'FOO', 'bar' => array(1, 2))),
             array('foo | bar | baz', array('foo' => 'FOO', 'bar' => function() { return 'BAR'; })),
             array('foo | bar | baz', array('foo' => 'FOO', 'baz' => function() { return 'BAZ'; })),
             array('foo | bar | baz', array('bar' => function() { return 'BAR'; })),
