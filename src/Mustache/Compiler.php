@@ -297,13 +297,6 @@ class Mustache_Compiler
         return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $filters, $this->flushIndent(), $value);
     }
 
-    const FILTER = '
-        if (!empty($value)) {
-            $filter = $context->%s(%s);
-            $value = (is_string($filter) || !is_callable($filter)) ? "" : call_user_func($filter, $value);
-        }
-    ';
-
     /**
      * Generate Mustache Template variable filtering PHP source.
      *
@@ -314,17 +307,41 @@ class Mustache_Compiler
      */
     private function getFilters($id, $level)
     {
-        $chunks  = array_map('trim', explode('|', $id));
-        $id      = array_shift($chunks);
-        $filters = '';
+        $filters = array_map('trim', explode('|', $id));
+        $id      = array_shift($filters);
 
-        foreach ($chunks as $filter) {
-            $method  = $this->getFindMethod($filter);
-            $filter  = ($method !== 'last') ? var_export($filter, true) : '';
-            $filters .= sprintf($this->prepare(self::FILTER, $level), $method, $filter);
+        return array($id, $this->getFilter($filters, $level));
+    }
+
+    const FILTER = '
+        $filter = $context->%s(%s);
+        if (!is_string($filter) && is_callable($filter)) {
+            $value = call_user_func($filter, $value);%s
+        } else {
+            throw new UnexpectedValueException(%s);
+        }
+    ';
+
+    /**
+     * Generate PHP source for a single filter.
+     *
+     * @param array $filters
+     * @param int   $level
+     *
+     * @return string Generated filter PHP source
+     */
+    private function getFilter(array $filters, $level)
+    {
+        if (empty($filters)) {
+            return '';
         }
 
-        return array($id, $filters);
+        $name   = array_shift($filters);
+        $method = $this->getFindMethod($name);
+        $filter = ($method !== 'last') ? var_export($name, true) : '';
+        $msg    = var_export(sprintf('Filter not found: %s', $name), true);
+
+        return sprintf($this->prepare(self::FILTER, $level), $method, $filter, $this->getFilter($filters, $level + 1), $msg);
     }
 
     const LINE = '$buffer .= "\n";';

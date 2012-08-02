@@ -13,15 +13,18 @@
  * @group filters
  * @group functional
  */
-class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_TestCase {
+class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_TestCase
+{
 
     private $mustache;
 
-    public function setUp() {
+    public function setUp()
+    {
         $this->mustache = new Mustache_Engine;
     }
 
-    public function testSingleFilter() {
+    public function testSingleFilter()
+    {
         $tpl = $this->mustache->loadTemplate('{{% FILTERS }}{{ date | longdate }}');
 
         $this->mustache->addHelper('longdate', function(\DateTime $value) {
@@ -34,7 +37,8 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
         $this->assertEquals('2000-01-01 12:01:00', $tpl->render($foo));
     }
 
-    public function testChainedFilters() {
+    public function testChainedFilters()
+    {
         $tpl = $this->mustache->loadTemplate('{{% FILTERS }}{{ date | longdate | withbrackets }}');
 
         $this->mustache->addHelper('longdate', function(\DateTime $value) {
@@ -51,29 +55,8 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
         $this->assertEquals('[[2000-01-01 12:01:00]]', $tpl->render($foo));
     }
 
-    public function testBrokenPipe() {
-        $tpl = $this->mustache->loadTemplate('{{% FILTERS }}{{ foo | bar | baz }}');
-        $this->assertEquals('', $tpl->render(array(
-            'foo' => 'FOO',
-        )));
-
-        $this->assertEquals('', $tpl->render(array(
-            'foo' => 'FOO',
-            'bar' => function($value) { return 'BAR'; },
-        )));
-
-        $this->assertEquals('', $tpl->render(array(
-            'foo' => 'FOO',
-            'baz' => function($value) { return 'BAZ'; },
-        )));
-
-        $this->assertEquals('', $tpl->render(array(
-            'bar' => function($value) { return 'BAR'; },
-            'baz' => function($value) { return 'BAZ'; },
-        )));
-    }
-
-    public function testInterpolateFirst() {
+    public function testInterpolateFirst()
+    {
         $tpl = $this->mustache->loadTemplate('{{% FILTERS }}{{ foo | bar }}');
         $this->assertEquals('win!', $tpl->render(array(
             'foo' => 'FOO',
@@ -81,5 +64,30 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
                 return ($value === 'FOO') ? 'win!' : 'fail :(';
             },
         )));
+    }
+
+    /**
+     * @expectedException UnexpectedValueException
+     * @dataProvider getBrokenPipes
+     */
+    public function testThrowsExceptionForBrokenPipes($tpl, $data)
+    {
+        $this->mustache
+            ->loadTemplate(sprintf('{{%% FILTERS }}{{ %s }}', $tpl))
+                ->render($data);
+    }
+
+    public function getBrokenPipes()
+    {
+        return array(
+            array('foo | bar', array()),
+            array('foo | bar', array('foo' => 'FOO')),
+            array('foo | bar', array('foo' => 'FOO', 'bar' => 'BAR')),
+            array('foo | bar | baz', array('foo' => 'FOO', 'bar' => function() { return 'BAR'; })),
+            array('foo | bar | baz', array('foo' => 'FOO', 'baz' => function() { return 'BAZ'; })),
+            array('foo | bar | baz', array('bar' => function() { return 'BAR'; })),
+            array('foo | bar | baz', array('baz' => function() { return 'BAZ'; })),
+            array('foo | bar.baz', array('foo' => 'FOO', 'bar' => function() { return 'BAR'; }, 'baz' => function() { return 'BAZ'; })),
+        );
     }
 }
