@@ -15,11 +15,12 @@
  * @group mustache-spec
  * @group functional
  */
-class Mustache_Test_FiveThree_Functional_MustacheSpecTest extends PHPUnit_Framework_TestCase {
-
+class Mustache_Test_FiveThree_Functional_MustacheSpecTest extends PHPUnit_Framework_TestCase
+{
     private static $mustache;
 
-    public static function setUpBeforeClass() {
+    public static function setUpBeforeClass()
+    {
         self::$mustache = new Mustache_Engine;
     }
 
@@ -27,7 +28,8 @@ class Mustache_Test_FiveThree_Functional_MustacheSpecTest extends PHPUnit_Framew
      * For some reason data providers can't mark tests skipped, so this test exists
      * simply to provide a 'skipped' test if the `spec` submodule isn't initialized.
      */
-    public function testSpecInitialized() {
+    public function testSpecInitialized()
+    {
         if (!file_exists(dirname(__FILE__).'/../../../../../vendor/spec/specs/')) {
             $this->markTestSkipped('Mustache spec submodule not initialized: run "git submodule update --init"');
         }
@@ -37,19 +39,22 @@ class Mustache_Test_FiveThree_Functional_MustacheSpecTest extends PHPUnit_Framew
      * @group lambdas
      * @dataProvider loadLambdasSpec
      */
-    public function testLambdasSpec($desc, $source, $partials, $data, $expected) {
+    public function testLambdasSpec($desc, $source, $partials, $data, $expected)
+    {
         $template = self::loadTemplate($source, $partials);
         $this->assertEquals($expected, $template($this->prepareLambdasSpec($data)), $desc);
     }
 
-    public function loadLambdasSpec() {
+    public function loadLambdasSpec()
+    {
         return $this->loadSpec('~lambdas');
     }
 
     /**
      * Extract and lambdafy any 'lambda' values found in the $data array.
      */
-    private function prepareLambdasSpec($data) {
+    private function prepareLambdasSpec($data)
+    {
         foreach ($data as $key => $val) {
             if ($key === 'lambda') {
                 if (!isset($val['php'])) {
@@ -76,7 +81,8 @@ class Mustache_Test_FiveThree_Functional_MustacheSpecTest extends PHPUnit_Framew
      * @access public
      * @return array
      */
-    private function loadSpec($name) {
+    private function loadSpec($name)
+    {
         $filename = dirname(__FILE__) . '/../../../../../vendor/spec/specs/' . $name . '.yml';
         if (!file_exists($filename)) {
             return array();
@@ -106,7 +112,8 @@ class Mustache_Test_FiveThree_Functional_MustacheSpecTest extends PHPUnit_Framew
         return $data;
     }
 
-    private static function loadTemplate($source, $partials) {
+    private static function loadTemplate($source, $partials)
+    {
         self::$mustache->setPartials($partials);
 
         return self::$mustache->loadTemplate($source);

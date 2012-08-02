@@ -244,7 +244,8 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class MustacheStub extends Mustache_Engine {
+class MustacheStub extends Mustache_Engine
+{
     public $source;
     public $template;
     public function loadTemplate($source)

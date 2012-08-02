@@ -1,6 +1,7 @@
 <?php
 
-class Partials {
+class Partials
+{
     public $page = array(
         'title'    => 'Page Title',
         'subtitle' => 'Page Subtitle',

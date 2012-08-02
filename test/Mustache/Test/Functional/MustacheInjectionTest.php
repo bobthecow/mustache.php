@@ -49,7 +49,6 @@ class Mustache_Test_Functional_MustacheInjectionTest extends PHPUnit_Framework_T
         $this->assertEquals('{{ b }}', $tpl->render($data));
     }
 
-
     // sections
 
     public function testSectionInjection()
@@ -77,7 +76,6 @@ class Mustache_Test_Functional_MustacheInjectionTest extends PHPUnit_Framework_T
 
         $this->assertEquals('{{ c }}', $tpl->render($data));
     }
-
 
     // partials
 
@@ -110,7 +108,6 @@ class Mustache_Test_Functional_MustacheInjectionTest extends PHPUnit_Framework_T
 
         $this->assertEquals('{{ b }}', $tpl->render($data));
     }
-
 
     // lambdas
 

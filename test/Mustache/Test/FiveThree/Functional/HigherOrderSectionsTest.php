@@ -13,15 +13,17 @@
  * @group lambdas
  * @group functional
  */
-class Mustache_Test_FiveThree_Functional_HigherOrderSectionsTest extends PHPUnit_Framework_TestCase {
-
+class Mustache_Test_FiveThree_Functional_HigherOrderSectionsTest extends PHPUnit_Framework_TestCase
+{
     private $mustache;
 
-    public function setUp() {
+    public function setUp()
+    {
         $this->mustache = new Mustache_Engine;
     }
 
-    public function testAnonymousFunctionSectionCallback() {
+    public function testAnonymousFunctionSectionCallback()
+    {
         $tpl = $this->mustache->loadTemplate('{{#wrapper}}{{name}}{{/wrapper}}');
 
         $foo = new Mustache_Test_FiveThree_Functional_Foo;
@@ -33,7 +35,8 @@ class Mustache_Test_FiveThree_Functional_HigherOrderSectionsTest extends PHPUnit
         $this->assertEquals(sprintf('<div class="anonymous">%s</div>', $foo->name), $tpl->render($foo));
     }
 
-    public function testSectionCallback() {
+    public function testSectionCallback()
+    {
         $one = $this->mustache->loadTemplate('{{name}}');
         $two = $this->mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
 
@@ -44,7 +47,8 @@ class Mustache_Test_FiveThree_Functional_HigherOrderSectionsTest extends PHPUnit
         $this->assertEquals(sprintf('<em>%s</em>', $foo->name), $two->render($foo));
     }
 
-    public function testViewArrayAnonymousSectionCallback() {
+    public function testViewArrayAnonymousSectionCallback()
+    {
         $tpl = $this->mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
 
         $data = array(
@@ -58,12 +62,14 @@ class Mustache_Test_FiveThree_Functional_HigherOrderSectionsTest extends PHPUnit
     }
 }
 
-class Mustache_Test_FiveThree_Functional_Foo {
+class Mustache_Test_FiveThree_Functional_Foo
+{
     public $name  = 'Justin';
     public $lorem = 'Lorem ipsum dolor sit amet,';
     public $wrap;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->wrap = function($text) {
             return sprintf('<em>%s</em>', $text);
         };
