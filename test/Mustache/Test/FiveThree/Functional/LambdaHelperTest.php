@@ -13,15 +13,17 @@
  * @group lambdas
  * @group functional
  */
-class Mustache_Test_FiveThree_Functional_LambdaHelperTest extends PHPUnit_Framework_TestCase {
-
+class Mustache_Test_FiveThree_Functional_LambdaHelperTest extends PHPUnit_Framework_TestCase
+{
     private $mustache;
 
-    public function setUp() {
+    public function setUp()
+    {
         $this->mustache = new Mustache_Engine;
     }
 
-    public function testSectionLambdaHelper() {
+    public function testSectionLambdaHelper()
+    {
         $one = $this->mustache->loadTemplate('{{name}}');
         $two = $this->mustache->loadTemplate('{{#lambda}}{{name}}{{/lambda}}');
 
