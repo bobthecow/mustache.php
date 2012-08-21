@@ -27,11 +27,13 @@ class Mustache_Engine
     const SPEC_VERSION   = '1.1.2';
 
     const PRAGMA_FILTERS = 'FILTERS';
+    const PRAGMA_BLOCKS  = 'BLOCKS';
 
     // Template cache
     private $templates = array();
 
     // Environment
+    private $baseTemplateClass   = 'Mustache_Template';
     private $templateClassPrefix = '__Mustache_';
     private $cache = null;
     private $cacheFileMode = null;
@@ -107,6 +109,10 @@ class Mustache_Engine
      */
     public function __construct(array $options = array())
     {
+        if (isset($options['base_template_class'])) {
+            $this->baseTemplateClass = $options['base_template_class'];
+        }
+
         if (isset($options['template_class_prefix'])) {
             $this->templateClassPrefix = $options['template_class_prefix'];
         }
@@ -500,6 +506,51 @@ class Mustache_Engine
     }
 
     /**
+     * Helper method to get a Mustache template's parent name.
+     *
+     * Used by {{%BLOCKS}} pragma to handle template inheritance.
+     *
+     * @param array $tree Parsed Mustache template
+     *
+     * @return string Mustache parent Template name
+     */
+    public function getParentTemplateName(array $tree)
+    {
+        foreach ($tree as $token) {
+            if ($token[Mustache_Tokenizer::TYPE] !== Mustache_Tokenizer::T_PRAGMA) {
+                // pragmas always come first, so bail early if this isn't a pragma
+                return;
+            }
+
+            if ($token[Mustache_Tokenizer::NAME] == Mustache_Engine::PRAGMA_BLOCKS) {
+                if (isset($token[Mustache_Tokenizer::VALUE]) && is_array($token[Mustache_Tokenizer::VALUE])) {
+                    if (array_key_exists('parent', $token[Mustache_Tokenizer::VALUE])) {
+                        return $token[Mustache_Tokenizer::VALUE]['parent'];
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Helper method to generate a Mustache template class.
+     *
+     * @param array $tree Parsed Mustache template
+     *
+     * @return string Mustache parent Template class name
+     */
+    public function getParentTemplateClassName(array $tree)
+    {
+        $name = $this->getParentTemplateName($tree);
+
+        if ($name !== null) {
+            return get_class($this->loadTemplate($name));
+        } else {
+            return $this->baseTemplateClass;
+        }
+    }
+
+    /**
      * Load a Mustache Template by name.
      *
      * @param string $name
@@ -654,8 +705,9 @@ class Mustache_Engine
      */
     private function compile($source)
     {
-        $tree = $this->parse($source);
-        $name = $this->getTemplateClassName($source);
+        $tree   = $this->parse($source);
+        $name   = $this->getTemplateClassName($source);
+        $parent = $this->getParentTemplateClassName($tree);
 
         $this->log(
             Mustache_Logger::INFO,
@@ -663,7 +715,7 @@ class Mustache_Engine
             array('className' => $name)
         );
 
-        return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables, $this->entityFlags);
+        return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables, $this->entityFlags, $parent);
     }
 
     /**
