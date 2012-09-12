@@ -23,7 +23,7 @@
  */
 class Mustache_Engine
 {
-    const VERSION      = '2.0.1';
+    const VERSION      = '2.0.2';
     const SPEC_VERSION = '1.1.2';
 
     // Template cache
