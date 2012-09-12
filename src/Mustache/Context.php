@@ -138,7 +138,12 @@ class Mustache_Context
                     return $stack[$i]->$id();
                 } elseif (isset($stack[$i]->$id)) {
                     return $stack[$i]->$id;
-                }
+                } elseif (method_exists($stack[$i], '__get')) {
+					$val = $stack[$i]->$id;
+					if (isset($val)) {
+						return $val;
+					}
+				}
             } elseif (is_array($stack[$i]) && array_key_exists($id, $stack[$i])) {
                 return $stack[$i][$id];
             }
