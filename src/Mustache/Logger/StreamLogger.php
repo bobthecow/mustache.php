@@ -47,7 +47,7 @@ class StreamLogger extends Mustache_Logger_AbstractLogger
      */
     protected function write($level, $message, array $context = array())
     {
-        if ($this->stream === null) {
+        if (!is_resource($this->stream)) {
             if (!isset($this->url)) {
                 throw new LogicException('Missing stream url, the stream can not be opened. This may be caused by a premature call to close().');
             }
