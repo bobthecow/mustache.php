@@ -12,7 +12,7 @@
 /**
  * A Mustache Monolog Logger adapter.
  */
-class MonologLogger extends Mustache_Logger_AbstractLogger
+class MonologLogger implements Mustache_Logger
 {
     protected $logger;
 
@@ -41,18 +41,6 @@ class MonologLogger extends Mustache_Logger_AbstractLogger
      * @param  array   $context The log context
      */
     public function log($level, $message, array $context = array())
-    {
-        $this->write($level, $message, $context);
-    }
-
-    /**
-     * Write a record to the log.
-     *
-     * @param  integer $level   The logging level
-     * @param  string  $message The log message
-     * @param  array   $context The log context
-     */
-    protected function write($level, $message, array $context = array())
     {
         $this->logger->addRecord($level, $message, $context);
     }
