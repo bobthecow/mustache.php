@@ -34,12 +34,13 @@ class Mustache_Engine
     // Environment
     private $templateClassPrefix = '__Mustache_';
     private $cache = null;
+    private $cacheFileMode = null;
     private $loader;
     private $partialsLoader;
     private $helpers;
     private $escape;
     private $charset = 'UTF-8';
-    private $cacheFileMode = null;
+    private $logger;
 
     /**
      * Mustache class constructor.
@@ -81,6 +82,9 @@ class Mustache_Engine
      *
      *         // Character set for `htmlspecialchars`. Defaults to 'UTF-8'. Use 'UTF-8'.
      *         'charset' => 'ISO-8859-1',
+     *
+     *         // A Mustache Logger instance. No logging will occur unless this is set.
+     *         'logger' => new Mustache_StreamLogger('php://stderr'),
      *     );
      *
      * @param array $options (default: array())
@@ -125,6 +129,10 @@ class Mustache_Engine
 
         if (isset($options['charset'])) {
             $this->charset = $options['charset'];
+        }
+
+        if (isset($options['logger'])) {
+            $this->setLogger($options['logger']);
         }
     }
 
@@ -331,6 +339,26 @@ class Mustache_Engine
     }
 
     /**
+     * Set the Mustache Logger instance.
+     *
+     * @param Mustache_Logger $logger
+     */
+    public function setLogger(Mustache_Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * Get the current Mustache Logger instance.
+     *
+     * @return Mustache_Logger
+     */
+    public function getLogger()
+    {
+        return $this->logger;
+    }
+
+    /**
      * Set the Mustache Tokenizer instance.
      *
      * @param Mustache_Tokenizer $tokenizer
@@ -453,7 +481,12 @@ class Mustache_Engine
         try {
             return $this->loadSource($this->getPartialsLoader()->load($name));
         } catch (InvalidArgumentException $e) {
-            // If the named partial cannot be found, return null.
+            // If the named partial cannot be found, log then return null.
+            $this->log(
+                Mustache_Logger::WARNING,
+                sprintf('Partial not found: "%s"', $name),
+                array('name' => $name)
+            );
         }
     }
 
@@ -496,14 +529,32 @@ class Mustache_Engine
             if (!class_exists($className, false)) {
                 if ($fileName = $this->getCacheFilename($source)) {
                     if (!is_file($fileName)) {
+                        $this->log(
+                            Mustache_Logger::DEBUG,
+                            sprintf('Writing "%s" class to template cache: "%s"', $className, $fileName),
+                            array('className' => $className, 'fileName' => $fileName)
+                        );
+
                         $this->writeCacheFile($fileName, $this->compile($source));
                     }
 
                     require_once $fileName;
                 } else {
+                    $this->log(
+                        Mustache_Logger::WARNING,
+                        sprintf('Template cache disabled, evaluating "%s" class at runtime', $className),
+                        array('className' => $className)
+                    );
+
                     eval('?>'.$this->compile($source));
                 }
             }
+
+            $this->log(
+                Mustache_Logger::DEBUG,
+                sprintf('Instantiating template: "%s"', $className),
+                array('className' => $className)
+            );
 
             $this->templates[$className] = new $className($this);
         }
@@ -553,6 +604,12 @@ class Mustache_Engine
         $tree = $this->parse($source);
         $name = $this->getTemplateClassName($source);
 
+        $this->log(
+            Mustache_Logger::INFO,
+            sprintf('Compiling template to "%s" class', $name),
+            array('name' => $name)
+        );
+
         return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset);
     }
 
@@ -573,7 +630,7 @@ class Mustache_Engine
     /**
      * Helper method to dump a generated Mustache Template subclass to the file cache.
      *
-     * @throws RuntimeException if unable to create the cache directory or write $fileName
+     * @throws RuntimeException if unable to create the cache directory or write to $fileName.
      *
      * @param string $fileName
      * @param string $source
@@ -584,11 +641,24 @@ class Mustache_Engine
     {
         $dirName = dirname($fileName);
         if (!is_dir($dirName)) {
+            $this->log(
+                Mustache_Logger::INFO,
+                sprintf('Creating Mustache template cache directory: "%s"', $dirName),
+                array('dirName' => $dirName)
+            );
+
             @mkdir($dirName, 0777, true);
             if (!is_dir($dirName)) {
                 throw new RuntimeException(sprintf('Failed to create cache directory "%s".', $dirName));
             }
+
         }
+
+        $this->log(
+            Mustache_Logger::DEBUG,
+            sprintf('Caching compiled template to "%s"', dirname($fileName)),
+            array('filename' => $fileName)
+        );
 
         $tempFile = tempnam($dirName, basename($fileName));
         if (false !== @file_put_contents($tempFile, $source)) {
@@ -598,8 +668,28 @@ class Mustache_Engine
 
                 return;
             }
+
+            $this->log(
+                Mustache_Logger::ERROR,
+                sprintf('Unable to rename Mustache temp cache file: "%s" -> "%s"', $tempFile, $fileName),
+                array('tempFile' => $tempFile, 'fileName' => $fileName)
+            );
         }
 
         throw new RuntimeException(sprintf('Failed to write cache file "%s".', $fileName));
+    }
+
+    /**
+     * Add a log record if logging is enabled.
+     *
+     * @param  integer $level   The logging level
+     * @param  string  $message The log message
+     * @param  array   $context The log context
+     */
+    private function log($level, $message, array $context = array())
+    {
+        if (isset($this->logger)) {
+            $this->logger->log($level, $message, $context);
+        }
     }
 }
