@@ -34,11 +34,33 @@ abstract class Mustache_Logger_AbstractLogger implements Mustache_Logger
      */
     public function __construct($level = self::ERROR)
     {
+        $this->setLevel($level);
+    }
+
+    /**
+     * Set the minimum logging level.
+     *
+     * @throws InvalidArgumentException if the logging level is unknown.
+     *
+     * @param  integer $level The minimum logging level which will be written
+     */
+    public function setLevel($level)
+    {
         if (!array_key_exists($level, self::$levels)) {
             throw new InvalidArgumentException('Unexpected logging level: ' . $level);
         }
 
         $this->level = $level;
+    }
+
+    /**
+     * Get the current minimum logging level.
+     *
+     * @return integer
+     */
+    public function getLevel()
+    {
+        return $this->level;
     }
 
     /**
