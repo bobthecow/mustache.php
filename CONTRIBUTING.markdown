@@ -16,8 +16,8 @@
 
 ### You can do some things to increase the chance that your pull request is accepted the first time:
 
- * Submit pull request per fix or feature.
- * To help with that, do your work in a feature branch (e.g. `feature/my-alsome-feature`).
+ * Submit one pull request per fix or feature.
+ * To help with that, do all your work in a feature branch (e.g. `feature/my-alsome-feature`).
  * Follow the conventions you see used in the project.
  * Use `phpcs --standard=PSR2` to check your changes against the coding standard.
  * Write tests that fail without your code, and pass with it.
