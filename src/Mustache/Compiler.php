@@ -22,6 +22,7 @@ class Mustache_Compiler
     private $indentNextLine;
     private $customEscape;
     private $charset;
+    private $pragmas;
 
     /**
      * Compile a Mustache token parse tree into PHP source code.
@@ -36,6 +37,7 @@ class Mustache_Compiler
      */
     public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8')
     {
+        $this->pragmas        = array();
         $this->sections       = array();
         $this->source         = $source;
         $this->indentNextLine = true;
@@ -61,6 +63,10 @@ class Mustache_Compiler
         $level++;
         foreach ($tree as $node) {
             switch ($node[Mustache_Tokenizer::TYPE]) {
+                case Mustache_Tokenizer::T_PRAGMA:
+                    $this->pragmas[$node[Mustache_Tokenizer::NAME]] = true;
+                    break;
+
                 case Mustache_Tokenizer::T_SECTION:
                     $code .= $this->section(
                         $node[Mustache_Tokenizer::NODES],
@@ -263,7 +269,7 @@ class Mustache_Compiler
             $value = $this->mustache
                 ->loadLambda((string) call_user_func($value))
                 ->renderInternal($context, $indent);
-        }
+        }%s
         $buffer .= %s%s;
     ';
 
@@ -278,11 +284,63 @@ class Mustache_Compiler
      */
     private function variable($id, $escape, $level)
     {
+        $filters = '';
+
+        if (isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS])) {
+            list($id, $filters) = $this->getFilters($id, $level);
+        }
+
         $method = $this->getFindMethod($id);
         $id     = ($method !== 'last') ? var_export($id, true) : '';
         $value  = $escape ? $this->getEscape() : '$value';
 
-        return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $this->flushIndent(), $value);
+        return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $filters, $this->flushIndent(), $value);
+    }
+
+    /**
+     * Generate Mustache Template variable filtering PHP source.
+     *
+     * @param string $id    Variable name
+     * @param int    $level
+     *
+     * @return string Generated variable filtering PHP source
+     */
+    private function getFilters($id, $level)
+    {
+        $filters = array_map('trim', explode('|', $id));
+        $id      = array_shift($filters);
+
+        return array($id, $this->getFilter($filters, $level));
+    }
+
+    const FILTER = '
+        $filter = $context->%s(%s);
+        if (is_string($filter) || !is_callable($filter)) {
+            throw new UnexpectedValueException(%s);
+        }
+        $value = call_user_func($filter, $value);%s
+    ';
+
+    /**
+     * Generate PHP source for a single filter.
+     *
+     * @param array $filters
+     * @param int   $level
+     *
+     * @return string Generated filter PHP source
+     */
+    private function getFilter(array $filters, $level)
+    {
+        if (empty($filters)) {
+            return '';
+        }
+
+        $name   = array_shift($filters);
+        $method = $this->getFindMethod($name);
+        $filter = ($method !== 'last') ? var_export($name, true) : '';
+        $msg    = var_export(sprintf('Filter not found: %s', $name), true);
+
+        return sprintf($this->prepare(self::FILTER, $level), $method, $filter, $msg, $this->getFilter($filters, $level));
     }
 
     const LINE = '$buffer .= "\n";';
