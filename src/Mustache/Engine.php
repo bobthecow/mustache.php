@@ -37,6 +37,7 @@ class Mustache_Engine
     private $helpers;
     private $escape;
     private $charset = 'UTF-8';
+    private $cacheFilePerm = 0644;
 
     /**
      * Mustache class constructor.
@@ -74,6 +75,9 @@ class Mustache_Engine
      *
      *         // character set for `htmlspecialchars`. Defaults to 'UTF-8'
      *         'charset' => 'ISO-8859-1',
+     *
+     *         // permissions for cache files. Defaults to 0644
+     *         'cache_file_perm' => 0666,
      *     );
      *
      * @param array $options (default: array())
@@ -114,6 +118,10 @@ class Mustache_Engine
 
         if (isset($options['charset'])) {
             $this->charset = $options['charset'];
+        }
+
+        if (isset($options['cache_file_perm'])) {
+            $this->cacheFilePerm = $options['cache_file_perm'];
         }
     }
 
@@ -578,7 +586,7 @@ class Mustache_Engine
         $tempFile = tempnam(dirname($fileName), basename($fileName));
         if (false !== @file_put_contents($tempFile, $source)) {
             if (@rename($tempFile, $fileName)) {
-                chmod($fileName, 0644);
+                chmod($fileName, $this->cacheFilePerm);
 
                 return;
             }
