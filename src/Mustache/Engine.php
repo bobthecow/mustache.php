@@ -581,6 +581,7 @@ class Mustache_Engine
     {
         if (!is_dir(dirname($fileName))) {
             mkdir(dirname($fileName), 0777, true);
+            chmod(dirname($fileName), 0777); // mkdir can have been affected by current umask
         }
 
         $tempFile = tempnam(dirname($fileName), basename($fileName));
