@@ -3,10 +3,15 @@
 	<testsuite name="Mustache">
 		<directory suffix="Test.php">./test</directory>
 		<exclude>./test/Mustache/Test/FiveThree</exclude>
+		<exclude>./test/Mustache/Test/FiveFour</exclude>
 	</testsuite>
 
 	<testsuite name="Mustache FiveThree">
 		<directory suffix="Test.php" phpVersion="5.3.0" phpVersionOperator=">=">./test/Mustache/Test/FiveThree</directory>
+	</testsuite>
+
+	<testsuite name="Mustache FiveFour">
+		<directory suffix="Test.php" phpVersion="5.4.0" phpVersionOperator=">=">./test/Mustache/Test/FiveFour</directory>
 	</testsuite>
 
 	<filter>
