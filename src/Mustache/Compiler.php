@@ -23,6 +23,7 @@ class Mustache_Compiler
     private $customEscape;
     private $charset;
     private $pragmas;
+    private $bindLambdas;
 
     /**
      * Compile a Mustache token parse tree into PHP source code.
@@ -35,7 +36,7 @@ class Mustache_Compiler
      *
      * @return string Generated PHP source code
      */
-    public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8')
+    public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8', $bindLambdas = false)
     {
         $this->pragmas        = array();
         $this->sections       = array();
@@ -43,6 +44,7 @@ class Mustache_Compiler
         $this->indentNextLine = true;
         $this->customEscape   = $customEscape;
         $this->charset        = $charset;
+        $this->bindLambdas    = $bindLambdas;
 
         return $this->writeCode($tree, $name);
     }
@@ -165,7 +167,7 @@ class Mustache_Compiler
     const SECTION = '
         private function section%s(Mustache_Context $context, $indent, $value) {
             $buffer = \'\';
-            if (!is_string($value) && is_callable($value)) {
+            if (!is_string($value) && is_callable($value)) {%s
                 $source = %s;
                 $buffer .= $this->mustache
                     ->loadLambda((string) call_user_func($value, $source, $this->lambdaHelper)%s)
@@ -180,6 +182,12 @@ class Mustache_Compiler
 
             return $buffer;
         }';
+
+    const BIND_LAMBDA = '
+        if ($value instanceof Closure) {
+            $value = $value->bindTo($this->lambdaHelper);
+        }
+    ';
 
     /**
      * Generate Mustache Template section PHP source.
@@ -198,6 +206,7 @@ class Mustache_Compiler
     {
         $method = $this->getFindMethod($id);
         $id     = var_export($id, true);
+        $bind   = $this->bindLambdas ? $this->prepare(self::BIND_LAMBDA, 2) : '';
         $source = var_export(substr($this->source, $start, $end - $start), true);
 
         if ($otag !== '{{' || $ctag !== '}}') {
@@ -209,7 +218,7 @@ class Mustache_Compiler
         $key    = ucfirst(md5($delims."\n".$source));
 
         if (!isset($this->sections[$key])) {
-            $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $source, $delims, $this->walk($nodes, 2));
+            $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $bind, $source, $delims, $this->walk($nodes, 2));
         }
 
         return sprintf($this->prepare(self::SECTION_CALL, $level), $id, $key, $method, $id);
