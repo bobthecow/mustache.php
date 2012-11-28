@@ -23,8 +23,10 @@
  */
 class Mustache_Engine
 {
-    const VERSION      = '2.0.2';
-    const SPEC_VERSION = '1.1.2';
+    const VERSION        = '2.0.2';
+    const SPEC_VERSION   = '1.1.2';
+
+    const PRAGMA_FILTERS = 'FILTERS';
 
     // Template cache
     private $templates = array();
@@ -37,6 +39,7 @@ class Mustache_Engine
     private $helpers;
     private $escape;
     private $charset = 'UTF-8';
+    private $bindLambdas;
 
     /**
      * Mustache class constructor.
@@ -115,6 +118,8 @@ class Mustache_Engine
         if (isset($options['charset'])) {
             $this->charset = $options['charset'];
         }
+
+        $this->bindLambdas = version_compare(PHP_VERSION, '5.4.0', '>=');
     }
 
     /**
@@ -407,10 +412,11 @@ class Mustache_Engine
     public function getTemplateClassName($source)
     {
         return $this->templateClassPrefix . md5(sprintf(
-            'version:%s,escape:%s,charset:%s,source:%s',
+            'version:%s,escape:%s,charset:%s,bind:%s,source:%s',
             self::VERSION,
             isset($this->escape) ? 'custom' : 'default',
             $this->charset,
+            $this->bindLambdas ? 'true' : 'false',
             $source
         ));
     }
@@ -542,7 +548,7 @@ class Mustache_Engine
         $tree = $this->parse($source);
         $name = $this->getTemplateClassName($source);
 
-        return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset);
+        return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->bindLambdas);
     }
 
     /**

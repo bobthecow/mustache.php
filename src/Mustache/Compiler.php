@@ -22,6 +22,8 @@ class Mustache_Compiler
     private $indentNextLine;
     private $customEscape;
     private $charset;
+    private $pragmas;
+    private $bindLambdas;
 
     /**
      * Compile a Mustache token parse tree into PHP source code.
@@ -34,13 +36,15 @@ class Mustache_Compiler
      *
      * @return string Generated PHP source code
      */
-    public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8')
+    public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8', $bindLambdas = false)
     {
+        $this->pragmas        = array();
         $this->sections       = array();
         $this->source         = $source;
         $this->indentNextLine = true;
         $this->customEscape   = $customEscape;
         $this->charset        = $charset;
+        $this->bindLambdas    = $bindLambdas;
 
         return $this->writeCode($tree, $name);
     }
@@ -61,6 +65,10 @@ class Mustache_Compiler
         $level++;
         foreach ($tree as $node) {
             switch ($node[Mustache_Tokenizer::TYPE]) {
+                case Mustache_Tokenizer::T_PRAGMA:
+                    $this->pragmas[$node[Mustache_Tokenizer::NAME]] = true;
+                    break;
+
                 case Mustache_Tokenizer::T_SECTION:
                     $code .= $this->section(
                         $node[Mustache_Tokenizer::NODES],
@@ -118,8 +126,11 @@ class Mustache_Compiler
 
         class %s extends Mustache_Template
         {
+            private $lambdaHelper;
+
             public function renderInternal(Mustache_Context $context, $indent = \'\', $escape = false)
             {
+                $this->lambdaHelper = new Mustache_LambdaHelper($this->mustache, $context);
                 $buffer = \'\';
         %s
 
@@ -156,10 +167,10 @@ class Mustache_Compiler
     const SECTION = '
         private function section%s(Mustache_Context $context, $indent, $value) {
             $buffer = \'\';
-            if (!is_string($value) && is_callable($value)) {
+            if (!is_string($value) && is_callable($value)) {%s
                 $source = %s;
                 $buffer .= $this->mustache
-                    ->loadLambda((string) call_user_func($value, $source)%s)
+                    ->loadLambda((string) call_user_func($value, $source, $this->lambdaHelper)%s)
                     ->renderInternal($context, $indent);
             } elseif (!empty($value)) {
                 $values = $this->isIterable($value) ? $value : array($value);
@@ -171,6 +182,12 @@ class Mustache_Compiler
 
             return $buffer;
         }';
+
+    const BIND_LAMBDA = '
+        if ($value instanceof Closure) {
+            $value = $value->bindTo($this->lambdaHelper);
+        }
+    ';
 
     /**
      * Generate Mustache Template section PHP source.
@@ -189,6 +206,7 @@ class Mustache_Compiler
     {
         $method = $this->getFindMethod($id);
         $id     = var_export($id, true);
+        $bind   = $this->bindLambdas ? $this->prepare(self::BIND_LAMBDA, 2) : '';
         $source = var_export(substr($this->source, $start, $end - $start), true);
 
         if ($otag !== '{{' || $ctag !== '}}') {
@@ -200,7 +218,7 @@ class Mustache_Compiler
         $key    = ucfirst(md5($delims."\n".$source));
 
         if (!isset($this->sections[$key])) {
-            $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $source, $delims, $this->walk($nodes, 2));
+            $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $bind, $source, $delims, $this->walk($nodes, 2));
         }
 
         return sprintf($this->prepare(self::SECTION_CALL, $level), $id, $key, $method, $id);
@@ -260,7 +278,7 @@ class Mustache_Compiler
             $value = $this->mustache
                 ->loadLambda((string) call_user_func($value))
                 ->renderInternal($context, $indent);
-        }
+        }%s
         $buffer .= %s%s;
     ';
 
@@ -275,11 +293,63 @@ class Mustache_Compiler
      */
     private function variable($id, $escape, $level)
     {
+        $filters = '';
+
+        if (isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS])) {
+            list($id, $filters) = $this->getFilters($id, $level);
+        }
+
         $method = $this->getFindMethod($id);
         $id     = ($method !== 'last') ? var_export($id, true) : '';
         $value  = $escape ? $this->getEscape() : '$value';
 
-        return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $this->flushIndent(), $value);
+        return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $filters, $this->flushIndent(), $value);
+    }
+
+    /**
+     * Generate Mustache Template variable filtering PHP source.
+     *
+     * @param string $id    Variable name
+     * @param int    $level
+     *
+     * @return string Generated variable filtering PHP source
+     */
+    private function getFilters($id, $level)
+    {
+        $filters = array_map('trim', explode('|', $id));
+        $id      = array_shift($filters);
+
+        return array($id, $this->getFilter($filters, $level));
+    }
+
+    const FILTER = '
+        $filter = $context->%s(%s);
+        if (is_string($filter) || !is_callable($filter)) {
+            throw new UnexpectedValueException(%s);
+        }
+        $value = call_user_func($filter, $value);%s
+    ';
+
+    /**
+     * Generate PHP source for a single filter.
+     *
+     * @param array $filters
+     * @param int   $level
+     *
+     * @return string Generated filter PHP source
+     */
+    private function getFilter(array $filters, $level)
+    {
+        if (empty($filters)) {
+            return '';
+        }
+
+        $name   = array_shift($filters);
+        $method = $this->getFindMethod($name);
+        $filter = ($method !== 'last') ? var_export($name, true) : '';
+        $msg    = var_export(sprintf('Filter not found: %s', $name), true);
+
+        return sprintf($this->prepare(self::FILTER, $level), $method, $filter, $msg, $this->getFilter($filters, $level));
     }
 
     const LINE = '$buffer .= "\n";';
