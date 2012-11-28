@@ -55,8 +55,12 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
             throw new RuntimeException('FilesystemLoader baseDir must be a directory: '.$baseDir);
         }
 
-        if (isset($options['extension'])) {
-            $this->extension = '.' . ltrim($options['extension'], '.');
+        if (array_key_exists('extension', $options)) {
+            if (empty($options['extension'])) {
+                $this->extension = '';
+            } else {
+                $this->extension = '.' . ltrim($options['extension'], '.');
+            }
         }
     }
 
