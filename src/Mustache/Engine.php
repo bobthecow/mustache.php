@@ -47,13 +47,17 @@ class Mustache_Engine
      * Passing an $options array allows overriding certain Mustache options during instantiation:
      *
      *     $options = array(
-     *         // The class prefix for compiled templates. Defaults to '__Mustache_'
+     *         // The class prefix for compiled templates. Defaults to '__Mustache_'.
      *         'template_class_prefix' => '__MyTemplates_',
      *
      *         // A cache directory for compiled templates. Mustache will not cache templates unless this is set
      *         'cache' => dirname(__FILE__).'/tmp/cache/mustache',
      *
-     *         // A Mustache template loader instance. Uses a StringLoader if not specified
+     *         // Override default permissions for cache files. Defaults to using the system-defined umask. It is
+     *         // *strongly* recommended that you configure your umask properly rather than overriding permissions here.
+     *         'cache_file_mode' => 0666,
+     *
+     *         // A Mustache template loader instance. Uses a StringLoader if not specified.
      *         'loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/views'),
      *
      *         // A Mustache loader instance for partials.
@@ -67,20 +71,16 @@ class Mustache_Engine
      *         // sections), or any other valid Mustache context value. They will be prepended to the context stack,
      *         // so they will be available in any template loaded by this Mustache instance.
      *         'helpers' => array('i18n' => function($text) {
-     *              // do something translatey here...
-     *          }),
+     *             // do something translatey here...
+     *         }),
      *
      *         // An 'escape' callback, responsible for escaping double-mustache variables.
      *         'escape' => function($value) {
      *             return htmlspecialchars($buffer, ENT_COMPAT, 'UTF-8');
      *         },
      *
-     *         // Character set for `htmlspecialchars`. Defaults to 'UTF-8'
+     *         // Character set for `htmlspecialchars`. Defaults to 'UTF-8'. Use 'UTF-8'.
      *         'charset' => 'ISO-8859-1',
-     *
-     *         // Override default permissions for cache files. Defaults to using the system-defined umask. It is
-     *         // *strongly* recommended that you configure your umask properly rather than overriding permissions here.
-     *         'cache_file_mode' => 0666,
      *     );
      *
      * @param array $options (default: array())
@@ -93,6 +93,10 @@ class Mustache_Engine
 
         if (isset($options['cache'])) {
             $this->cache = $options['cache'];
+        }
+
+        if (isset($options['cache_file_mode'])) {
+            $this->cacheFileMode = $options['cache_file_mode'];
         }
 
         if (isset($options['loader'])) {
@@ -121,10 +125,6 @@ class Mustache_Engine
 
         if (isset($options['charset'])) {
             $this->charset = $options['charset'];
-        }
-
-        if (isset($options['cache_file_mode'])) {
-            $this->cacheFileMode = $options['cache_file_mode'];
         }
     }
 
