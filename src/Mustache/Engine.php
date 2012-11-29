@@ -39,7 +39,7 @@ class Mustache_Engine
     private $helpers;
     private $escape;
     private $charset = 'UTF-8';
-    private $cacheFilePerm = 0644;
+    private $cacheFileMode = null;
 
     /**
      * Mustache class constructor.
@@ -75,11 +75,12 @@ class Mustache_Engine
      *             return htmlspecialchars($buffer, ENT_COMPAT, 'UTF-8');
      *         },
      *
-     *         // character set for `htmlspecialchars`. Defaults to 'UTF-8'
+     *         // Character set for `htmlspecialchars`. Defaults to 'UTF-8'
      *         'charset' => 'ISO-8859-1',
      *
-     *         // permissions for cache files. Defaults to 0644
-     *         'cache_file_perm' => 0666,
+     *         // Override default permissions for cache files. Defaults to using the system-defined umask. It is
+     *         // *strongly* recommended that you configure your umask properly rather than overriding permissions here.
+     *         'cache_file_mode' => 0666,
      *     );
      *
      * @param array $options (default: array())
@@ -122,8 +123,8 @@ class Mustache_Engine
             $this->charset = $options['charset'];
         }
 
-        if (isset($options['cache_file_perm'])) {
-            $this->cacheFilePerm = $options['cache_file_perm'];
+        if (isset($options['cache_file_mode'])) {
+            $this->cacheFileMode = $options['cache_file_mode'];
         }
     }
 
@@ -572,7 +573,7 @@ class Mustache_Engine
     /**
      * Helper method to dump a generated Mustache Template subclass to the file cache.
      *
-     * @throws RuntimeException if unable to write to $fileName.
+     * @throws RuntimeException if unable to create the cache directory or write $fileName
      *
      * @param string $fileName
      * @param string $source
@@ -581,14 +582,19 @@ class Mustache_Engine
      */
     private function writeCacheFile($fileName, $source)
     {
-        if (!is_dir(dirname($fileName))) {
-            mkdir(dirname($fileName), 0777, true);
+        $dirName = dirname($fileName);
+        if (!is_dir($dirName)) {
+            @mkdir($dirName, 0777, true);
+            if (!is_dir($dirName)) {
+                throw new RuntimeException(sprintf('Failed to create cache directory "%s".', $dirName));
+            }
         }
 
-        $tempFile = tempnam(dirname($fileName), basename($fileName));
+        $tempFile = tempnam($dirName, basename($fileName));
         if (false !== @file_put_contents($tempFile, $source)) {
             if (@rename($tempFile, $fileName)) {
-                chmod($fileName, $this->cacheFilePerm);
+                $mode = isset($this->cacheFileMode) ? $this->cacheFileMode : (0666 & ~umask());
+                @chmod($fileName, $mode);
 
                 return;
             }
