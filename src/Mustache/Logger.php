@@ -10,66 +10,126 @@
  */
 
 /**
- * The Mustache Logger interface.
+ * Describes a Mustache logger instance
+ *
+ * This is identical to the Psr\Log\LoggerInterface.
+ *
+ * The message MUST be a string or object implementing __toString().
+ *
+ * The message MAY contain placeholders in the form: %foo% where foo
+ * will be replaced by the context data in key "foo".
+ *
+ * The context array can contain arbitrary data, the only assumption that
+ * can be made by implementors is that if an Exception instance is given
+ * to produce a stack trace, it MUST be in a key named "exception".
+ *
+ * See https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
+ * for the full interface specification.
  */
 interface Mustache_Logger
 {
     /**
-     * Detailed debug information
+     * Psr\Log compatible log levels
      */
-    const DEBUG = 100;
+    const EMERGENCY = 'emergency';
+    const ALERT     = 'alert';
+    const CRITICAL  = 'critical';
+    const ERROR     = 'error';
+    const WARNING   = 'warning';
+    const NOTICE    = 'notice';
+    const INFO      = 'info';
+    const DEBUG     = 'debug';
 
     /**
-     * Interesting events
+     * System is unusable.
      *
-     * Examples: User logs in, SQL logs.
+     * @param string $message
+     * @param array $context
+     * @return null
      */
-    const INFO = 200;
+    public function emergency($message, array $context = array());
 
     /**
-     * Uncommon events
-     */
-    const NOTICE = 250;
-
-    /**
-     * Exceptional occurrences that are not errors
+     * Action must be taken immediately.
      *
-     * Examples: Use of deprecated APIs, poor use of an API,
-     * undesirable things that are not necessarily wrong.
+     * Example: Entire website down, database unavailable, etc. This should
+     * trigger the SMS alerts and wake you up.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
      */
-    const WARNING = 300;
+    public function alert($message, array $context = array());
 
     /**
-     * Runtime errors
-     */
-    const ERROR = 400;
-
-    /**
-     * Critical conditions
+     * Critical conditions.
      *
      * Example: Application component unavailable, unexpected exception.
-     */
-    const CRITICAL = 500;
-
-    /**
-     * Action must be taken immediately
      *
-     * Example: Entire website down, database unavailable, etc.
-     * This should trigger the SMS alerts and wake you up.
+     * @param string $message
+     * @param array $context
+     * @return null
      */
-    const ALERT = 550;
+    public function critical($message, array $context = array());
 
     /**
-     * Urgent alert.
-     */
-    const EMERGENCY = 600;
-
-    /**
-     * Adds a log record.
+     * Runtime errors that do not require immediate action but should typically
+     * be logged and monitored.
      *
-     * @param  integer $level   The logging level
-     * @param  string  $message The log message
-     * @param  array   $context The log context
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
+    public function error($message, array $context = array());
+
+    /**
+     * Exceptional occurrences that are not errors.
+     *
+     * Example: Use of deprecated APIs, poor use of an API, undesirable things
+     * that are not necessarily wrong.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
+    public function warning($message, array $context = array());
+
+    /**
+     * Normal but significant events.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
+    public function notice($message, array $context = array());
+
+    /**
+     * Interesting events.
+     *
+     * Example: User logs in, SQL logs.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
+    public function info($message, array $context = array());
+
+    /**
+     * Detailed debug information.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
+    public function debug($message, array $context = array());
+
+    /**
+     * Logs with an arbitrary level.
+     *
+     * @param mixed $level
+     * @param string $message
+     * @param array $context
+     * @return null
      */
     public function log($level, $message, array $context = array());
 }

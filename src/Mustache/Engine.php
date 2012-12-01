@@ -341,17 +341,21 @@ class Mustache_Engine
     /**
      * Set the Mustache Logger instance.
      *
-     * @param Mustache_Logger $logger
+     * @param Mustache_Logger|Psr\Log\LoggerInterface $logger
      */
-    public function setLogger(Mustache_Logger $logger)
+    public function setLogger($logger = null)
     {
+        if ($logger !== null && !($logger instanceof Mustache_Logger || is_a($logger, 'Psr\\Log\\LoggerInterface'))) {
+            throw new InvalidArgumentException('Expected an instance of Mustache_Logger or Psr\\Log\\LoggerInterface.');
+        }
+
         $this->logger = $logger;
     }
 
     /**
      * Get the current Mustache Logger instance.
      *
-     * @return Mustache_Logger
+     * @return Mustache_Logger|Psr\Log\LoggerInterface
      */
     public function getLogger()
     {
