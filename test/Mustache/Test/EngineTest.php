@@ -27,11 +27,14 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
 
     public function testConstructor()
     {
+        $logger         = new Mustache_Logger_StreamLogger(tmpfile());
         $loader         = new Mustache_Loader_StringLoader;
         $partialsLoader = new Mustache_Loader_ArrayLoader;
         $mustache       = new Mustache_Engine(array(
             'template_class_prefix' => '__whot__',
-            'cache' => self::$tempDir,
+            'cache'  => self::$tempDir,
+            'cache_file_mode' => 777,
+            'logger' => $logger,
             'loader' => $loader,
             'partials_loader' => $partialsLoader,
             'partials' => array(
@@ -45,6 +48,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
             'charset' => 'ISO-8859-1',
         ));
 
+        $this->assertSame($logger, $mustache->getLogger());
         $this->assertSame($loader, $mustache->getLoader());
         $this->assertSame($partialsLoader, $mustache->getPartialsLoader());
         $this->assertEquals('{{ foo }}', $partialsLoader->load('foo'));
@@ -85,11 +89,16 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
 
     public function testSettingServices()
     {
+        $logger    = new Mustache_Logger_StreamLogger(tmpfile());
         $loader    = new Mustache_Loader_StringLoader;
         $tokenizer = new Mustache_Tokenizer;
         $parser    = new Mustache_Parser;
         $compiler  = new Mustache_Compiler;
         $mustache  = new Mustache_Engine;
+
+        $this->assertNotSame($logger, $mustache->getLogger());
+        $mustache->setLogger($logger);
+        $this->assertSame($logger, $mustache->getLogger());
 
         $this->assertNotSame($loader, $mustache->getLoader());
         $mustache->setLoader($loader);
@@ -222,6 +231,74 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $mustache->setHelpers('monkeymonkeymonkey');
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testSetLoggerThrowsExceptions()
+    {
+        $mustache = new Mustache_Engine;
+        $mustache->setLogger(new StdClass);
+    }
+
+    public function testPartialLoadFailLogging()
+    {
+        $name     = tempnam(sys_get_temp_dir(), 'mustache-test');
+        $mustache = new Mustache_Engine(array(
+            'logger'   => new Mustache_Logger_StreamLogger($name, Mustache_Logger::WARNING),
+            'partials' => array(
+                'foo' => 'FOO',
+                'bar' => 'BAR',
+            ),
+        ));
+
+        $result = $mustache->render('{{> foo }}{{> bar }}{{> baz }}', array());
+        $this->assertEquals('FOOBAR', $result);
+
+        $this->assertContains('WARNING: Partial not found: "baz"', file_get_contents($name));
+    }
+
+    public function testCacheWarningLogging()
+    {
+        $name     = tempnam(sys_get_temp_dir(), 'mustache-test');
+        $mustache = new Mustache_Engine(array(
+            'logger'   => new Mustache_Logger_StreamLogger($name, Mustache_Logger::WARNING)
+        ));
+
+        $result = $mustache->render('{{ foo }}', array('foo' => 'FOO'));
+        $this->assertEquals('FOO', $result);
+
+        $this->assertContains('WARNING: Template cache disabled, evaluating', file_get_contents($name));
+    }
+
+    public function testLoggingIsNotTooAnnoying()
+    {
+        $name     = tempnam(sys_get_temp_dir(), 'mustache-test');
+        $mustache = new Mustache_Engine(array(
+            'logger'   => new Mustache_Logger_StreamLogger($name)
+        ));
+
+        $result = $mustache->render('{{ foo }}{{> bar }}', array('foo' => 'FOO'));
+        $this->assertEquals('FOO', $result);
+
+        $this->assertEmpty(file_get_contents($name));
+    }
+
+    public function testVerboseLoggingIsVerbose()
+    {
+        $name     = tempnam(sys_get_temp_dir(), 'mustache-test');
+        $mustache = new Mustache_Engine(array(
+            'logger'   => new Mustache_Logger_StreamLogger($name, Mustache_Logger::DEBUG)
+        ));
+
+        $result = $mustache->render('{{ foo }}{{> bar }}', array('foo' => 'FOO'));
+        $this->assertEquals('FOO', $result);
+
+        $log = file_get_contents($name);
+
+        $this->assertContains("DEBUG: Instantiating template: ", $log);
+        $this->assertContains("WARNING: Partial not found: \"bar\"", $log);
+    }
+
     private static function rmdir($path)
     {
         $path = rtrim($path, '/').'/';
@@ -244,7 +321,8 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class MustacheStub extends Mustache_Engine {
+class MustacheStub extends Mustache_Engine
+{
     public $source;
     public $template;
     public function loadTemplate($source)

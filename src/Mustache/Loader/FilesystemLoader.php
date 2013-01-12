@@ -12,19 +12,19 @@
 /**
  * Mustache Template filesystem Loader implementation.
  *
- * An ArrayLoader instance loads Mustache Template source from the filesystem by name:
+ * A FilesystemLoader instance loads Mustache Template source from the filesystem by name:
  *
- *     $loader = new FilesystemLoader(dirname(__FILE__).'/views');
+ *     $loader = new Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/views');
  *     $tpl = $loader->load('foo'); // equivalent to `file_get_contents(dirname(__FILE__).'/views/foo.mustache');
  *
  * This is probably the most useful Mustache Loader implementation. It can be used for partials and normal Templates:
  *
  *     $m = new Mustache(array(
- *          'loader'          => new FilesystemLoader(dirname(__FILE__).'/views'),
- *          'partials_loader' => new FilesystemLoader(dirname(__FILE__).'/views/partials'),
+ *          'loader'          => new Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/views'),
+ *          'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/views/partials'),
  *     ));
  *
- * @implements Loader
+ * @implements Mustache_Loader
  */
 class Mustache_Loader_FilesystemLoader implements Mustache_Loader
 {
@@ -55,15 +55,19 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
             throw new RuntimeException('FilesystemLoader baseDir must be a directory: '.$baseDir);
         }
 
-        if (isset($options['extension'])) {
-            $this->extension = '.' . ltrim($options['extension'], '.');
+        if (array_key_exists('extension', $options)) {
+            if (empty($options['extension'])) {
+                $this->extension = '';
+            } else {
+                $this->extension = '.' . ltrim($options['extension'], '.');
+            }
         }
     }
 
     /**
      * Load a Template by name.
      *
-     *     $loader = new FilesystemLoader(dirname(__FILE__).'/views');
+     *     $loader = new Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/views');
      *     $loader->load('admin/dashboard'); // loads "./views/admin/dashboard.mustache";
      *
      * @param string $name

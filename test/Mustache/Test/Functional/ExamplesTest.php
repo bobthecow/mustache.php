@@ -116,7 +116,7 @@ class Mustache_Test_Functional_ExamplesTest extends PHPUnit_Framework_TestCase
      *
      * @param string $path
      *
-     * @return array  $partials
+     * @return array $partials
      */
     private function loadPartials($path)
     {
