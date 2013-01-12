@@ -16,7 +16,7 @@
  *
  * The message MUST be a string or object implementing __toString().
  *
- * The message MAY contain placeholders in the form: %foo% where foo
+ * The message MAY contain placeholders in the form: {foo} where foo
  * will be replaced by the context data in key "foo".
  *
  * The context array can contain arbitrary data, the only assumption that

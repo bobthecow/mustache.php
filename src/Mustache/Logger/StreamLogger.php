@@ -18,7 +18,7 @@
  *
  * Hint: Try `php://stderr` for your stream URL.
  */
-class StreamLogger implements Mustache_Logger
+class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
 {
     protected static $levels = array(
         self::DEBUG     => 100,
@@ -35,6 +35,8 @@ class StreamLogger implements Mustache_Logger
     protected $url    = null;
 
     /**
+     * @throws InvalidArgumentException if the logging level is unknown.
+     *
      * @param string  $stream Resource instance or URL
      * @param integer $level  The minimum logging level at which this handler will be triggered
      */
@@ -46,6 +48,16 @@ class StreamLogger implements Mustache_Logger
             $this->stream = $stream;
         } else {
             $this->url = $stream;
+        }
+    }
+
+    /**
+     * Close stream resources.
+     */
+    public function __destruct()
+    {
+        if (is_resource($this->stream)) {
+            fclose($this->stream);
         }
     }
 
@@ -76,119 +88,13 @@ class StreamLogger implements Mustache_Logger
     }
 
     /**
-     * System is unusable.
-     *
-     * @param string $message
-     * @param array $context
-     * @return null
-     */
-    public function emergency($message, array $context = array())
-    {
-        $this->log(self::EMERGENCY, $message, $context);
-    }
-
-    /**
-     * Action must be taken immediately.
-     *
-     * Example: Entire website down, database unavailable, etc. This should
-     * trigger the SMS alerts and wake you up.
-     *
-     * @param string $message
-     * @param array $context
-     * @return null
-     */
-    public function alert($message, array $context = array())
-    {
-        $this->log(self::ALERT, $message, $context);
-    }
-
-    /**
-     * Critical conditions.
-     *
-     * Example: Application component unavailable, unexpected exception.
-     *
-     * @param string $message
-     * @param array $context
-     * @return null
-     */
-    public function critical($message, array $context = array())
-    {
-        $this->log(self::CRITICAL, $message, $context);
-    }
-
-    /**
-     * Runtime errors that do not require immediate action but should typically
-     * be logged and monitored.
-     *
-     * @param string $message
-     * @param array $context
-     * @return null
-     */
-    public function error($message, array $context = array())
-    {
-        $this->log(self::ERROR, $message, $context);
-    }
-
-    /**
-     * Exceptional occurrences that are not errors.
-     *
-     * Example: Use of deprecated APIs, poor use of an API, undesirable things
-     * that are not necessarily wrong.
-     *
-     * @param string $message
-     * @param array $context
-     * @return null
-     */
-    public function warning($message, array $context = array())
-    {
-        $this->log(self::WARNING, $message, $context);
-    }
-
-    /**
-     * Normal but significant events.
-     *
-     * @param string $message
-     * @param array $context
-     * @return null
-     */
-    public function notice($message, array $context = array())
-    {
-        $this->log(self::NOTICE, $message, $context);
-    }
-
-    /**
-     * Interesting events.
-     *
-     * Example: User logs in, SQL logs.
-     *
-     * @param string $message
-     * @param array $context
-     * @return null
-     */
-    public function info($message, array $context = array())
-    {
-        $this->log(self::INFO, $message, $context);
-    }
-
-    /**
-     * Detailed debug information.
-     *
-     * @param string $message
-     * @param array $context
-     * @return null
-     */
-    public function debug($message, array $context = array())
-    {
-        $this->log(self::DEBUG, $message, $context);
-    }
-
-    /**
      * Logs with an arbitrary level.
+     *
+     * @throws InvalidArgumentException if the logging level is unknown.
      *
      * @param mixed $level
      * @param string $message
      * @param array $context
-     * @return null
      */
     public function log($level, $message, array $context = array())
     {
@@ -196,7 +102,7 @@ class StreamLogger implements Mustache_Logger
             throw new InvalidArgumentException('Unexpected logging level: ' . $level);
         }
 
-        if (self::$levels[$level] >= $this->level) {
+        if (self::$levels[$level] >= self::$levels[$this->level]) {
             $this->writeLog($level, $message, $context);
         }
     }
@@ -217,7 +123,9 @@ class StreamLogger implements Mustache_Logger
 
             $this->stream = fopen($this->url, 'a');
             if (!is_resource($this->stream)) {
+                // @codeCoverageIgnoreStart
                 throw new UnexpectedValueException(sprintf('The stream or file "%s" could not be opened.', $this->url));
+                // @codeCoverageIgnoreEnd
             }
         }
 
@@ -235,10 +143,6 @@ class StreamLogger implements Mustache_Logger
      */
     protected static function getLevelName($level)
     {
-        if (!array_key_exists($level, self::$levels)) {
-            throw new InvalidArgumentException('Unexpected logging level: ' . $level);
-        }
-
         return strtoupper($level);
     }
 
@@ -248,14 +152,37 @@ class StreamLogger implements Mustache_Logger
      * @param  integer $level   The logging level
      * @param  string  $message The log message
      * @param  array   $context The log context
+     *
+     * @return string
      */
     protected static function formatLine($level, $message, array $context = array())
     {
+        return sprintf(
+            "%s: %s\n",
+            self::getLevelName($level),
+            self::interpolateMessage($message, $context)
+        );
+    }
+
+    /**
+     * Interpolate context values into the message placeholders.
+     *
+     * @param  string $message
+     * @param  array  $context
+     *
+     * @return string
+     */
+    protected static function interpolateMessage($message, array $context = array())
+    {
         $message = (string) $message;
+
+        // build a replacement array with braces around the context keys
+        $replace = array();
         foreach ($context as $key => $val) {
-            $message = str_replace('%'.$key.'%', $val, $message);
+            $replace['{' . $key . '}'] = $val;
         }
 
-        return sprintf('%s: %s %s', self::getLevelName($level), (string) $message, json_encode($context));
+        // interpolate replacement values into the the message and return
+        return strtr($message, $replace);
     }
 }

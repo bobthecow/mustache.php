@@ -488,7 +488,7 @@ class Mustache_Engine
             // If the named partial cannot be found, log then return null.
             $this->log(
                 Mustache_Logger::WARNING,
-                sprintf('Partial not found: "%s"', $name),
+                'Partial not found: "{name}"',
                 array('name' => $name)
             );
         }
@@ -535,7 +535,7 @@ class Mustache_Engine
                     if (!is_file($fileName)) {
                         $this->log(
                             Mustache_Logger::DEBUG,
-                            sprintf('Writing "%s" class to template cache: "%s"', $className, $fileName),
+                            'Writing "{className}" class to template cache: "{fileName}"',
                             array('className' => $className, 'fileName' => $fileName)
                         );
 
@@ -546,7 +546,7 @@ class Mustache_Engine
                 } else {
                     $this->log(
                         Mustache_Logger::WARNING,
-                        sprintf('Template cache disabled, evaluating "%s" class at runtime', $className),
+                        'Template cache disabled, evaluating "{className}" class at runtime',
                         array('className' => $className)
                     );
 
@@ -556,7 +556,7 @@ class Mustache_Engine
 
             $this->log(
                 Mustache_Logger::DEBUG,
-                sprintf('Instantiating template: "%s"', $className),
+                'Instantiating template: "{className}"',
                 array('className' => $className)
             );
 
@@ -610,8 +610,8 @@ class Mustache_Engine
 
         $this->log(
             Mustache_Logger::INFO,
-            sprintf('Compiling template to "%s" class', $name),
-            array('name' => $name)
+            'Compiling template to "{className}" class',
+            array('className' => $name)
         );
 
         return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset);
@@ -647,7 +647,7 @@ class Mustache_Engine
         if (!is_dir($dirName)) {
             $this->log(
                 Mustache_Logger::INFO,
-                sprintf('Creating Mustache template cache directory: "%s"', $dirName),
+                'Creating Mustache template cache directory: "{dirName}"',
                 array('dirName' => $dirName)
             );
 
@@ -660,8 +660,8 @@ class Mustache_Engine
 
         $this->log(
             Mustache_Logger::DEBUG,
-            sprintf('Caching compiled template to "%s"', dirname($fileName)),
-            array('filename' => $fileName)
+            'Caching compiled template to "{fileName}"',
+            array('fileName' => $fileName)
         );
 
         $tempFile = tempnam($dirName, basename($fileName));
@@ -675,8 +675,8 @@ class Mustache_Engine
 
             $this->log(
                 Mustache_Logger::ERROR,
-                sprintf('Unable to rename Mustache temp cache file: "%s" -> "%s"', $tempFile, $fileName),
-                array('tempFile' => $tempFile, 'fileName' => $fileName)
+                'Unable to rename Mustache temp cache file: "{tempName}" -> "{fileName}"',
+                array('tempName' => $tempFile, 'fileName' => $fileName)
             );
         }
 
