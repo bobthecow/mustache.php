@@ -83,7 +83,9 @@ class Mustache_Engine
      *         // Character set for `htmlspecialchars`. Defaults to 'UTF-8'. Use 'UTF-8'.
      *         'charset' => 'ISO-8859-1',
      *
-     *         // A Mustache Logger instance. No logging will occur unless this is set.
+     *         // A Mustache Logger instance. No logging will occur unless this is set. Using a PSR-3 compatible
+     *         // logging library -- such as Monolog -- is highly recommended. A simple stream logger implementation is
+     *         // available as well:
      *         'logger' => new Mustache_StreamLogger('php://stderr'),
      *     );
      *
