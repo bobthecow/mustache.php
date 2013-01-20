@@ -108,7 +108,7 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getBadParseTrees
-     * @expectedException LogicException
+     * @expectedException Mustache_Exception_SyntaxException
      */
     public function testParserThrowsExceptions($tokens)
     {

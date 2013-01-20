@@ -42,7 +42,7 @@ class Mustache_Test_Loader_ArrayLoaderTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Mustache_Exception_UnknownTemplateException
      */
     public function testMissingTemplatesThrowExceptions()
     {

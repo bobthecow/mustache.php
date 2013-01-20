@@ -32,12 +32,12 @@ class Mustache_Parser
     /**
      * Helper method for recursively building a parse tree.
      *
+     * @throws Mustache_Exception_SyntaxException when nesting errors or mismatched section tags are encountered.
+     *
      * @param ArrayIterator $tokens Stream of Mustache tokens
      * @param array         $parent Parent token (default: null)
      *
      * @return array Mustache Token parse tree
-     *
-     * @throws LogicException when nesting errors or mismatched section tags are encountered.
      */
     private function buildTree(ArrayIterator $tokens, array $parent = null)
     {
@@ -58,11 +58,13 @@ class Mustache_Parser
 
                     case Mustache_Tokenizer::T_END_SECTION:
                         if (!isset($parent)) {
-                            throw new LogicException('Unexpected closing tag: /'. $token[Mustache_Tokenizer::NAME]);
+                            $msg = sprintf('Unexpected closing tag: /%s', $token[Mustache_Tokenizer::NAME]);
+                            throw new Mustache_Exception_SyntaxException($msg, $token);
                         }
 
                         if ($token[Mustache_Tokenizer::NAME] !== $parent[Mustache_Tokenizer::NAME]) {
-                            throw new LogicException('Nesting error: ' . $parent[Mustache_Tokenizer::NAME] . ' vs. ' . $token[Mustache_Tokenizer::NAME]);
+                            $msg = sprintf('Nesting error: %s vs. %s', $parent[Mustache_Tokenizer::NAME], $token[Mustache_Tokenizer::NAME]);
+                            throw new Mustache_Exception_SyntaxException($msg, $token);
                         }
 
                         $parent[Mustache_Tokenizer::END]   = $token[Mustache_Tokenizer::INDEX];
@@ -80,7 +82,8 @@ class Mustache_Parser
         } while ($tokens->valid());
 
         if (isset($parent)) {
-            throw new LogicException('Missing closing tag: ' . $parent[Mustache_Tokenizer::NAME]);
+            $msg = sprintf('Missing closing tag: %s', $parent[Mustache_Tokenizer::NAME]);
+            throw new Mustache_Exception_SyntaxException($msg, $parent);
         }
 
         return $nodes;

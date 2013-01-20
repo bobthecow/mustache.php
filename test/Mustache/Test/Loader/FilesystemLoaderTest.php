@@ -44,7 +44,7 @@ class Mustache_Test_Loader_FilesystemLoaderTest extends PHPUnit_Framework_TestCa
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException Mustache_Exception_RuntimeException
      */
     public function testMissingBaseDirThrowsException()
     {
@@ -52,7 +52,7 @@ class Mustache_Test_Loader_FilesystemLoaderTest extends PHPUnit_Framework_TestCa
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Mustache_Exception_UnknownTemplateException
      */
     public function testMissingTemplateThrowsException()
     {

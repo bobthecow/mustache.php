@@ -141,7 +141,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Mustache_Exception_InvalidArgumentException
      * @dataProvider getBadEscapers
      */
     public function testNonCallableEscapeThrowsException($escape)
@@ -158,7 +158,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException Mustache_Exception_RuntimeException
      */
     public function testImmutablePartialsLoadersThrowException()
     {
@@ -223,7 +223,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Mustache_Exception_InvalidArgumentException
      */
     public function testSetHelpersThrowsExceptions()
     {
@@ -232,7 +232,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Mustache_Exception_InvalidArgumentException
      */
     public function testSetLoggerThrowsExceptions()
     {

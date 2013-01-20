@@ -50,7 +50,7 @@ class Mustache_Compiler
     /**
      * Helper function for walking the Mustache token parse tree.
      *
-     * @throws InvalidArgumentException upon encountering unknown token types.
+     * @throws Mustache_Exception_SyntaxException upon encountering unknown token types.
      *
      * @param array $tree  Parse tree of Mustache tokens
      * @param int   $level (default: 0)
@@ -113,7 +113,7 @@ class Mustache_Compiler
                     break;
 
                 default:
-                    throw new InvalidArgumentException('Unknown node type: '.json_encode($node));
+                    throw new Mustache_Exception_SyntaxException(sprintf('Unknown token type: %s', $node[Mustache_Tokenizer::TYPE]), $node);
             }
         }
 
@@ -316,7 +316,7 @@ class Mustache_Compiler
     const FILTER = '
         $filter = $context->%s(%s);
         if (is_string($filter) || !is_callable($filter)) {
-            throw new UnexpectedValueException(%s);
+            throw new Mustache_Exception_UnknownFilterException(%s);
         }
         $value = call_user_func($filter, $value);%s
     ';
@@ -338,7 +338,7 @@ class Mustache_Compiler
         $name   = array_shift($filters);
         $method = $this->getFindMethod($name);
         $filter = ($method !== 'last') ? var_export($name, true) : '';
-        $msg    = var_export(sprintf('Filter not found: %s', $name), true);
+        $msg    = var_export($name, true);
 
         return sprintf($this->prepare(self::FILTER, $level), $method, $filter, $msg, $this->getFilter($filters, $level));
     }
