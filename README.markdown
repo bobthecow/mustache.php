@@ -5,6 +5,7 @@ A [Mustache](http://mustache.github.com/) implementation in PHP.
 
 [![Build Status](https://secure.travis-ci.org/bobthecow/mustache.php.png?branch=dev)](http://travis-ci.org/bobthecow/mustache.php)
 
+
 Usage
 -----
 
@@ -55,9 +56,14 @@ echo $m->render($template, $chris);
 ```
 
 
+And That's Not All!
+-------------------
+
+Read [the Mustache.php documentation](https://github.com/bobthecow/mustache.php/wiki/Home) for more information.
+
+
 See Also
 --------
 
- * [Mustache.php wiki](https://github.com/bobthecow/mustache.php/wiki/Home).
  * [Readme for the Ruby Mustache implementation](http://github.com/defunkt/mustache/blob/master/README.md).
  * [mustache(5)](http://mustache.github.com/mustache.5.html) man page.
