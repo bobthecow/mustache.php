@@ -18,6 +18,8 @@ interface Mustache_Loader
     /**
      * Load a Template by name.
      *
+     * @throws Mustache_Exception_UnknownTemplateException If a template file is not found.
+     *
      * @param string $name
      *
      * @return string Mustache Template source
