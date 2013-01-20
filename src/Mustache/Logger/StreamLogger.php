@@ -177,7 +177,9 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      */
     protected static function interpolateMessage($message, array $context = array())
     {
-        $message = (string) $message;
+        if (strpos($message, '{') === false) {
+            return $message;
+        }
 
         // build a replacement array with braces around the context keys
         $replace = array();
