@@ -34,7 +34,7 @@ class Mustache_Test_Logger_StreamLoggerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException LogicException
+     * @expectedException Mustache_Exception_LogicException
      */
     public function testPrematurelyClosedStreamThrowsException()
     {
@@ -187,7 +187,7 @@ class Mustache_Test_Logger_StreamLoggerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Mustache_Exception_InvalidArgumentException
      */
     public function testThrowsInvalidArgumentExceptionWhenSettingUnknownLevels()
     {
@@ -196,7 +196,7 @@ class Mustache_Test_Logger_StreamLoggerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Mustache_Exception_InvalidArgumentException
      */
     public function testThrowsInvalidArgumentExceptionWhenLoggingUnknownLevels()
     {

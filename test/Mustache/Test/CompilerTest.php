@@ -85,9 +85,9 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Mustache_Exception_SyntaxException
      */
-    public function testCompilerThrowsUnknownNodeTypeException()
+    public function testCompilerThrowsSyntaxException()
     {
         $compiler = new Mustache_Compiler;
         $compiler->compile('', array(array(Mustache_Tokenizer::TYPE => 'invalid')), 'SomeClass');
