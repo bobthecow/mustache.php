@@ -23,9 +23,6 @@
  *
  * The ArrayLoader is used internally as a partials loader by Mustache_Engine instance when an array of partials
  * is set. It can also be used as a quick-and-dirty Template loader.
- *
- * @implements Loader
- * @implements MutableLoader
  */
 class Mustache_Loader_ArrayLoader implements Mustache_Loader, Mustache_Loader_MutableLoader
 {

@@ -22,8 +22,6 @@
  *     $m = new Mustache;
  *     $tpl = $m->loadTemplate('{{ foo }}');
  *     echo $tpl->render(array('foo' => 'bar')); // "bar"
- *
- * @implements Loader
  */
 class Mustache_Loader_StringLoader implements Mustache_Loader
 {

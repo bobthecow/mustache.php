@@ -23,8 +23,6 @@
  *          'loader'          => new Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/views'),
  *          'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/views/partials'),
  *     ));
- *
- * @implements Mustache_Loader
  */
 class Mustache_Loader_FilesystemLoader implements Mustache_Loader
 {
