@@ -86,7 +86,7 @@ class Mustache_Engine
      *         // A Mustache Logger instance. No logging will occur unless this is set. Using a PSR-3 compatible
      *         // logging library -- such as Monolog -- is highly recommended. A simple stream logger implementation is
      *         // available as well:
-     *         'logger' => new Mustache_StreamLogger('php://stderr'),
+     *         'logger' => new Mustache_Logger_StreamLogger('php://stderr'),
      *     );
      *
      * @param array $options (default: array())
