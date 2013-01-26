@@ -147,4 +147,26 @@ abstract class Mustache_Template
 
         return $stack;
     }
+
+    /**
+     * Resolve a context value.
+     *
+     * Invoke the value if it is callable, otherwise return the value.
+     *
+     * @param  mixed            $value
+     * @param  Mustache_Context $context
+     * @param  string           $indent
+     *
+     * @return string
+     */
+    protected function resolveValue($value, Mustache_Context $context, $indent = '')
+    {
+        if (!is_string($value) && is_callable($value)) {
+            return $this->mustache
+                ->loadLambda((string) call_user_func($value))
+                ->renderInternal($context, $indent);
+        }
+
+        return $value;
+    }
 }

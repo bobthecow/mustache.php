@@ -70,9 +70,9 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
                     "\nclass Monkey extends Mustache_Template",
                     '$buffer .= $indent . \'foo\'',
                     '$buffer .= "\n"',
-                    '$value = $context->find(\'name\');',
+                    '$value = $this->resolveValue($context->find(\'name\'), $context, $indent);',
                     '$buffer .= htmlspecialchars($value, ENT_COMPAT, \'UTF-8\');',
-                    '$value = $context->last();',
+                    '$value = $this->resolveValue($context->last(), $context, $indent);',
                     '$buffer .= \'\\\'bar\\\'\';',
                     'return $buffer;',
                 )
