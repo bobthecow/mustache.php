@@ -141,6 +141,24 @@ class Mustache_Compiler
         %s
         }';
 
+    const KLASS_NO_LAMBDAS = '<?php
+
+        class %s extends Mustache_Template
+        {
+            public function renderInternal(Mustache_Context $context, $indent = \'\', $escape = false)
+            {
+                $buffer = \'\';
+        %s
+
+                if ($escape) {
+                    return %s;
+                } else {
+                    return $buffer;
+                }
+            }
+        %s
+        }';
+
     /**
      * Generate Mustache Template class PHP source.
      *
@@ -153,8 +171,9 @@ class Mustache_Compiler
     {
         $code     = $this->walk($tree);
         $sections = implode("\n", $this->sections);
+        $klass    = empty($this->sections) ? self::KLASS_NO_LAMBDAS : self::KLASS;
 
-        return sprintf($this->prepare(self::KLASS, 0, false), $name, $code, $this->getEscape('$buffer'), $sections);
+        return sprintf($this->prepare($klass, 0, false), $name, $code, $this->getEscape('$buffer'), $sections);
     }
 
     const SECTION_CALL = '
