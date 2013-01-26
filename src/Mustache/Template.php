@@ -67,13 +67,14 @@ abstract class Mustache_Template
      *
      * This is where the magic happens :)
      *
+     * NOTE: This method is not part of the Mustache.php public API.
+     *
      * @param Mustache_Context $context
      * @param string           $indent  (default: '')
-     * @param bool             $escape  (default: false)
      *
      * @return string Rendered template
      */
-    abstract public function renderInternal(Mustache_Context $context, $indent = '', $escape = false);
+    abstract public function renderInternal(Mustache_Context $context, $indent = '');
 
     /**
      * Tests whether a value should be iterated over (e.g. in a section context).

@@ -33,13 +33,11 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
         return array(
             array('', array(), 'Banana', false, 'ISO-8859-1', array(
                 "\nclass Banana extends Mustache_Template",
-                'return htmlspecialchars($buffer, ENT_COMPAT, \'ISO-8859-1\');',
                 'return $buffer;',
             )),
 
             array('', array($this->createTextToken('TEXT')), 'Monkey', false, 'UTF-8', array(
                 "\nclass Monkey extends Mustache_Template",
-                'return htmlspecialchars($buffer, ENT_COMPAT, \'UTF-8\');',
                 '$buffer .= $indent . \'TEXT\';',
                 'return $buffer;',
             )),
@@ -47,7 +45,6 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
             array('', array($this->createTextToken('TEXT')), 'Monkey', true, 'ISO-8859-1', array(
                 "\nclass Monkey extends Mustache_Template",
                 '$buffer .= $indent . \'TEXT\';',
-                'return call_user_func($this->mustache->getEscape(), $buffer);',
                 'return $buffer;',
             )),
 
@@ -77,7 +74,6 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
                     '$buffer .= htmlspecialchars($value, ENT_COMPAT, \'UTF-8\');',
                     '$value = $context->last();',
                     '$buffer .= \'\\\'bar\\\'\';',
-                    'return htmlspecialchars($buffer, ENT_COMPAT, \'UTF-8\');',
                     'return $buffer;',
                 )
             ),

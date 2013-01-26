@@ -126,17 +126,13 @@ class Mustache_Compiler
         {
             private $lambdaHelper;
 
-            public function renderInternal(Mustache_Context $context, $indent = \'\', $escape = false)
+            public function renderInternal(Mustache_Context $context, $indent = \'\')
             {
                 $this->lambdaHelper = new Mustache_LambdaHelper($this->mustache, $context);
                 $buffer = \'\';
         %s
 
-                if ($escape) {
-                    return %s;
-                } else {
-                    return $buffer;
-                }
+                return $buffer;
             }
         %s
         }';
@@ -145,16 +141,12 @@ class Mustache_Compiler
 
         class %s extends Mustache_Template
         {
-            public function renderInternal(Mustache_Context $context, $indent = \'\', $escape = false)
+            public function renderInternal(Mustache_Context $context, $indent = \'\')
             {
                 $buffer = \'\';
         %s
 
-                if ($escape) {
-                    return %s;
-                } else {
-                    return $buffer;
-                }
+                return $buffer;
             }
         %s
         }';
@@ -173,7 +165,7 @@ class Mustache_Compiler
         $sections = implode("\n", $this->sections);
         $klass    = empty($this->sections) ? self::KLASS_NO_LAMBDAS : self::KLASS;
 
-        return sprintf($this->prepare($klass, 0, false), $name, $code, $this->getEscape('$buffer'), $sections);
+        return sprintf($this->prepare($klass, 0, false), $name, $code, $sections);
     }
 
     const SECTION_CALL = '
