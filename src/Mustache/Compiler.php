@@ -148,7 +148,6 @@ class Mustache_Compiler
 
                 return $buffer;
             }
-        %s
         }';
 
     /**
@@ -165,7 +164,7 @@ class Mustache_Compiler
         $sections = implode("\n", $this->sections);
         $klass    = empty($this->sections) ? self::KLASS_NO_LAMBDAS : self::KLASS;
 
-        return sprintf($this->prepare($klass, 0, false), $name, $code, $sections);
+        return sprintf($this->prepare($klass, 0, false, true), $name, $code, $sections);
     }
 
     const SECTION_CALL = '
@@ -174,7 +173,8 @@ class Mustache_Compiler
     ';
 
     const SECTION = '
-        private function section%s(Mustache_Context $context, $indent, $value) {
+        private function section%s(Mustache_Context $context, $indent, $value)
+        {
             $buffer = \'\';
             if (!is_string($value) && is_callable($value)) {
                 $source = %s;
@@ -377,14 +377,18 @@ class Mustache_Compiler
      * @param string  $text
      * @param int     $bonus          Additional indent level (default: 0)
      * @param boolean $prependNewline Prepend a newline to the snippet? (default: true)
+     * @param boolean $appendNewline  Append a newline to the snippet? (default: false)
      *
      * @return string PHP source code snippet
      */
-    private function prepare($text, $bonus = 0, $prependNewline = true)
+    private function prepare($text, $bonus = 0, $prependNewline = true, $appendNewline = false)
     {
         $text = ($prependNewline ? "\n" : '').trim($text);
         if ($prependNewline) {
             $bonus++;
+        }
+        if ($appendNewline) {
+            $text .= "\n";
         }
 
         return preg_replace("/\n( {8})?/", "\n".str_repeat(" ", $bonus * 4), $text);
