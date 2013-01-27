@@ -178,7 +178,8 @@ class Mustache_Compiler
 
     const SECTION_CALL = '
         // %s section
-        $buffer .= $this->section%s($context, $indent, $context->%s(%s));
+        $value = $context->%s(%s);%s
+        $buffer .= $this->section%s($context, $indent, $value);
     ';
 
     const SECTION = '
@@ -216,6 +217,12 @@ class Mustache_Compiler
      */
     private function section($nodes, $id, $start, $end, $otag, $ctag, $level)
     {
+        $filters = '';
+
+        if (isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS])) {
+            list($id, $filters) = $this->getFilters($id, $level);
+        }
+
         $method   = $this->getFindMethod($id);
         $id       = var_export($id, true);
         $source   = var_export(substr($this->source, $start, $end - $start), true);
@@ -233,12 +240,12 @@ class Mustache_Compiler
             $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $callable, $source, $delims, $this->walk($nodes, 2));
         }
 
-        return sprintf($this->prepare(self::SECTION_CALL, $level), $id, $key, $method, $id);
+        return sprintf($this->prepare(self::SECTION_CALL, $level), $id, $method, $id, $filters, $key);
     }
 
     const INVERTED_SECTION = '
         // %s inverted section
-        $value = $context->%s(%s);
+        $value = $context->%s(%s);%s
         if (empty($value)) {
             %s
         }';
@@ -254,10 +261,16 @@ class Mustache_Compiler
      */
     private function invertedSection($nodes, $id, $level)
     {
+        $filters = '';
+
+        if (isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS])) {
+            list($id, $filters) = $this->getFilters($id, $level);
+        }
+
         $method = $this->getFindMethod($id);
         $id     = var_export($id, true);
 
-        return sprintf($this->prepare(self::INVERTED_SECTION, $level), $id, $method, $id, $this->walk($nodes, $level));
+        return sprintf($this->prepare(self::INVERTED_SECTION, $level), $id, $method, $id, $filters, $this->walk($nodes, $level));
     }
 
     const PARTIAL = '
