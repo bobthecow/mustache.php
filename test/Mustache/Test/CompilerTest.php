@@ -42,11 +42,43 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
                 'return $buffer;',
             )),
 
-            array('', array($this->createTextToken('TEXT')), 'Monkey', true, 'ISO-8859-1', array(
-                "\nclass Monkey extends Mustache_Template",
-                '$buffer .= $indent . \'TEXT\';',
-                'return $buffer;',
-            )),
+            array(
+                '',
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME => 'name',
+                    )
+                ),
+                'Monkey',
+                true,
+                'ISO-8859-1',
+                array(
+                    "\nclass Monkey extends Mustache_Template",
+                    '$value = $this->resolveValue($context->find(\'name\'), $context, $indent);',
+                    '$buffer .= $indent . call_user_func($this->mustache->getEscape(), $value);',
+                    'return $buffer;',
+                )
+            ),
+
+            array(
+                '',
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME => 'name',
+                    )
+                ),
+                'Monkey',
+                false,
+                'ISO-8859-1',
+                array(
+                    "\nclass Monkey extends Mustache_Template",
+                    '$value = $this->resolveValue($context->find(\'name\'), $context, $indent);',
+                    '$buffer .= $indent . htmlspecialchars($value, ENT_COMPAT, \'ISO-8859-1\');',
+                    'return $buffer;',
+                )
+            ),
 
             array(
                 '',
