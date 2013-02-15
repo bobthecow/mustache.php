@@ -113,8 +113,6 @@ class Mustache_Engine
 
         if (isset($options['partials_loader'])) {
             $this->setPartialsLoader($options['partials_loader']);
-        } else if (isset($options['loader'])) {
-            $this->setPartialsLoader($options['loader']);
         }
 
         if (isset($options['partials'])) {
@@ -228,7 +226,7 @@ class Mustache_Engine
     public function getPartialsLoader()
     {
         if (!isset($this->partialsLoader)) {
-            $this->partialsLoader = new Mustache_Loader_ArrayLoader;
+            $this->partialsLoader = $this->loader;
         }
 
         return $this->partialsLoader;
@@ -243,12 +241,15 @@ class Mustache_Engine
      */
     public function setPartials(array $partials = array())
     {
-        $loader = $this->getPartialsLoader();
-        if (!$loader instanceof Mustache_Loader_MutableLoader) {
-            throw new Mustache_Exception_RuntimeException('Unable to set partials on an immutable Mustache Loader instance');
+        if (isset($this->partialsLoader)) {
+            if (!$this->partialsLoader instanceof Mustache_Loader_MutableLoader) {
+                throw new Mustache_Exception_RuntimeException('Unable to set partials on an immutable Mustache Loader instance');
+            }
+        } else {
+            $this->partialsLoader = new Mustache_Loader_ArrayLoader;
         }
 
-        $loader->setTemplates($partials);
+        $this->partialsLoader->setTemplates($partials);
     }
 
     /**
