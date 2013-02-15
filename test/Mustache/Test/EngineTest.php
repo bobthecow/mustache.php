@@ -104,7 +104,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $mustache->setLoader($loader);
         $this->assertSame($loader, $mustache->getLoader());
 
-        $this->assertNotSame($loader, $mustache->getPartialsLoader());
+        $this->assertSame($loader, $mustache->getPartialsLoader());
         $mustache->setPartialsLoader($loader);
         $this->assertSame($loader, $mustache->getPartialsLoader());
 
