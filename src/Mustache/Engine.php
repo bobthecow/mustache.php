@@ -113,6 +113,8 @@ class Mustache_Engine
 
         if (isset($options['partials_loader'])) {
             $this->setPartialsLoader($options['partials_loader']);
+        } else if (isset($options['loader'])) {
+            $this->setPartialsLoader($options['loader']);
         }
 
         if (isset($options['partials'])) {
