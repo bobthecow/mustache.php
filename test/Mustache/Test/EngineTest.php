@@ -278,7 +278,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         ));
 
         $result = $mustache->render('{{ foo }}{{> bar }}', array('foo' => 'FOO'));
-        $this->assertEquals('FOO', $result);
+        $this->assertEquals('FOObar', $result);
 
         $this->assertEmpty(file_get_contents($name));
     }
@@ -291,12 +291,11 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         ));
 
         $result = $mustache->render('{{ foo }}{{> bar }}', array('foo' => 'FOO'));
-        $this->assertEquals('FOO', $result);
+        $this->assertEquals('FOObar', $result);
 
         $log = file_get_contents($name);
 
         $this->assertContains("DEBUG: Instantiating template: ", $log);
-        $this->assertContains("WARNING: Partial not found: \"bar\"", $log);
     }
 
     private static function rmdir($path)
