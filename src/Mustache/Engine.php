@@ -226,7 +226,7 @@ class Mustache_Engine
     public function getPartialsLoader()
     {
         if (!isset($this->partialsLoader)) {
-            $this->partialsLoader = $this->loader;
+            $this->partialsLoader = $this->getLoader();
         }
 
         return $this->partialsLoader;
