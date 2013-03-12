@@ -241,12 +241,12 @@ class Mustache_Engine
      */
     public function setPartials(array $partials = array())
     {
-        if (isset($this->partialsLoader)) {
-            if (!$this->partialsLoader instanceof Mustache_Loader_MutableLoader) {
-                throw new Mustache_Exception_RuntimeException('Unable to set partials on an immutable Mustache Loader instance');
-            }
-        } else {
+        if (!isset($this->partialsLoader)) {
             $this->partialsLoader = new Mustache_Loader_ArrayLoader;
+        }
+
+        if (!$this->partialsLoader instanceof Mustache_Loader_MutableLoader) {
+            throw new Mustache_Exception_RuntimeException('Unable to set partials on an immutable Mustache Loader instance');
         }
 
         $this->partialsLoader->setTemplates($partials);
