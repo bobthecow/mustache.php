@@ -104,7 +104,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $mustache->setLoader($loader);
         $this->assertSame($loader, $mustache->getLoader());
 
-        $this->assertSame($loader, $mustache->getPartialsLoader());
+        $this->assertNotSame($loader, $mustache->getPartialsLoader());
         $mustache->setPartialsLoader($loader);
         $this->assertSame($loader, $mustache->getPartialsLoader());
 
@@ -238,6 +238,29 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
     {
         $mustache = new Mustache_Engine;
         $mustache->setLogger(new StdClass);
+    }
+
+    public function testLoadPartialCascading()
+    {
+        $loader = new Mustache_Loader_ArrayLoader(array(
+            'foo' => 'FOO',
+        ));
+
+        $mustache = new Mustache_Engine(array('loader' => $loader));
+
+        $tpl = $mustache->loadTemplate('foo');
+
+        $this->assertSame($tpl, $mustache->loadPartial('foo'));
+
+        $mustache->setPartials(array(
+            'foo' => 'f00',
+        ));
+
+        // setting partials overrides the default template loading fallback.
+        $this->assertNotSame($tpl, $mustache->loadPartial('foo'));
+
+        // but it didn't overwrite the original template loader templates.
+        $this->assertSame($tpl, $mustache->loadTemplate('foo'));
     }
 
     public function testPartialLoadFailLogging()
