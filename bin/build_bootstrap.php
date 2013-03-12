@@ -75,6 +75,19 @@ class SymfonyClassCollectionLoader
 {
     static private $loaded;
 
+    const HEADER = <<<EOS
+<?php
+
+/*
+ * This file is part of Mustache.php.
+ *
+ * (c) %d Justin Hileman
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+EOS;
+
     /**
      * Loads a list of classes and caches them in one big file.
      *
@@ -104,8 +117,9 @@ class SymfonyClassCollectionLoader
             $content .= preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', file_get_contents($r->getFileName()));
         }
 
-        $cache = $cacheDir.'/'.$name.$extension;
-        self::writeCacheFile($cache, self::stripComments('<?php '.$content));
+        $cache  = $cacheDir.'/'.$name.$extension;
+        $header = sprintf(self::HEADER, strftime('%Y'));
+        self::writeCacheFile($cache, $header . substr(self::stripComments('<?php '.$content), 5));
     }
 
     /**
