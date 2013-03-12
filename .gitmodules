@@ -4,6 +4,3 @@
 [submodule "vendor/yaml"]
 	path = vendor/yaml
 	url = https://github.com/fabpot/yaml.git
-[submodule "vendor/symfony/Symfony/Component/ClassLoader"]
-	path = vendor/symfony/Symfony/Component/ClassLoader
-	url = https://github.com/symfony/ClassLoader.git
