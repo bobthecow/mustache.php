@@ -23,6 +23,11 @@ abstract class Mustache_Template
     protected $mustache;
 
     /**
+     * @var boolean
+     */
+    protected $strictCallables = false;
+
+    /**
      * Mustache Template constructor.
      *
      * @param Mustache_Engine $mustache
@@ -161,7 +166,7 @@ abstract class Mustache_Template
      */
     protected function resolveValue($value, Mustache_Context $context, $indent = '')
     {
-        if (!is_string($value) && is_callable($value)) {
+        if (($this->strictCallables ? is_object($value) : !is_string($value)) && is_callable($value)) {
             return $this->mustache
                 ->loadLambda((string) call_user_func($value))
                 ->renderInternal($context, $indent);
