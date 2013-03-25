@@ -23,7 +23,7 @@
  */
 class Mustache_Engine
 {
-    const VERSION        = '2.1.0';
+    const VERSION        = '2.2.0';
     const SPEC_VERSION   = '1.1.2';
 
     const PRAGMA_FILTERS = 'FILTERS';
@@ -41,6 +41,7 @@ class Mustache_Engine
     private $escape;
     private $charset = 'UTF-8';
     private $logger;
+    private $strictCallables = false;
 
     /**
      * Mustache class constructor.
@@ -87,6 +88,13 @@ class Mustache_Engine
      *         // logging library -- such as Monolog -- is highly recommended. A simple stream logger implementation is
      *         // available as well:
      *         'logger' => new Mustache_StreamLogger('php://stderr'),
+     *
+     *         // Only treat Closure instances and invokable classes as callable. If true, values like
+     *         // `array('ClassName', 'methodName')` and `array($classInstance, 'methodName')`, which are traditionally
+     *         // "callable" in PHP, are not called to resolve variables for interpolation or section contexts. This
+     *         // helps protect against arbitrary code execution when user input is passed directly into the template.
+     *         // This currently defaults to false, but will default to true in v3.0.
+     *         'strict_callables' => true,
      *     );
      *
      * @param array $options (default: array())
@@ -135,6 +143,10 @@ class Mustache_Engine
 
         if (isset($options['logger'])) {
             $this->setLogger($options['logger']);
+        }
+
+        if (isset($options['strict_callables'])) {
+            $this->strictCallables = $options['strict_callables'];
         }
     }
 
@@ -452,10 +464,11 @@ class Mustache_Engine
     public function getTemplateClassName($source)
     {
         return $this->templateClassPrefix . md5(sprintf(
-            'version:%s,escape:%s,charset:%s,source:%s',
+            'version:%s,escape:%s,charset:%s,strict_callables:%s,source:%s',
             self::VERSION,
             isset($this->escape) ? 'custom' : 'default',
             $this->charset,
+            $this->strictCallables ? 'true' : 'false',
             $source
         ));
     }
@@ -616,7 +629,7 @@ class Mustache_Engine
             array('className' => $name)
         );
 
-        return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset);
+        return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables);
     }
 
     /**

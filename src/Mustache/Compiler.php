@@ -22,27 +22,30 @@ class Mustache_Compiler
     private $indentNextLine;
     private $customEscape;
     private $charset;
+    private $strictCallables;
     private $pragmas;
 
     /**
      * Compile a Mustache token parse tree into PHP source code.
      *
-     * @param string $source       Mustache Template source code
-     * @param string $tree         Parse tree of Mustache tokens
-     * @param string $name         Mustache Template class name
-     * @param bool   $customEscape (default: false)
-     * @param string $charset      (default: 'UTF-8')
+     * @param string $source          Mustache Template source code
+     * @param string $tree            Parse tree of Mustache tokens
+     * @param string $name            Mustache Template class name
+     * @param bool   $customEscape    (default: false)
+     * @param string $charset         (default: 'UTF-8')
+     * @param bool   $strictCallables (default: false)
      *
      * @return string Generated PHP source code
      */
-    public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8')
+    public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8', $strictCallables = false)
     {
-        $this->pragmas        = array();
-        $this->sections       = array();
-        $this->source         = $source;
-        $this->indentNextLine = true;
-        $this->customEscape   = $customEscape;
-        $this->charset        = $charset;
+        $this->pragmas         = array();
+        $this->sections        = array();
+        $this->source          = $source;
+        $this->indentNextLine  = true;
+        $this->customEscape    = $customEscape;
+        $this->charset         = $charset;
+        $this->strictCallables = $strictCallables;
 
         return $this->writeCode($tree, $name);
     }
@@ -165,7 +168,7 @@ class Mustache_Compiler
     const SECTION = '
         private function section%s(Mustache_Context $context, $indent, $value) {
             $buffer = \'\';
-            if (!is_string($value) && is_callable($value)) {
+            if (%s) {
                 $source = %s;
                 $buffer .= $this->mustache
                     ->loadLambda((string) call_user_func($value, $source, $this->lambdaHelper)%s)
@@ -196,9 +199,10 @@ class Mustache_Compiler
      */
     private function section($nodes, $id, $start, $end, $otag, $ctag, $level)
     {
-        $method = $this->getFindMethod($id);
-        $id     = var_export($id, true);
-        $source = var_export(substr($this->source, $start, $end - $start), true);
+        $method   = $this->getFindMethod($id);
+        $id       = var_export($id, true);
+        $source   = var_export(substr($this->source, $start, $end - $start), true);
+        $callable = $this->getCallable();
 
         if ($otag !== '{{' || $ctag !== '}}') {
             $delims = ', '.var_export(sprintf('{{= %s %s =}}', $otag, $ctag), true);
@@ -209,7 +213,7 @@ class Mustache_Compiler
         $key    = ucfirst(md5($delims."\n".$source));
 
         if (!isset($this->sections[$key])) {
-            $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $source, $delims, $this->walk($nodes, 2));
+            $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $callable, $source, $delims, $this->walk($nodes, 2));
         }
 
         return sprintf($this->prepare(self::SECTION_CALL, $level), $id, $key, $method, $id);
@@ -265,7 +269,7 @@ class Mustache_Compiler
 
     const VARIABLE = '
         $value = $context->%s(%s);
-        if (!is_string($value) && is_callable($value)) {
+        if (%s) {
             $value = $this->mustache
                 ->loadLambda((string) call_user_func($value))
                 ->renderInternal($context, $indent);
@@ -290,11 +294,12 @@ class Mustache_Compiler
             list($id, $filters) = $this->getFilters($id, $level);
         }
 
-        $method = $this->getFindMethod($id);
-        $id     = ($method !== 'last') ? var_export($id, true) : '';
-        $value  = $escape ? $this->getEscape() : '$value';
+        $method   = $this->getFindMethod($id);
+        $id       = ($method !== 'last') ? var_export($id, true) : '';
+        $callable = $this->getCallable();
+        $value    = $escape ? $this->getEscape() : '$value';
 
-        return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $filters, $this->flushIndent(), $value);
+        return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $callable, $filters, $this->flushIndent(), $value);
     }
 
     /**
@@ -315,7 +320,7 @@ class Mustache_Compiler
 
     const FILTER = '
         $filter = $context->%s(%s);
-        if (is_string($filter) || !is_callable($filter)) {
+        if (!(%s)) {
             throw new UnexpectedValueException(%s);
         }
         $value = call_user_func($filter, $value);%s
@@ -335,12 +340,13 @@ class Mustache_Compiler
             return '';
         }
 
-        $name   = array_shift($filters);
-        $method = $this->getFindMethod($name);
-        $filter = ($method !== 'last') ? var_export($name, true) : '';
-        $msg    = var_export(sprintf('Filter not found: %s', $name), true);
+        $name     = array_shift($filters);
+        $method   = $this->getFindMethod($name);
+        $filter   = ($method !== 'last') ? var_export($name, true) : '';
+        $callable = $this->getCallable('$filter');
+        $msg      = var_export(sprintf('Filter not found: %s', $name), true);
 
-        return sprintf($this->prepare(self::FILTER, $level), $method, $filter, $msg, $this->getFilter($filters, $level));
+        return sprintf($this->prepare(self::FILTER, $level), $method, $filter, $callable, $msg, $this->getFilter($filters, $level));
     }
 
     const LINE = '$buffer .= "\n";';
@@ -425,6 +431,16 @@ class Mustache_Compiler
         } else {
             return 'findDot';
         }
+    }
+
+    const IS_CALLABLE        = '!is_string(%s) && is_callable(%s)';
+    const STRICT_IS_CALLABLE = 'is_object(%s) && is_callable(%s)';
+
+    private function getCallable($variable = '$value')
+    {
+        $tpl = $this->strictCallables ? self::STRICT_IS_CALLABLE : self::IS_CALLABLE;
+
+        return sprintf($tpl, $variable, $variable);
     }
 
     const LINE_INDENT = '$indent . ';
