@@ -10,7 +10,7 @@
  */
 
 /**
- * An Mustache Template loader for inline templates.
+ * A Mustache Template loader for inline templates.
  *
  * With the InlineLoader, templates can be defined at the end of any PHP source
  * file:
