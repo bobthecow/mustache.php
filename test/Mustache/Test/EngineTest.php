@@ -141,7 +141,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Mustache_Exception_InvalidArgumentException
      * @dataProvider getBadEscapers
      */
     public function testNonCallableEscapeThrowsException($escape)
@@ -158,7 +158,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException Mustache_Exception_RuntimeException
      */
     public function testImmutablePartialsLoadersThrowException()
     {
@@ -223,7 +223,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Mustache_Exception_InvalidArgumentException
      */
     public function testSetHelpersThrowsExceptions()
     {
@@ -232,12 +232,35 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Mustache_Exception_InvalidArgumentException
      */
     public function testSetLoggerThrowsExceptions()
     {
         $mustache = new Mustache_Engine;
         $mustache->setLogger(new StdClass);
+    }
+
+    public function testLoadPartialCascading()
+    {
+        $loader = new Mustache_Loader_ArrayLoader(array(
+            'foo' => 'FOO',
+        ));
+
+        $mustache = new Mustache_Engine(array('loader' => $loader));
+
+        $tpl = $mustache->loadTemplate('foo');
+
+        $this->assertSame($tpl, $mustache->loadPartial('foo'));
+
+        $mustache->setPartials(array(
+            'foo' => 'f00',
+        ));
+
+        // setting partials overrides the default template loading fallback.
+        $this->assertNotSame($tpl, $mustache->loadPartial('foo'));
+
+        // but it didn't overwrite the original template loader templates.
+        $this->assertSame($tpl, $mustache->loadTemplate('foo'));
     }
 
     public function testPartialLoadFailLogging()

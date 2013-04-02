@@ -67,7 +67,7 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
     }
 
     /**
-     * @expectedException UnexpectedValueException
+     * @expectedException Mustache_Exception_UnknownFilterException
      * @dataProvider getBrokenPipes
      */
     public function testThrowsExceptionForBrokenPipes($tpl, $data)

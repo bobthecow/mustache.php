@@ -53,7 +53,7 @@ class Mustache_Compiler
     /**
      * Helper function for walking the Mustache token parse tree.
      *
-     * @throws InvalidArgumentException upon encountering unknown token types.
+     * @throws Mustache_Exception_SyntaxException upon encountering unknown token types.
      *
      * @param array $tree  Parse tree of Mustache tokens
      * @param int   $level (default: 0)
@@ -116,7 +116,7 @@ class Mustache_Compiler
                     break;
 
                 default:
-                    throw new InvalidArgumentException('Unknown node type: '.json_encode($node));
+                    throw new Mustache_Exception_SyntaxException(sprintf('Unknown token type: %s', $node[Mustache_Tokenizer::TYPE]), $node);
             }
         }
 
@@ -127,22 +127,33 @@ class Mustache_Compiler
 
         class %s extends Mustache_Template
         {
-            private $lambdaHelper;
+            private $lambdaHelper;%s
 
-            public function renderInternal(Mustache_Context $context, $indent = \'\', $escape = false)
+            public function renderInternal(Mustache_Context $context, $indent = \'\')
             {
                 $this->lambdaHelper = new Mustache_LambdaHelper($this->mustache, $context);
                 $buffer = \'\';
         %s
 
-                if ($escape) {
-                    return %s;
-                } else {
-                    return $buffer;
-                }
+                return $buffer;
             }
         %s
         }';
+
+    const KLASS_NO_LAMBDAS = '<?php
+
+        class %s extends Mustache_Template
+        {%s
+            public function renderInternal(Mustache_Context $context, $indent = \'\')
+            {
+                $buffer = \'\';
+        %s
+
+                return $buffer;
+            }
+        }';
+
+    const STRICT_CALLABLE = 'protected $strictCallables = true;';
 
     /**
      * Generate Mustache Template class PHP source.
@@ -156,8 +167,10 @@ class Mustache_Compiler
     {
         $code     = $this->walk($tree);
         $sections = implode("\n", $this->sections);
+        $klass    = empty($this->sections) ? self::KLASS_NO_LAMBDAS : self::KLASS;
+        $callable = $this->strictCallables ? $this->prepare(self::STRICT_CALLABLE) : '';
 
-        return sprintf($this->prepare(self::KLASS, 0, false), $name, $code, $this->getEscape('$buffer'), $sections);
+        return sprintf($this->prepare($klass, 0, false, true), $name, $callable, $code, $sections);
     }
 
     const SECTION_CALL = '
@@ -166,7 +179,8 @@ class Mustache_Compiler
     ';
 
     const SECTION = '
-        private function section%s(Mustache_Context $context, $indent, $value) {
+        private function section%s(Mustache_Context $context, $indent, $value)
+        {
             $buffer = \'\';
             if (%s) {
                 $source = %s;
@@ -268,12 +282,7 @@ class Mustache_Compiler
     }
 
     const VARIABLE = '
-        $value = $context->%s(%s);
-        if (%s) {
-            $value = $this->mustache
-                ->loadLambda((string) call_user_func($value))
-                ->renderInternal($context, $indent);
-        }%s
+        $value = $this->resolveValue($context->%s(%s), $context, $indent);%s
         $buffer .= %s%s;
     ';
 
@@ -294,12 +303,11 @@ class Mustache_Compiler
             list($id, $filters) = $this->getFilters($id, $level);
         }
 
-        $method   = $this->getFindMethod($id);
-        $id       = ($method !== 'last') ? var_export($id, true) : '';
-        $callable = $this->getCallable();
-        $value    = $escape ? $this->getEscape() : '$value';
+        $method = $this->getFindMethod($id);
+        $id     = ($method !== 'last') ? var_export($id, true) : '';
+        $value  = $escape ? $this->getEscape() : '$value';
 
-        return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $callable, $filters, $this->flushIndent(), $value);
+        return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $filters, $this->flushIndent(), $value);
     }
 
     /**
@@ -321,7 +329,7 @@ class Mustache_Compiler
     const FILTER = '
         $filter = $context->%s(%s);
         if (!(%s)) {
-            throw new UnexpectedValueException(%s);
+            throw new Mustache_Exception_UnknownFilterException(%s);
         }
         $value = call_user_func($filter, $value);%s
     ';
@@ -344,7 +352,7 @@ class Mustache_Compiler
         $method   = $this->getFindMethod($name);
         $filter   = ($method !== 'last') ? var_export($name, true) : '';
         $callable = $this->getCallable('$filter');
-        $msg      = var_export(sprintf('Filter not found: %s', $name), true);
+        $msg      = var_export($name, true);
 
         return sprintf($this->prepare(self::FILTER, $level), $method, $filter, $callable, $msg, $this->getFilter($filters, $level));
     }
@@ -377,14 +385,18 @@ class Mustache_Compiler
      * @param string  $text
      * @param int     $bonus          Additional indent level (default: 0)
      * @param boolean $prependNewline Prepend a newline to the snippet? (default: true)
+     * @param boolean $appendNewline  Append a newline to the snippet? (default: false)
      *
      * @return string PHP source code snippet
      */
-    private function prepare($text, $bonus = 0, $prependNewline = true)
+    private function prepare($text, $bonus = 0, $prependNewline = true, $appendNewline = false)
     {
         $text = ($prependNewline ? "\n" : '').trim($text);
         if ($prependNewline) {
             $bonus++;
+        }
+        if ($appendNewline) {
+            $text .= "\n";
         }
 
         return preg_replace("/\n( {8})?/", "\n".str_repeat(" ", $bonus * 4), $text);

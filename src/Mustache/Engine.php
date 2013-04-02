@@ -23,7 +23,7 @@
  */
 class Mustache_Engine
 {
-    const VERSION        = '2.2.0';
+    const VERSION        = '2.3.0';
     const SPEC_VERSION   = '1.1.2';
 
     const PRAGMA_FILTERS = 'FILTERS';
@@ -87,7 +87,7 @@ class Mustache_Engine
      *         // A Mustache Logger instance. No logging will occur unless this is set. Using a PSR-3 compatible
      *         // logging library -- such as Monolog -- is highly recommended. A simple stream logger implementation is
      *         // available as well:
-     *         'logger' => new Mustache_StreamLogger('php://stderr'),
+     *         'logger' => new Mustache_Logger_StreamLogger('php://stderr'),
      *
      *         // Only treat Closure instances and invokable classes as callable. If true, values like
      *         // `array('ClassName', 'methodName')` and `array($classInstance, 'methodName')`, which are traditionally
@@ -96,6 +96,8 @@ class Mustache_Engine
      *         // This currently defaults to false, but will default to true in v3.0.
      *         'strict_callables' => true,
      *     );
+     *
+     * @throws Mustache_Exception_InvalidArgumentException If `escape` option is not callable.
      *
      * @param array $options (default: array())
      */
@@ -131,7 +133,7 @@ class Mustache_Engine
 
         if (isset($options['escape'])) {
             if (!is_callable($options['escape'])) {
-                throw new InvalidArgumentException('Mustache Constructor "escape" option must be callable');
+                throw new Mustache_Exception_InvalidArgumentException('Mustache Constructor "escape" option must be callable');
             }
 
             $this->escape = $options['escape'];
@@ -245,18 +247,21 @@ class Mustache_Engine
     /**
      * Set partials for the current partials Loader instance.
      *
-     * @throws RuntimeException If the current Loader instance is immutable
+     * @throws Mustache_Exception_RuntimeException If the current Loader instance is immutable
      *
      * @param array $partials (default: array())
      */
     public function setPartials(array $partials = array())
     {
-        $loader = $this->getPartialsLoader();
-        if (!$loader instanceof Mustache_Loader_MutableLoader) {
-            throw new RuntimeException('Unable to set partials on an immutable Mustache Loader instance');
+        if (!isset($this->partialsLoader)) {
+            $this->partialsLoader = new Mustache_Loader_ArrayLoader;
         }
 
-        $loader->setTemplates($partials);
+        if (!$this->partialsLoader instanceof Mustache_Loader_MutableLoader) {
+            throw new Mustache_Exception_RuntimeException('Unable to set partials on an immutable Mustache Loader instance');
+        }
+
+        $this->partialsLoader->setTemplates($partials);
     }
 
     /**
@@ -266,14 +271,14 @@ class Mustache_Engine
      * any other valid Mustache context value. They will be prepended to the context stack, so they will be available in
      * any template loaded by this Mustache instance.
      *
-     * @throws InvalidArgumentException if $helpers is not an array or Traversable
+     * @throws Mustache_Exception_InvalidArgumentException if $helpers is not an array or Traversable
      *
      * @param array|Traversable $helpers
      */
     public function setHelpers($helpers)
     {
         if (!is_array($helpers) && !$helpers instanceof Traversable) {
-            throw new InvalidArgumentException('setHelpers expects an array of helpers');
+            throw new Mustache_Exception_InvalidArgumentException('setHelpers expects an array of helpers');
         }
 
         $this->getHelpers()->clear();
@@ -355,12 +360,14 @@ class Mustache_Engine
     /**
      * Set the Mustache Logger instance.
      *
+     * @throws Mustache_Exception_InvalidArgumentException If logger is not an instance of Mustache_Logger or Psr\Log\LoggerInterface.
+     *
      * @param Mustache_Logger|Psr\Log\LoggerInterface $logger
      */
     public function setLogger($logger = null)
     {
         if ($logger !== null && !($logger instanceof Mustache_Logger || is_a($logger, 'Psr\\Log\\LoggerInterface'))) {
-            throw new InvalidArgumentException('Expected an instance of Mustache_Logger or Psr\\Log\\LoggerInterface.');
+            throw new Mustache_Exception_InvalidArgumentException('Expected an instance of Mustache_Logger or Psr\\Log\\LoggerInterface.');
         }
 
         $this->logger = $logger;
@@ -498,13 +505,21 @@ class Mustache_Engine
     public function loadPartial($name)
     {
         try {
-            return $this->loadSource($this->getPartialsLoader()->load($name));
-        } catch (InvalidArgumentException $e) {
+            if (isset($this->partialsLoader)) {
+                $loader = $this->partialsLoader;
+            } elseif (isset($this->loader) && !$this->loader instanceof Mustache_Loader_StringLoader) {
+                $loader = $this->loader;
+            } else {
+                throw new Mustache_Exception_UnknownTemplateException($name);
+            }
+
+            return $this->loadSource($loader->load($name));
+        } catch (Mustache_Exception_UnknownTemplateException $e) {
             // If the named partial cannot be found, log then return null.
             $this->log(
                 Mustache_Logger::WARNING,
                 'Partial not found: "{name}"',
-                array('name' => $name)
+                array('name' => $e->getTemplateName())
             );
         }
     }
@@ -649,7 +664,7 @@ class Mustache_Engine
     /**
      * Helper method to dump a generated Mustache Template subclass to the file cache.
      *
-     * @throws RuntimeException if unable to create the cache directory or write to $fileName.
+     * @throws Mustache_Exception_RuntimeException if unable to create the cache directory or write to $fileName.
      *
      * @param string $fileName
      * @param string $source
@@ -668,7 +683,7 @@ class Mustache_Engine
 
             @mkdir($dirName, 0777, true);
             if (!is_dir($dirName)) {
-                throw new RuntimeException(sprintf('Failed to create cache directory "%s".', $dirName));
+                throw new Mustache_Exception_RuntimeException(sprintf('Failed to create cache directory "%s".', $dirName));
             }
 
         }
@@ -695,7 +710,7 @@ class Mustache_Engine
             );
         }
 
-        throw new RuntimeException(sprintf('Failed to write cache file "%s".', $fileName));
+        throw new Mustache_Exception_RuntimeException(sprintf('Failed to write cache file "%s".', $fileName));
     }
 
     /**

@@ -12,8 +12,9 @@
 /**
  * Mustache Lambda Helper.
  *
- * Passed to section and interpolation lambdas, giving them access to a `render`
- * method for rendering a string with the current context.
+ * Passed as the second argument to section lambdas (higher order sections),
+ * giving them access to a `render` method for rendering a string with the
+ * current context.
  */
 class Mustache_LambdaHelper
 {

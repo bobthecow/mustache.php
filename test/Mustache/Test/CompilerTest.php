@@ -33,23 +33,52 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
         return array(
             array('', array(), 'Banana', false, 'ISO-8859-1', array(
                 "\nclass Banana extends Mustache_Template",
-                'return htmlspecialchars($buffer, ENT_COMPAT, \'ISO-8859-1\');',
                 'return $buffer;',
             )),
 
             array('', array($this->createTextToken('TEXT')), 'Monkey', false, 'UTF-8', array(
                 "\nclass Monkey extends Mustache_Template",
-                'return htmlspecialchars($buffer, ENT_COMPAT, \'UTF-8\');',
                 '$buffer .= $indent . \'TEXT\';',
                 'return $buffer;',
             )),
 
-            array('', array($this->createTextToken('TEXT')), 'Monkey', true, 'ISO-8859-1', array(
-                "\nclass Monkey extends Mustache_Template",
-                '$buffer .= $indent . \'TEXT\';',
-                'return call_user_func($this->mustache->getEscape(), $buffer);',
-                'return $buffer;',
-            )),
+            array(
+                '',
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME => 'name',
+                    )
+                ),
+                'Monkey',
+                true,
+                'ISO-8859-1',
+                array(
+                    "\nclass Monkey extends Mustache_Template",
+                    '$value = $this->resolveValue($context->find(\'name\'), $context, $indent);',
+                    '$buffer .= $indent . call_user_func($this->mustache->getEscape(), $value);',
+                    'return $buffer;',
+                )
+            ),
+
+            array(
+                '',
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME => 'name',
+                    )
+                ),
+                'Monkey',
+                false,
+                'ISO-8859-1',
+                array(
+                    "\nclass Monkey extends Mustache_Template",
+                    '$value = $this->resolveValue($context->find(\'name\'), $context, $indent);',
+                    '$buffer .= $indent . htmlspecialchars($value, ENT_COMPAT, \'ISO-8859-1\');',
+                    'return $buffer;',
+                )
+            ),
 
             array(
                 '',
@@ -73,11 +102,10 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
                     "\nclass Monkey extends Mustache_Template",
                     '$buffer .= $indent . \'foo\'',
                     '$buffer .= "\n"',
-                    '$value = $context->find(\'name\');',
+                    '$value = $this->resolveValue($context->find(\'name\'), $context, $indent);',
                     '$buffer .= htmlspecialchars($value, ENT_COMPAT, \'UTF-8\');',
-                    '$value = $context->last();',
+                    '$value = $this->resolveValue($context->last(), $context, $indent);',
                     '$buffer .= \'\\\'bar\\\'\';',
-                    'return htmlspecialchars($buffer, ENT_COMPAT, \'UTF-8\');',
                     'return $buffer;',
                 )
             ),
@@ -85,9 +113,9 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException Mustache_Exception_SyntaxException
      */
-    public function testCompilerThrowsUnknownNodeTypeException()
+    public function testCompilerThrowsSyntaxException()
     {
         $compiler = new Mustache_Compiler;
         $compiler->compile('', array(array(Mustache_Tokenizer::TYPE => 'invalid')), 'SomeClass');

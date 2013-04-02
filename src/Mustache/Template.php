@@ -23,6 +23,11 @@ abstract class Mustache_Template
     protected $mustache;
 
     /**
+     * @var boolean
+     */
+    protected $strictCallables = false;
+
+    /**
      * Mustache Template constructor.
      *
      * @param Mustache_Engine $mustache
@@ -67,13 +72,14 @@ abstract class Mustache_Template
      *
      * This is where the magic happens :)
      *
+     * NOTE: This method is not part of the Mustache.php public API.
+     *
      * @param Mustache_Context $context
      * @param string           $indent  (default: '')
-     * @param bool             $escape  (default: false)
      *
      * @return string Rendered template
      */
-    abstract public function renderInternal(Mustache_Context $context, $indent = '', $escape = false);
+    abstract public function renderInternal(Mustache_Context $context, $indent = '');
 
     /**
      * Tests whether a value should be iterated over (e.g. in a section context).
@@ -145,5 +151,27 @@ abstract class Mustache_Template
         }
 
         return $stack;
+    }
+
+    /**
+     * Resolve a context value.
+     *
+     * Invoke the value if it is callable, otherwise return the value.
+     *
+     * @param  mixed            $value
+     * @param  Mustache_Context $context
+     * @param  string           $indent
+     *
+     * @return string
+     */
+    protected function resolveValue($value, Mustache_Context $context, $indent = '')
+    {
+        if (($this->strictCallables ? is_object($value) : !is_string($value)) && is_callable($value)) {
+            return $this->mustache
+                ->loadLambda((string) call_user_func($value))
+                ->renderInternal($context, $indent);
+        }
+
+        return $value;
     }
 }

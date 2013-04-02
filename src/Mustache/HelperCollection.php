@@ -21,7 +21,7 @@ class Mustache_HelperCollection
      *
      * Optionally accepts an array (or Traversable) of `$name => $helper` pairs.
      *
-     * @throws InvalidArgumentException if the $helpers argument isn't an array or Traversable
+     * @throws Mustache_Exception_InvalidArgumentException if the $helpers argument isn't an array or Traversable
      *
      * @param array|Traversable $helpers (default: null)
      */
@@ -29,7 +29,7 @@ class Mustache_HelperCollection
     {
         if ($helpers !== null) {
             if (!is_array($helpers) && !$helpers instanceof Traversable) {
-                throw new InvalidArgumentException('HelperCollection constructor expects an array of helpers');
+                throw new Mustache_Exception_InvalidArgumentException('HelperCollection constructor expects an array of helpers');
             }
 
             foreach ($helpers as $name => $helper) {
@@ -79,6 +79,8 @@ class Mustache_HelperCollection
     /**
      * Get a helper by name.
      *
+     * @throws Mustache_Exception_UnknownHelperException If helper does not exist.
+     *
      * @param string $name
      *
      * @return mixed Helper
@@ -86,7 +88,7 @@ class Mustache_HelperCollection
     public function get($name)
     {
         if (!$this->has($name)) {
-            throw new InvalidArgumentException('Unknown helper: '.$name);
+            throw new Mustache_Exception_UnknownHelperException($name);
         }
 
         return $this->helpers[$name];
@@ -133,14 +135,14 @@ class Mustache_HelperCollection
     /**
      * Check whether a given helper is present in the collection.
      *
-     * @throws InvalidArgumentException if the requested helper is not present.
+     * @throws Mustache_Exception_UnknownHelperException if the requested helper is not present.
      *
      * @param string $name
      */
     public function remove($name)
     {
         if (!$this->has($name)) {
-            throw new InvalidArgumentException('Unknown helper: '.$name);
+            throw new Mustache_Exception_UnknownHelperException($name);
         }
 
         unset($this->helpers[$name]);
