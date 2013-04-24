@@ -155,7 +155,7 @@ class Mustache_Engine
     /**
      * Shortcut 'render' invocation.
      *
-     * Equivalent to calling `$mustache->loadTemplate($template)->render($data);`
+     * Equivalent to calling `$mustache->loadTemplate($template)->render($context);`
      *
      * @see Mustache_Engine::loadTemplate
      * @see Mustache_Template::render
