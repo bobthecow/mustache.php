@@ -161,13 +161,13 @@ class Mustache_Engine
      * @see Mustache_Template::render
      *
      * @param string $template
-     * @param mixed  $data
+     * @param mixed  $context (default: array())
      *
      * @return string Rendered template
      */
-    public function render($template, $data = array())
+    public function render($template, $context = array())
     {
-        return $this->loadTemplate($template)->render($data);
+        return $this->loadTemplate($template)->render($context);
     }
 
     /**
