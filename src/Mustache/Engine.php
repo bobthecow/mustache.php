@@ -165,7 +165,7 @@ class Mustache_Engine
      *
      * @return string Rendered template
      */
-    public function render($template, $data)
+    public function render($template, $data = array())
     {
         return $this->loadTemplate($template)->render($data);
     }
