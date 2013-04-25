@@ -23,7 +23,7 @@
  */
 class Mustache_Engine
 {
-    const VERSION        = '2.3.0';
+    const VERSION        = '2.3.1';
     const SPEC_VERSION   = '1.1.2';
 
     const PRAGMA_FILTERS = 'FILTERS';
@@ -155,19 +155,19 @@ class Mustache_Engine
     /**
      * Shortcut 'render' invocation.
      *
-     * Equivalent to calling `$mustache->loadTemplate($template)->render($data);`
+     * Equivalent to calling `$mustache->loadTemplate($template)->render($context);`
      *
      * @see Mustache_Engine::loadTemplate
      * @see Mustache_Template::render
      *
      * @param string $template
-     * @param mixed  $data
+     * @param mixed  $context (default: array())
      *
      * @return string Rendered template
      */
-    public function render($template, $data)
+    public function render($template, $context = array())
     {
-        return $this->loadTemplate($template)->render($data);
+        return $this->loadTemplate($template)->render($context);
     }
 
     /**

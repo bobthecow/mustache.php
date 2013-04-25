@@ -107,10 +107,11 @@ class Mustache_Tokenizer
                         $this->flushBuffer();
                         $this->state = self::IN_TAG_TYPE;
                     } else {
-                        if ($text[$i] == "\n") {
+                        $char = substr($text, $i, 1);
+                        if ($char == "\n") {
                             $this->filterLine();
                         } else {
-                            $this->buffer .= $text[$i];
+                            $this->buffer .= $char;
                         }
                     }
                     break;
@@ -118,8 +119,9 @@ class Mustache_Tokenizer
                 case self::IN_TAG_TYPE:
 
                     $i += strlen($this->otag) - 1;
-                    if (isset(self::$tagTypes[$text[$i + 1]])) {
-                        $tag = $text[$i + 1];
+                    $char = substr($text, $i + 1, 1);
+                    if (isset(self::$tagTypes[$char])) {
+                        $tag = $char;
                         $this->tagType = $tag;
                     } else {
                         $tag = null;
@@ -166,7 +168,7 @@ class Mustache_Tokenizer
                             }
                         }
                     } else {
-                        $this->buffer .= $text[$i];
+                        $this->buffer .= substr($text, $i, 1);
                     }
                     break;
             }
