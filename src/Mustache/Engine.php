@@ -39,6 +39,7 @@ class Mustache_Engine
     private $partialsLoader;
     private $helpers;
     private $escape;
+    private $entity_flags = ENT_COMPAT;
     private $charset = 'UTF-8';
     private $logger;
     private $strictCallables = false;
@@ -80,6 +81,9 @@ class Mustache_Engine
      *         'escape' => function($value) {
      *             return htmlspecialchars($buffer, ENT_COMPAT, 'UTF-8');
      *         },
+     *
+     *         // Type argument for `htmlspecialchars`.  Defaults to ENT_COMPAT.  You may prefer ENT_QUOTES.
+     *         'entity_flags' => ENT_QUOTES,
      *
      *         // Character set for `htmlspecialchars`. Defaults to 'UTF-8'. Use 'UTF-8'.
      *         'charset' => 'ISO-8859-1',
@@ -139,6 +143,10 @@ class Mustache_Engine
             $this->escape = $options['escape'];
         }
 
+        if (isset($options['entity_flags'])) {
+          $this->entity_flags = $options['entity_flags'];
+        }
+
         if (isset($options['charset'])) {
             $this->charset = $options['charset'];
         }
@@ -178,6 +186,16 @@ class Mustache_Engine
     public function getEscape()
     {
         return $this->escape;
+    }
+
+    /**
+     * Get the current Mustache entitity type to escape.
+     *
+     * @return int
+     */
+    public function getEntityFlags()
+    {
+      return $this->entity_flags;
     }
 
     /**
@@ -471,9 +489,10 @@ class Mustache_Engine
     public function getTemplateClassName($source)
     {
         return $this->templateClassPrefix . md5(sprintf(
-            'version:%s,escape:%s,charset:%s,strict_callables:%s,source:%s',
+            'version:%s,escape:%s,entity_flags:%i,charset:%s,strict_callables:%s,source:%s',
             self::VERSION,
             isset($this->escape) ? 'custom' : 'default',
+            $this->entity_flags,
             $this->charset,
             $this->strictCallables ? 'true' : 'false',
             $source
@@ -644,7 +663,7 @@ class Mustache_Engine
             array('className' => $name)
         );
 
-        return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables);
+        return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables, $this->entity_flags);
     }
 
     /**
