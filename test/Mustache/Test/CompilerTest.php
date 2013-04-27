@@ -18,11 +18,11 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider getCompileValues
      */
-    public function testCompile($source, array $tree, $name, $customEscaper, $charset, $expected)
+    public function testCompile($source, array $tree, $name, $customEscaper, $entity_flags, $charset, $expected)
     {
         $compiler = new Mustache_Compiler;
 
-        $compiled = $compiler->compile($source, $tree, $name, $customEscaper, $charset);
+        $compiled = $compiler->compile($source, $tree, $name, $customEscaper, $charset, false, $entity_flags);
         foreach ($expected as $contains) {
             $this->assertContains($contains, $compiled);
         }
@@ -31,12 +31,12 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
     public function getCompileValues()
     {
         return array(
-            array('', array(), 'Banana', false, 'ISO-8859-1', array(
+            array('', array(), 'Banana', false, ENT_COMPAT, 'ISO-8859-1', array(
                 "\nclass Banana extends Mustache_Template",
                 'return $buffer;',
             )),
 
-            array('', array($this->createTextToken('TEXT')), 'Monkey', false, 'UTF-8', array(
+            array('', array($this->createTextToken('TEXT')), 'Monkey', false, ENT_COMPAT, 'UTF-8', array(
                 "\nclass Monkey extends Mustache_Template",
                 '$buffer .= $indent . \'TEXT\';',
                 'return $buffer;',
@@ -52,6 +52,7 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
                 ),
                 'Monkey',
                 true,
+                ENT_COMPAT,
                 'ISO-8859-1',
                 array(
                     "\nclass Monkey extends Mustache_Template",
@@ -71,11 +72,32 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
                 ),
                 'Monkey',
                 false,
+                ENT_COMPAT,
                 'ISO-8859-1',
                 array(
                     "\nclass Monkey extends Mustache_Template",
                     '$value = $this->resolveValue($context->find(\'name\'), $context, $indent);',
-                    '$buffer .= $indent . htmlspecialchars($value, ENT_COMPAT, \'ISO-8859-1\');',
+                    '$buffer .= $indent . htmlspecialchars($value, '.ENT_COMPAT.', \'ISO-8859-1\');',
+                    'return $buffer;',
+                )
+            ),
+
+            array(
+                '',
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME => 'name',
+                    )
+                ),
+                'Monkey',
+                false,
+                ENT_QUOTES,
+                'ISO-8859-1',
+                array(
+                    "\nclass Monkey extends Mustache_Template",
+                    '$value = $this->resolveValue($context->find(\'name\'), $context, $indent);',
+                    '$buffer .= $indent . htmlspecialchars($value, '.ENT_QUOTES.', \'ISO-8859-1\');',
                     'return $buffer;',
                 )
             ),
@@ -97,13 +119,14 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
                 ),
                 'Monkey',
                 false,
+                ENT_COMPAT,
                 'UTF-8',
                 array(
                     "\nclass Monkey extends Mustache_Template",
                     '$buffer .= $indent . \'foo\'',
                     '$buffer .= "\n"',
                     '$value = $this->resolveValue($context->find(\'name\'), $context, $indent);',
-                    '$buffer .= htmlspecialchars($value, ENT_COMPAT, \'UTF-8\');',
+                    '$buffer .= htmlspecialchars($value, '.ENT_COMPAT.', \'UTF-8\');',
                     '$value = $this->resolveValue($context->last(), $context, $indent);',
                     '$buffer .= \'\\\'bar\\\'\';',
                     'return $buffer;',
