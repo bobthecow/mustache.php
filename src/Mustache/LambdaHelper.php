@@ -19,7 +19,7 @@
 class Mustache_LambdaHelper
 {
     private $mustache;
-    private $context;
+    public $context;
 
     /**
      * Mustache Lambda Helper constructor.
