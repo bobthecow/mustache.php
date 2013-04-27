@@ -39,7 +39,7 @@ class Mustache_Engine
     private $partialsLoader;
     private $helpers;
     private $escape;
-    private $entity_flags = ENT_COMPAT;
+    private $entityFlags = ENT_COMPAT;
     private $charset = 'UTF-8';
     private $logger;
     private $strictCallables = false;
@@ -144,7 +144,7 @@ class Mustache_Engine
         }
 
         if (isset($options['entity_flags'])) {
-          $this->entity_flags = $options['entity_flags'];
+          $this->entityFlags = $options['entity_flags'];
         }
 
         if (isset($options['charset'])) {
@@ -195,7 +195,7 @@ class Mustache_Engine
      */
     public function getEntityFlags()
     {
-      return $this->entity_flags;
+      return $this->entityFlags;
     }
 
     /**
@@ -492,7 +492,7 @@ class Mustache_Engine
             'version:%s,escape:%s,entity_flags:%i,charset:%s,strict_callables:%s,source:%s',
             self::VERSION,
             isset($this->escape) ? 'custom' : 'default',
-            $this->entity_flags,
+            $this->entityFlags,
             $this->charset,
             $this->strictCallables ? 'true' : 'false',
             $source
@@ -663,7 +663,7 @@ class Mustache_Engine
             array('className' => $name)
         );
 
-        return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables, $this->entity_flags);
+        return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables, $this->entityFlags);
     }
 
     /**

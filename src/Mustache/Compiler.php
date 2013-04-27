@@ -21,7 +21,7 @@ class Mustache_Compiler
     private $source;
     private $indentNextLine;
     private $customEscape;
-    private $entity_flags;
+    private $entityFlags;
     private $charset;
     private $strictCallables;
     private $pragmas;
@@ -33,20 +33,20 @@ class Mustache_Compiler
      * @param string $tree            Parse tree of Mustache tokens
      * @param string $name            Mustache Template class name
      * @param bool   $customEscape    (default: false)
-     * @param int    $entity_flags    (default: ENT_COMPAT)
+     * @param int    $entityFlags     (default: ENT_COMPAT)
      * @param string $charset         (default: 'UTF-8')
      * @param bool   $strictCallables (default: false)
      *
      * @return string Generated PHP source code
      */
-    public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8', $strictCallables = false, $entity_flags = ENT_COMPAT)
+    public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8', $strictCallables = false, $entityFlags = ENT_COMPAT)
     {
         $this->pragmas         = array();
         $this->sections        = array();
         $this->source          = $source;
         $this->indentNextLine  = true;
         $this->customEscape    = $customEscape;
-        $this->entity_flags    = $entity_flags;
+        $this->entityFlags     = $entityFlags;
         $this->charset         = $charset;
         $this->strictCallables = $strictCallables;
 
@@ -420,7 +420,7 @@ class Mustache_Compiler
         if ($this->customEscape) {
             return sprintf(self::CUSTOM_ESCAPE, $value);
         } else {
-            return sprintf(self::DEFAULT_ESCAPE, $value, var_export($this->entity_flags, true), var_export($this->charset, true));
+            return sprintf(self::DEFAULT_ESCAPE, $value, var_export($this->entityFlags, true), var_export($this->charset, true));
         }
     }
 

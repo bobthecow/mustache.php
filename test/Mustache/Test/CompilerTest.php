@@ -18,11 +18,11 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider getCompileValues
      */
-    public function testCompile($source, array $tree, $name, $customEscaper, $entity_flags, $charset, $expected)
+    public function testCompile($source, array $tree, $name, $customEscaper, $entityFlags, $charset, $expected)
     {
         $compiler = new Mustache_Compiler;
 
-        $compiled = $compiler->compile($source, $tree, $name, $customEscaper, $charset, false, $entity_flags);
+        $compiled = $compiler->compile($source, $tree, $name, $customEscaper, $charset, false, $entityFlags);
         foreach ($expected as $contains) {
             $this->assertContains($contains, $compiled);
         }
