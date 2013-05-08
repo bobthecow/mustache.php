@@ -18,7 +18,7 @@
  */
 class Mustache_LambdaHelper
 {
-    private $mustache;
+    public $mustache;
     private $context;
 
     /**
