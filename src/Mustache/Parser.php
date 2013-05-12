@@ -26,7 +26,7 @@ class Mustache_Parser
      */
     public function parse(array $tokens = array())
     {
-        return $this->buildTree(new ArrayIterator($tokens));
+        return $this->buildTree($tokens);
     }
 
     /**
@@ -34,18 +34,17 @@ class Mustache_Parser
      *
      * @throws Mustache_Exception_SyntaxException when nesting errors or mismatched section tags are encountered.
      *
-     * @param ArrayIterator $tokens Stream of Mustache tokens
-     * @param array         $parent Parent token (default: null)
+     * @param array &$tokens Set of Mustache tokens
+     * @param array  $parent Parent token (default: null)
      *
      * @return array Mustache Token parse tree
      */
-    private function buildTree(ArrayIterator $tokens, array $parent = null)
+    private function buildTree(array &$tokens, array $parent = null)
     {
         $nodes = array();
 
-        do {
-            $token = $tokens->current();
-            $tokens->next();
+        while (!empty($tokens)) {
+            $token = array_shift($tokens);
 
             if ($token === null) {
                 continue;
@@ -78,8 +77,7 @@ class Mustache_Parser
                         break;
                 }
             }
-
-        } while ($tokens->valid());
+        };
 
         if (isset($parent)) {
             $msg = sprintf('Missing closing tag: %s', $parent[Mustache_Tokenizer::NAME]);
