@@ -70,7 +70,6 @@ class Mustache_Tokenizer
     const NODES  = 'nodes';
     const VALUE  = 'value';
 
-    private $pragmas;
     private $state;
     private $tagType;
     private $tag;
@@ -177,14 +176,6 @@ class Mustache_Tokenizer
 
         $this->flushBuffer();
 
-        // Pragmas are hoisted to the front of the template.
-        foreach ($this->pragmas as $pragma) {
-            array_unshift($this->tokens, array(
-                self::TYPE => self::T_PRAGMA,
-                self::NAME => $pragma,
-            ));
-        }
-
         return $this->tokens;
     }
 
@@ -202,7 +193,6 @@ class Mustache_Tokenizer
         $this->line      = 0;
         $this->otag      = '{{';
         $this->ctag      = '}}';
-        $this->pragmas   = array();
     }
 
     /**
@@ -242,7 +232,10 @@ class Mustache_Tokenizer
     }
 
     /**
-     * Add pragma tag this template's list of pragmas.
+     * Add pragma token.
+     *
+     * Pragmas are hoisted to the front of the template, so all pragma tokens
+     * will appear at the front of the token list.
      *
      * @param string $text
      * @param int    $index
@@ -251,8 +244,15 @@ class Mustache_Tokenizer
      */
     private function addPragma($text, $index)
     {
-        $end = strpos($text, $this->ctag, $index);
-        $this->pragmas[] = trim(substr($text, $index + 2, $end - $index - 2));
+        $end    = strpos($text, $this->ctag, $index);
+        $pragma = trim(substr($text, $index + 2, $end - $index - 2));
+
+        // Pragmas are hoisted to the front of the template.
+        array_unshift($this->tokens, array(
+            self::TYPE => self::T_PRAGMA,
+            self::NAME => $pragma,
+            self::LINE => 0,
+        ));
 
         return $end + strlen($this->ctag) - 1;
     }
