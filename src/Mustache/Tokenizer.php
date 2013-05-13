@@ -228,6 +228,11 @@ class Mustache_Tokenizer
         $this->otag = $otag;
         $this->ctag = $ctag;
 
+        $this->tokens[] = array(
+            self::TYPE => self::T_DELIM_CHANGE,
+            self::LINE => $this->line,
+        );
+
         return $closeIndex + strlen($close) - 1;
     }
 
