@@ -176,6 +176,7 @@ class Mustache_Tokenizer
 
         $this->filterLine(true);
 
+        // Pragmas are hoisted to the front of the template.
         foreach ($this->pragmas as $pragma) {
             array_unshift($this->tokens, array(
                 self::TYPE => self::T_PRAGMA,
@@ -286,6 +287,14 @@ class Mustache_Tokenizer
         return $closeIndex + strlen($close) - 1;
     }
 
+    /**
+     * Add pragma tag this template's list of pragmas.
+     *
+     * @param string $text
+     * @param int    $index
+     *
+     * @return int New index value
+     */
     private function addPragma($text, $index)
     {
         $end = strpos($text, $this->ctag, $index);
