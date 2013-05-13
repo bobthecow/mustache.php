@@ -105,8 +105,7 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
             array(
                 '',
                 array(
-                    $this->createTextToken('foo'),
-                    $this->createTextToken("\n"),
+                    $this->createTextToken("foo\n"),
                     array(
                         Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
                         Mustache_Tokenizer::NAME => 'name',
@@ -123,8 +122,7 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
                 'UTF-8',
                 array(
                     "\nclass Monkey extends Mustache_Template",
-                    '$buffer .= $indent . \'foo\'',
-                    '$buffer .= "\n"',
+                    "\$buffer .= \$indent . 'foo\n';",
                     '$value = $this->resolveValue($context->find(\'name\'), $context, $indent);',
                     '$buffer .= htmlspecialchars($value, '.ENT_COMPAT.', \'UTF-8\');',
                     '$value = $this->resolveValue($context->last(), $context, $indent);',
