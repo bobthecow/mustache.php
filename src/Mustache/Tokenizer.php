@@ -108,16 +108,14 @@ class Mustache_Tokenizer
                         $this->state = self::IN_TAG_TYPE;
                     } else {
                         $char = substr($text, $i, 1);
+                        $this->buffer .= $char;
                         if ($char == "\n") {
-                            $this->filterLine();
-                        } else {
-                            $this->buffer .= $char;
+                            $this->flushBuffer();
                         }
                     }
                     break;
 
                 case self::IN_TAG_TYPE:
-
                     $i += strlen($this->otag) - 1;
                     $char = substr($text, $i + 1, 1);
                     if (isset(self::$tagTypes[$char])) {
@@ -174,7 +172,7 @@ class Mustache_Tokenizer
             }
         }
 
-        $this->filterLine(true);
+        $this->flushBuffer();
 
         // Pragmas are hoisted to the front of the template.
         foreach ($this->pragmas as $pragma) {
@@ -198,7 +196,6 @@ class Mustache_Tokenizer
         $this->buffer    = '';
         $this->tokens    = array();
         $this->seenTag   = false;
-        $this->lineStart = 0;
         $this->otag      = '{{';
         $this->ctag      = '}}';
         $this->pragmas   = array();
@@ -213,57 +210,6 @@ class Mustache_Tokenizer
             $this->tokens[] = array(self::TYPE  => self::T_TEXT, self::VALUE => $this->buffer);
             $this->buffer   = '';
         }
-    }
-
-    /**
-     * Test whether the current line is entirely made up of whitespace.
-     *
-     * @return boolean True if the current line is all whitespace
-     */
-    private function lineIsWhitespace()
-    {
-        $tokensCount = count($this->tokens);
-        for ($j = $this->lineStart; $j < $tokensCount; $j++) {
-            $token = $this->tokens[$j];
-            if (isset(self::$tagTypes[$token[self::TYPE]])) {
-                if (isset(self::$interpolatedTags[$token[self::TYPE]])) {
-                    return false;
-                }
-            } elseif ($token[self::TYPE] == self::T_TEXT) {
-                if (preg_match('/\S/', $token[self::VALUE])) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Filter out whitespace-only lines and store indent levels for partials.
-     *
-     * @param bool $noNewLine Suppress the newline? (default: false)
-     */
-    private function filterLine($noNewLine = false)
-    {
-        $this->flushBuffer();
-        if ($this->seenTag && $this->lineIsWhitespace()) {
-            $tokensCount = count($this->tokens);
-            for ($j = $this->lineStart; $j < $tokensCount; $j++) {
-                if ($this->tokens[$j][self::TYPE] == self::T_TEXT) {
-                    if (isset($this->tokens[$j+1]) && $this->tokens[$j+1][self::TYPE] == self::T_PARTIAL) {
-                        $this->tokens[$j+1][self::INDENT] = $this->tokens[$j][self::VALUE];
-                    }
-
-                    $this->tokens[$j] = null;
-                }
-            }
-        } elseif (!$noNewLine) {
-            $this->tokens[] = array(self::TYPE => self::T_TEXT, self::VALUE => "\n");
-        }
-
-        $this->seenTag   = false;
-        $this->lineStart = count($this->tokens);
     }
 
     /**

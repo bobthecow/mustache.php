@@ -110,7 +110,11 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::CTAG  => '}}',
                         Mustache_Tokenizer::INDEX => 18,
                     ),
-                    null,
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
+                        Mustache_Tokenizer::LINE  => 1,
+                        Mustache_Tokenizer::VALUE => "  \n",
+                    ),
                     array(
                         Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_ESCAPED,
                         Mustache_Tokenizer::NAME  => 'c',
