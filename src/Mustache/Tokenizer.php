@@ -63,6 +63,7 @@ class Mustache_Tokenizer
     const NAME   = 'name';
     const OTAG   = 'otag';
     const CTAG   = 'ctag';
+    const LINE   = 'line';
     const INDEX  = 'index';
     const END    = 'end';
     const INDENT = 'indent';
@@ -76,7 +77,7 @@ class Mustache_Tokenizer
     private $buffer;
     private $tokens;
     private $seenTag;
-    private $lineStart;
+    private $line;
     private $otag;
     private $ctag;
 
@@ -111,6 +112,7 @@ class Mustache_Tokenizer
                         $this->buffer .= $char;
                         if ($char == "\n") {
                             $this->flushBuffer();
+                            $this->line++;
                         }
                     }
                     break;
@@ -148,6 +150,7 @@ class Mustache_Tokenizer
                             self::NAME  => trim($this->buffer),
                             self::OTAG  => $this->otag,
                             self::CTAG  => $this->ctag,
+                            self::LINE  => $this->line,
                             self::INDEX => ($this->tagType == self::T_END_SECTION) ? $this->seenTag - strlen($this->otag) : $i + strlen($this->ctag)
                         );
 
@@ -196,6 +199,7 @@ class Mustache_Tokenizer
         $this->buffer    = '';
         $this->tokens    = array();
         $this->seenTag   = false;
+        $this->line      = 0;
         $this->otag      = '{{';
         $this->ctag      = '}}';
         $this->pragmas   = array();
@@ -207,7 +211,11 @@ class Mustache_Tokenizer
     private function flushBuffer()
     {
         if (!empty($this->buffer)) {
-            $this->tokens[] = array(self::TYPE  => self::T_TEXT, self::VALUE => $this->buffer);
+            $this->tokens[] = array(
+                self::TYPE  => self::T_TEXT,
+                self::LINE  => $this->line,
+                self::VALUE => $this->buffer
+            );
             $this->buffer   = '';
         }
     }
