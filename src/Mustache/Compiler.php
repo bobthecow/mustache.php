@@ -373,13 +373,11 @@ class Mustache_Compiler
      */
     private function text($text, $level)
     {
-        if ($text === "\n") {
-            $this->indentNextLine = true;
+        $indentNextLine = (substr($text, -1) === "\n");
+        $code = sprintf($this->prepare(self::TEXT, $level), $this->flushIndent(), var_export($text, true));
+        $this->indentNextLine = $indentNextLine;
 
-            return $this->prepare(self::LINE, $level);
-        } else {
-            return sprintf($this->prepare(self::TEXT, $level), $this->flushIndent(), var_export($text, true));
-        }
+        return $code;
     }
 
     /**
@@ -467,12 +465,12 @@ class Mustache_Compiler
      */
     private function flushIndent()
     {
-        if ($this->indentNextLine) {
-            $this->indentNextLine = false;
-
-            return self::LINE_INDENT;
-        } else {
+        if (!$this->indentNextLine) {
             return '';
         }
+
+        $this->indentNextLine = false;
+
+        return self::LINE_INDENT;
     }
 }
