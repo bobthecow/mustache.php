@@ -14,25 +14,6 @@
  */
 class Mustache_Test_Loader_FilesystemLoaderTest extends PHPUnit_Framework_TestCase
 {
-    private static $_tempDir, $_tmp_alpha, $_tmp_beta;
-
-    public static function tearDownAfterClass()
-    {
-        // clean up files for testConstructorWithProtocol in case test fails
-        if (is_file(self::$_tmp_alpha)) {
-            unlink(self::$_tmp_alpha);
-        }
-        if (is_file(self::$_tmp_beta)) {
-            unlink(self::$_tmp_beta);
-        }
-        if (is_dir(self::$_tempDir)) {
-            rmdir(self::$_tempDir);
-        }
-        if (is_file(self::$_tempDir)) {
-            unlink(self::$_tempDir);
-        }
-    }
-
     public function testConstructor()
     {
         $baseDir = realpath(dirname(__FILE__).'/../../../fixtures/templates');
@@ -43,26 +24,11 @@ class Mustache_Test_Loader_FilesystemLoaderTest extends PHPUnit_Framework_TestCa
 
     public function testConstructorWithProtocol()
     {
-        $baseDir        = realpath(dirname(__FILE__).'/../../../fixtures/templates');
-        self::$_tempDir = tempnam(sys_get_temp_dir(), '');
+        $baseDir = realpath(dirname(__FILE__).'/../../../fixtures/templates');
 
-        // starts as a file, so unlink
-        if (file_exists(self::$_tempDir)) {
-            unlink(self::$_tempDir);
-        }
-
-        if (mkdir(self::$_tempDir)) {
-            self::$_tmp_alpha = self::$_tempDir . '/alpha.ms';
-            self::$_tmp_beta  = self::$_tempDir . '/beta.ms';
-
-            // copy to tempDir
-            copy($baseDir . '/alpha.ms', self::$_tmp_alpha);
-            copy($baseDir . '/beta.ms', self::$_tmp_beta);
-
-            $loader = new Mustache_Loader_FilesystemLoader('file://' . self::$_tempDir, array('extension' => '.ms'));
-            $this->assertEquals('alpha contents', $loader->load('alpha'));
-            $this->assertEquals('beta contents', $loader->load('beta.ms'));
-        }
+        $loader = new Mustache_Loader_FilesystemLoader('file://' . $baseDir, array('extension' => '.ms'));
+        $this->assertEquals('alpha contents', $loader->load('alpha'));
+        $this->assertEquals('beta contents', $loader->load('beta.ms'));
     }
 
     public function testLoadTemplates()
