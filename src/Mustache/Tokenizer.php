@@ -63,20 +63,20 @@ class Mustache_Tokenizer
     const NAME   = 'name';
     const OTAG   = 'otag';
     const CTAG   = 'ctag';
+    const LINE   = 'line';
     const INDEX  = 'index';
     const END    = 'end';
     const INDENT = 'indent';
     const NODES  = 'nodes';
     const VALUE  = 'value';
 
-    private $pragmas;
     private $state;
     private $tagType;
     private $tag;
     private $buffer;
     private $tokens;
     private $seenTag;
-    private $lineStart;
+    private $line;
     private $otag;
     private $ctag;
 
@@ -108,16 +108,15 @@ class Mustache_Tokenizer
                         $this->state = self::IN_TAG_TYPE;
                     } else {
                         $char = substr($text, $i, 1);
+                        $this->buffer .= $char;
                         if ($char == "\n") {
-                            $this->filterLine();
-                        } else {
-                            $this->buffer .= $char;
+                            $this->flushBuffer();
+                            $this->line++;
                         }
                     }
                     break;
 
                 case self::IN_TAG_TYPE:
-
                     $i += strlen($this->otag) - 1;
                     $char = substr($text, $i + 1, 1);
                     if (isset(self::$tagTypes[$char])) {
@@ -150,6 +149,7 @@ class Mustache_Tokenizer
                             self::NAME  => trim($this->buffer),
                             self::OTAG  => $this->otag,
                             self::CTAG  => $this->ctag,
+                            self::LINE  => $this->line,
                             self::INDEX => ($this->tagType == self::T_END_SECTION) ? $this->seenTag - strlen($this->otag) : $i + strlen($this->ctag)
                         );
 
@@ -174,14 +174,7 @@ class Mustache_Tokenizer
             }
         }
 
-        $this->filterLine(true);
-
-        foreach ($this->pragmas as $pragma) {
-            array_unshift($this->tokens, array(
-                self::TYPE => self::T_PRAGMA,
-                self::NAME => $pragma,
-            ));
-        }
+        $this->flushBuffer();
 
         return $this->tokens;
     }
@@ -197,10 +190,9 @@ class Mustache_Tokenizer
         $this->buffer    = '';
         $this->tokens    = array();
         $this->seenTag   = false;
-        $this->lineStart = 0;
+        $this->line      = 0;
         $this->otag      = '{{';
         $this->ctag      = '}}';
-        $this->pragmas   = array();
     }
 
     /**
@@ -209,60 +201,13 @@ class Mustache_Tokenizer
     private function flushBuffer()
     {
         if (!empty($this->buffer)) {
-            $this->tokens[] = array(self::TYPE  => self::T_TEXT, self::VALUE => $this->buffer);
+            $this->tokens[] = array(
+                self::TYPE  => self::T_TEXT,
+                self::LINE  => $this->line,
+                self::VALUE => $this->buffer
+            );
             $this->buffer   = '';
         }
-    }
-
-    /**
-     * Test whether the current line is entirely made up of whitespace.
-     *
-     * @return boolean True if the current line is all whitespace
-     */
-    private function lineIsWhitespace()
-    {
-        $tokensCount = count($this->tokens);
-        for ($j = $this->lineStart; $j < $tokensCount; $j++) {
-            $token = $this->tokens[$j];
-            if (isset(self::$tagTypes[$token[self::TYPE]])) {
-                if (isset(self::$interpolatedTags[$token[self::TYPE]])) {
-                    return false;
-                }
-            } elseif ($token[self::TYPE] == self::T_TEXT) {
-                if (preg_match('/\S/', $token[self::VALUE])) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Filter out whitespace-only lines and store indent levels for partials.
-     *
-     * @param bool $noNewLine Suppress the newline? (default: false)
-     */
-    private function filterLine($noNewLine = false)
-    {
-        $this->flushBuffer();
-        if ($this->seenTag && $this->lineIsWhitespace()) {
-            $tokensCount = count($this->tokens);
-            for ($j = $this->lineStart; $j < $tokensCount; $j++) {
-                if ($this->tokens[$j][self::TYPE] == self::T_TEXT) {
-                    if (isset($this->tokens[$j+1]) && $this->tokens[$j+1][self::TYPE] == self::T_PARTIAL) {
-                        $this->tokens[$j+1][self::INDENT] = $this->tokens[$j][self::VALUE];
-                    }
-
-                    $this->tokens[$j] = null;
-                }
-            }
-        } elseif (!$noNewLine) {
-            $this->tokens[] = array(self::TYPE => self::T_TEXT, self::VALUE => "\n");
-        }
-
-        $this->seenTag   = false;
-        $this->lineStart = count($this->tokens);
     }
 
     /**
@@ -283,13 +228,36 @@ class Mustache_Tokenizer
         $this->otag = $otag;
         $this->ctag = $ctag;
 
+        $this->tokens[] = array(
+            self::TYPE => self::T_DELIM_CHANGE,
+            self::LINE => $this->line,
+        );
+
         return $closeIndex + strlen($close) - 1;
     }
 
+    /**
+     * Add pragma token.
+     *
+     * Pragmas are hoisted to the front of the template, so all pragma tokens
+     * will appear at the front of the token list.
+     *
+     * @param string $text
+     * @param int    $index
+     *
+     * @return int New index value
+     */
     private function addPragma($text, $index)
     {
-        $end = strpos($text, $this->ctag, $index);
-        $this->pragmas[] = trim(substr($text, $index + 2, $end - $index - 2));
+        $end    = strpos($text, $this->ctag, $index);
+        $pragma = trim(substr($text, $index + 2, $end - $index - 2));
+
+        // Pragmas are hoisted to the front of the template.
+        array_unshift($this->tokens, array(
+            self::TYPE => self::T_PRAGMA,
+            self::NAME => $pragma,
+            self::LINE => 0,
+        ));
 
         return $end + strlen($this->ctag) - 1;
     }

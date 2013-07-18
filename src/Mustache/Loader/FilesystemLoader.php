@@ -47,7 +47,11 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
      */
     public function __construct($baseDir, array $options = array())
     {
-        $this->baseDir = rtrim(realpath($baseDir), '/');
+        $this->baseDir = $baseDir;
+
+        if (strpos($this->baseDir, '://') === -1) {
+            $this->baseDir = realpath($this->baseDir);
+        }
 
         if (!is_dir($this->baseDir)) {
             throw new Mustache_Exception_RuntimeException(sprintf('FilesystemLoader baseDir must be a directory: %s', $baseDir));
