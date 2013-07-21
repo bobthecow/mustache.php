@@ -13,7 +13,7 @@
  * @group lambdas
  * @group functional
  */
-class Mustache_Test_Functional_PartialLambdaIndentTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_FiveThree_Functional_PartialLambdaIndentTest extends PHPUnit_Framework_TestCase
 {
 
     public function testLambdasInsidePartialsAreIndentedProperly()
