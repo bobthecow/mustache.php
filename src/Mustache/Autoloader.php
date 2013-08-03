@@ -61,7 +61,7 @@ class Mustache_Autoloader
             return;
         }
 
-        $file = sprintf('%s/%s.php', $this->baseDir, str_replace('_', '/', $class));
+        $file = sprintf('%s/%s.php', realpath($this->baseDir), str_replace('_', '/', $class));
         if (is_file($file)) {
             require $file;
         }
