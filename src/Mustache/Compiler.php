@@ -189,7 +189,7 @@ class Mustache_Compiler
                 $source = %s;
                 $buffer .= $this->mustache
                     ->loadLambda((string) call_user_func($value, $source, $this->lambdaHelper)%s)
-                    ->renderInternal($context, $indent);
+                    ->renderInternal($context);
             } elseif (!empty($value)) {
                 $values = $this->isIterable($value) ? $value : array($value);
                 foreach ($values as $value) {
