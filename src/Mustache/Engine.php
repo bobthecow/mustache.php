@@ -29,20 +29,20 @@ class Mustache_Engine
     const PRAGMA_FILTERS = 'FILTERS';
 
     // Template cache
-    private $templates = array();
+    protected $templates = array();
 
     // Environment
-    private $templateClassPrefix = '__Mustache_';
-    private $cache = null;
-    private $cacheFileMode = null;
-    private $loader;
-    private $partialsLoader;
-    private $helpers;
-    private $escape;
-    private $entityFlags = ENT_COMPAT;
-    private $charset = 'UTF-8';
-    private $logger;
-    private $strictCallables = false;
+    protected $templateClassPrefix = '__Mustache_';
+    protected $cache = null;
+    protected $cacheFileMode = null;
+    protected $loader;
+    protected $partialsLoader;
+    protected $helpers;
+    protected $escape;
+    protected $entityFlags = ENT_COMPAT;
+    protected $charset = 'UTF-8';
+    protected $logger;
+    protected $strictCallables = false;
 
     /**
      * Mustache class constructor.
@@ -574,7 +574,7 @@ class Mustache_Engine
      *
      * @return Mustache_Template
      */
-    private function loadSource($source)
+    protected function loadSource($source)
     {
         $className = $this->getTemplateClassName($source);
 
@@ -673,7 +673,7 @@ class Mustache_Engine
      *
      * @return string Mustache Template class cache filename
      */
-    private function getCacheFilename($source)
+    protected function getCacheFilename($source)
     {
         if ($this->cache) {
             return sprintf('%s/%s.php', $this->cache, $this->getTemplateClassName($source));
@@ -690,7 +690,7 @@ class Mustache_Engine
      *
      * @codeCoverageIgnore
      */
-    private function writeCacheFile($fileName, $source)
+    protected function writeCacheFile($fileName, $source)
     {
         $dirName = dirname($fileName);
         if (!is_dir($dirName)) {
