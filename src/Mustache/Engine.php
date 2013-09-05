@@ -55,7 +55,8 @@ class Mustache_Engine
      *         // A Mustache cache instance. Uses a NoopCache if not specified.
      *         'cacher' => new Mustache_Cache_FilesystemCache(dirname(__FILE__).'/tmp/cache/mustache'),
      *
-     *         // A cache directory for compiled templates. Mustache will not cache templates unless this is set
+     *         // A Mustache cache instance or a cache directory string for compiled templates.
+     *         // Mustache will not cache templates unless this is set
      *         'cache' => dirname(__FILE__).'/tmp/cache/mustache',
      *
      *         // Override default permissions for cache files. Defaults to using the system-defined umask. It is
@@ -113,16 +114,15 @@ class Mustache_Engine
             $this->templateClassPrefix = $options['template_class_prefix'];
         }
 
-        if (isset($options['cacher'])) {
-            $this->cache = $options['cacher'];
-        } else if (isset($options['cache'])) {
-            $cacheFileMode = isset($options['cache_file_mode'])
-                ? $options['cache_file_mode']
-                : null;
-            $this->cache = new Mustache_Cache_FilesystemCache(
-                $options['cache'],
-                $cacheFileMode
-            );
+        if (isset($options['cache'])) {
+            $cache = $options['cache'];
+
+            if (is_string($cache)) {
+                $mode  = isset($options['cache_file_mode']) ? $options['cache_file_mode'] : null;
+                $cache = new Mustache_Cache_FilesystemCache($cache, $mode);
+            }
+
+            $this->setCache($cache);
         }
 
         if (isset($options['loader'])) {
