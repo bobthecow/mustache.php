@@ -58,6 +58,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($mustache->hasHelper('foo'));
         $this->assertTrue($mustache->hasHelper('bar'));
         $this->assertFalse($mustache->hasHelper('baz'));
+        $this->assertInstanceOf('Mustache_Cache_FilesystemCache', $mustache->getCache());
     }
 
     public static function getFoo()
@@ -95,6 +96,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $parser    = new Mustache_Parser;
         $compiler  = new Mustache_Compiler;
         $mustache  = new Mustache_Engine;
+        $cache     = new Mustache_Cache_FilesystemCache(sys_get_temp_dir());
 
         $this->assertNotSame($logger, $mustache->getLogger());
         $mustache->setLogger($logger);
@@ -119,6 +121,10 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $this->assertNotSame($compiler, $mustache->getCompiler());
         $mustache->setCompiler($compiler);
         $this->assertSame($compiler, $mustache->getCompiler());
+
+        $this->assertNotSame($cache, $mustache->getCache());
+        $mustache->setCache($cache);
+        $this->assertSame($cache, $mustache->getCache());
     }
 
     /**
@@ -134,10 +140,8 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $source    = '{{ foo }}';
         $template  = $mustache->loadTemplate($source);
         $className = $mustache->getTemplateClassName($source);
-        $fileName  = self::$tempDir . '/' . $className . '.php';
+
         $this->assertInstanceOf($className, $template);
-        $this->assertFileExists($fileName);
-        $this->assertContains("\nclass $className extends Mustache_Template", file_get_contents($fileName));
     }
 
     /**
@@ -290,7 +294,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $result = $mustache->render('{{ foo }}', array('foo' => 'FOO'));
         $this->assertEquals('FOO', $result);
 
-        $this->assertContains('WARNING: Template cache disabled, evaluating', file_get_contents($name));
+        $this->assertContains('WARNING: Template cache disabled', file_get_contents($name));
     }
 
     public function testLoggingIsNotTooAnnoying()

@@ -33,8 +33,7 @@ class Mustache_Engine
 
     // Environment
     private $templateClassPrefix = '__Mustache_';
-    private $cache = null;
-    private $cacheFileMode = null;
+    private $cache;
     private $loader;
     private $partialsLoader;
     private $helpers;
@@ -52,6 +51,9 @@ class Mustache_Engine
      *     $options = array(
      *         // The class prefix for compiled templates. Defaults to '__Mustache_'.
      *         'template_class_prefix' => '__MyTemplates_',
+     *
+     *         // A Mustache cache instance. Uses a NoopCache if not specified.
+     *         'cacher' => new Mustache_Cache_FilesystemCache(dirname(__FILE__).'/tmp/cache/mustache'),
      *
      *         // A cache directory for compiled templates. Mustache will not cache templates unless this is set
      *         'cache' => dirname(__FILE__).'/tmp/cache/mustache',
@@ -111,12 +113,13 @@ class Mustache_Engine
             $this->templateClassPrefix = $options['template_class_prefix'];
         }
 
-        if (isset($options['cache'])) {
-            $this->cache = $options['cache'];
-        }
-
-        if (isset($options['cache_file_mode'])) {
-            $this->cacheFileMode = $options['cache_file_mode'];
+        if (isset($options['cacher'])) {
+            $this->cache = $options['cacher'];
+        } else if (isset($options['cache'])) {
+            $this->cache = new Mustache_Cache_FilesystemCache(
+                $options['cache'],
+                $options['cache_file_mode']
+            );
         }
 
         if (isset($options['loader'])) {
@@ -480,6 +483,38 @@ class Mustache_Engine
     }
 
     /**
+     * Set the Mustache Tokenizer instance.
+     *
+     * @param Mustache_Cache $cache
+     */
+    public function setCache(Mustache_Cache $cache)
+    {
+        $this->cache = $cache;
+    }
+
+    /**
+     * Get the current Mustache Cache instance.
+     *
+     * If no Cache instance has been explicitly specified, this method will instantiate and return a new one.
+     *
+     * @return Mustache_Cache
+     */
+    public function getCache()
+    {
+        if (!isset($this->cache)) {
+            $this->cache = new Mustache_Cache_NoopCache();
+
+            $this->log(
+                Mustache_Logger::WARNING,
+                'Template cache disabled',
+                array()
+            );
+        }
+
+        return $this->cache;
+    }
+
+    /**
      * Helper method to generate a Mustache template class.
      *
      * @param string $source
@@ -580,27 +615,17 @@ class Mustache_Engine
 
         if (!isset($this->templates[$className])) {
             if (!class_exists($className, false)) {
-                if ($fileName = $this->getCacheFilename($source)) {
-                    if (!is_file($fileName)) {
-                        $this->log(
-                            Mustache_Logger::DEBUG,
-                            'Writing "{className}" class to template cache: "{fileName}"',
-                            array('className' => $className, 'fileName' => $fileName)
-                        );
-
-                        $this->writeCacheFile($fileName, $this->compile($source));
-                    }
-
-                    require_once $fileName;
-                } else {
+                $cached = $this->getCache()->get($source);
+                if (!$cached) {
                     $this->log(
-                        Mustache_Logger::WARNING,
-                        'Template cache disabled, evaluating "{className}" class at runtime',
+                        Mustache_Logger::DEBUG,
+                        'Writing "{className}" class to template cache',
                         array('className' => $className)
                     );
-
-                    eval('?>'.$this->compile($source));
+                    $cached = $this->compile($source);
+                    $this->getCache()->put($source, $cached);
                 }
+                eval('?>'.$cached);
             }
 
             $this->log(
@@ -664,72 +689,6 @@ class Mustache_Engine
         );
 
         return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables, $this->entityFlags);
-    }
-
-    /**
-     * Helper method to generate a Mustache Template class cache filename.
-     *
-     * @param string $source
-     *
-     * @return string Mustache Template class cache filename
-     */
-    private function getCacheFilename($source)
-    {
-        if ($this->cache) {
-            return sprintf('%s/%s.php', $this->cache, $this->getTemplateClassName($source));
-        }
-    }
-
-    /**
-     * Helper method to dump a generated Mustache Template subclass to the file cache.
-     *
-     * @throws Mustache_Exception_RuntimeException if unable to create the cache directory or write to $fileName.
-     *
-     * @param string $fileName
-     * @param string $source
-     *
-     * @codeCoverageIgnore
-     */
-    private function writeCacheFile($fileName, $source)
-    {
-        $dirName = dirname($fileName);
-        if (!is_dir($dirName)) {
-            $this->log(
-                Mustache_Logger::INFO,
-                'Creating Mustache template cache directory: "{dirName}"',
-                array('dirName' => $dirName)
-            );
-
-            @mkdir($dirName, 0777, true);
-            if (!is_dir($dirName)) {
-                throw new Mustache_Exception_RuntimeException(sprintf('Failed to create cache directory "%s".', $dirName));
-            }
-
-        }
-
-        $this->log(
-            Mustache_Logger::DEBUG,
-            'Caching compiled template to "{fileName}"',
-            array('fileName' => $fileName)
-        );
-
-        $tempFile = tempnam($dirName, basename($fileName));
-        if (false !== @file_put_contents($tempFile, $source)) {
-            if (@rename($tempFile, $fileName)) {
-                $mode = isset($this->cacheFileMode) ? $this->cacheFileMode : (0666 & ~umask());
-                @chmod($fileName, $mode);
-
-                return;
-            }
-
-            $this->log(
-                Mustache_Logger::ERROR,
-                'Unable to rename Mustache temp cache file: "{tempName}" -> "{fileName}"',
-                array('tempName' => $tempFile, 'fileName' => $fileName)
-            );
-        }
-
-        throw new Mustache_Exception_RuntimeException(sprintf('Failed to write cache file "%s".', $fileName));
     }
 
     /**
