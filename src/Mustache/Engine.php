@@ -116,9 +116,12 @@ class Mustache_Engine
         if (isset($options['cacher'])) {
             $this->cache = $options['cacher'];
         } else if (isset($options['cache'])) {
+            $cacheFileMode = isset($options['cache_file_mode'])
+                ? $options['cache_file_mode']
+                : null;
             $this->cache = new Mustache_Cache_FilesystemCache(
                 $options['cache'],
-                $options['cache_file_mode']
+                $cacheFileMode
             );
         }
 
