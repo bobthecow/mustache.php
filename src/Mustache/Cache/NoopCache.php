@@ -2,6 +2,13 @@
 
 class Mustache_Cache_NoopCache implements Mustache_Cache
 {
-    public function get($key) { return null; }
-    public function put($key, $value) {}
+    public function load($key)
+    {
+        return false;
+    }
+
+    public function cache($key, $compiled)
+    {
+        eval("?>".$compiled);
+    }
 }

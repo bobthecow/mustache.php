@@ -11,41 +11,55 @@ class Mustache_Cache_FilesystemCache implements Mustache_Cache
         $this->fileMode = $fileMode;
     }
 
-    public function get($key)
+    public function load($key)
     {
         $fileName = $this->getCacheFilename($key);
-        return (is_file($fileName))
-            ? file_get_contents($fileName)
-            : null;
+        if (!is_file($fileName)) {
+            return false;
+        }
+
+        require_once $fileName;
+
+        return true;
     }
 
-    public function put($key, $value)
+    public function cache($key, $value)
     {
         $fileName = $this->getCacheFilename($key);
+        $this->writeFile($fileName, $value);
+        $this->load($key);
+    }
+
+    protected function getCacheFilename($name)
+    {
+        return sprintf('%s/%s.php', $this->directory, md5($name));
+    }
+
+    private function buildDirectoryForFilename($fileName)
+    {
         $dirName = dirname($fileName);
         if (!is_dir($dirName)) {
             @mkdir($dirName, 0777, true);
             if (!is_dir($dirName)) {
                 throw new Mustache_Exception_RuntimeException(sprintf('Failed to create cache directory "%s".', $dirName));
             }
-
         }
+        return $dirName;
+    }
 
+    private function writeFile($fileName, $value)
+    {
+        $dirName = $this->buildDirectoryForFilename($fileName);
         $tempFile = tempnam($dirName, basename($fileName));
         if (false !== @file_put_contents($tempFile, $value)) {
             if (@rename($tempFile, $fileName)) {
                 $mode = isset($this->fileMode) ? $this->fileMode : (0666 & ~umask());
                 @chmod($fileName, $mode);
 
-                return;
+                return $fileName;
             }
         }
 
         throw new Mustache_Exception_RuntimeException(sprintf('Failed to write cache file "%s".', $fileName));
-    }
-
-    protected function getCacheFilename($name)
-    {
-        return sprintf('%s/%s.php', $this->directory, md5($name));
     }
 }

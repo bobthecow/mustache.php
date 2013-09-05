@@ -618,17 +618,10 @@ class Mustache_Engine
 
         if (!isset($this->templates[$className])) {
             if (!class_exists($className, false)) {
-                $cached = $this->getCache()->get($source);
-                if (!$cached) {
-                    $this->log(
-                        Mustache_Logger::DEBUG,
-                        'Writing "{className}" class to template cache',
-                        array('className' => $className)
-                    );
-                    $cached = $this->compile($source);
-                    $this->getCache()->put($source, $cached);
+                if (!$this->getCache()->load($source)) {
+                    $compiled = $this->compile($source);
+                    $this->getCache()->cache($source, $compiled);
                 }
-                eval('?>'.$cached);
             }
 
             $this->log(

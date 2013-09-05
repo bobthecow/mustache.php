@@ -2,6 +2,6 @@
 
 interface Mustache_Cache
 {
-    public function get($key);
-    public function put($key, $value);
+    public function load($key);
+    public function cache($key, $value);
 }

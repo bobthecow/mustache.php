@@ -19,20 +19,20 @@ class Mustache_Test_Cache_FilesystemCacheTest extends PHPUnit_Framework_TestCase
     {
         $key = 'some key';
         $cache = new Mustache_Cache_FilesystemCache(self::$tempDir);;
-        $cached = $cache->get($key);
+        $loaded = $cache->load($key);
 
-        $this->assertNull($cached);
+        $this->assertFalse($loaded);
     }
 
     public function testCachePut()
     {
         $key = 'some key';
-        $value = 'some value';
+        $value = '<?php /* some value */';
         $cache = new Mustache_Cache_FilesystemCache(self::$tempDir);;
-        $cache->put($key, $value);
-        $cached = $cache->get($key);
+        $cache->cache($key, $value);
+        $loaded = $cache->load($key);
 
-        $this->assertEquals($cached, $value);
+        $this->assertTrue($loaded);
     }
 
     private static function rmdir($path)
