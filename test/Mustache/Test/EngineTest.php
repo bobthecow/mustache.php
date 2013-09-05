@@ -294,7 +294,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $result = $mustache->render('{{ foo }}', array('foo' => 'FOO'));
         $this->assertEquals('FOO', $result);
 
-        $this->assertContains('WARNING: Template cache disabled', file_get_contents($name));
+        $this->assertContains('WARNING: Template cache disabled, evaluating', file_get_contents($name));
     }
 
     public function testLoggingIsNotTooAnnoying()

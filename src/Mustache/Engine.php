@@ -164,6 +164,10 @@ class Mustache_Engine
         if (isset($options['strict_callables'])) {
             $this->strictCallables = $options['strict_callables'];
         }
+
+        if (!isset($options['cache']) || is_string($options['cache'])) {
+            $this->getCache()->setLogger($this->getLogger());
+        }
     }
 
     /**
@@ -506,12 +510,6 @@ class Mustache_Engine
     {
         if (!isset($this->cache)) {
             $this->cache = new Mustache_Cache_NoopCache();
-
-            $this->log(
-                Mustache_Logger::WARNING,
-                'Template cache disabled',
-                array()
-            );
         }
 
         return $this->cache;

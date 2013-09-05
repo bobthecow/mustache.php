@@ -1,6 +1,6 @@
 <?php
 
-class Mustache_Cache_FilesystemCache implements Mustache_Cache
+class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
 {
     private $directory;
     private $fileMode;
@@ -26,6 +26,13 @@ class Mustache_Cache_FilesystemCache implements Mustache_Cache
     public function cache($key, $value)
     {
         $fileName = $this->getCacheFilename($key);
+
+        $this->log(
+            Mustache_Logger::DEBUG,
+            'Writing to template cache: "{fileName}"',
+            array('fileName' => $fileName)
+        );
+
         $this->writeFile($fileName, $value);
         $this->load($key);
     }
@@ -39,6 +46,12 @@ class Mustache_Cache_FilesystemCache implements Mustache_Cache
     {
         $dirName = dirname($fileName);
         if (!is_dir($dirName)) {
+            $this->log(
+                Mustache_Logger::INFO,
+                'Creating Mustache template cache directory: "{dirName}"',
+                array('dirName' => $dirName)
+            );
+
             @mkdir($dirName, 0777, true);
             if (!is_dir($dirName)) {
                 throw new Mustache_Exception_RuntimeException(sprintf('Failed to create cache directory "%s".', $dirName));
@@ -50,6 +63,13 @@ class Mustache_Cache_FilesystemCache implements Mustache_Cache
     private function writeFile($fileName, $value)
     {
         $dirName = $this->buildDirectoryForFilename($fileName);
+
+        $this->log(
+            Mustache_Logger::DEBUG,
+            'Caching compiled template to "{fileName}"',
+            array('fileName' => $fileName)
+        );
+
         $tempFile = tempnam($dirName, basename($fileName));
         if (false !== @file_put_contents($tempFile, $value)) {
             if (@rename($tempFile, $fileName)) {
@@ -58,6 +78,12 @@ class Mustache_Cache_FilesystemCache implements Mustache_Cache
 
                 return $fileName;
             }
+
+            $this->log(
+                Mustache_Logger::ERROR,
+                'Unable to rename Mustache temp cache file: "{tempName}" -> "{fileName}"',
+                array('tempName' => $tempFile, 'fileName' => $fileName)
+            );
         }
 
         throw new Mustache_Exception_RuntimeException(sprintf('Failed to write cache file "%s".', $fileName));
