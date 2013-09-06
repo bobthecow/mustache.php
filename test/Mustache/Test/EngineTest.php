@@ -96,7 +96,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $parser    = new Mustache_Parser;
         $compiler  = new Mustache_Compiler;
         $mustache  = new Mustache_Engine;
-        $cache     = new Mustache_Cache_FilesystemCache(sys_get_temp_dir());
+        $cache     = new Mustache_Cache_FilesystemCache(self::$tempDir);
 
         $this->assertNotSame($logger, $mustache->getLogger());
         $mustache->setLogger($logger);
