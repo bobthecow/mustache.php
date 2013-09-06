@@ -161,10 +161,6 @@ class Mustache_Engine
         if (isset($options['strict_callables'])) {
             $this->strictCallables = $options['strict_callables'];
         }
-
-        if (!isset($options['cache']) || is_string($options['cache'])) {
-            $this->getCache()->setLogger($this->getLogger());
-        }
     }
 
     /**
@@ -395,6 +391,10 @@ class Mustache_Engine
             throw new Mustache_Exception_InvalidArgumentException('Expected an instance of Mustache_Logger or Psr\\Log\\LoggerInterface.');
         }
 
+        if ($this->getCache()->getLogger() === null) {
+            $this->getCache()->setLogger($logger);
+        }
+
         $this->logger = $logger;
     }
 
@@ -493,6 +493,10 @@ class Mustache_Engine
      */
     public function setCache(Mustache_Cache $cache)
     {
+        if (isset($this->logger) && $cache->getLogger() === null) {
+            $cache->setLogger($this->getLogger());
+        }
+
         $this->cache = $cache;
     }
 
