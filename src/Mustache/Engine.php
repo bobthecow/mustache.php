@@ -52,9 +52,6 @@ class Mustache_Engine
      *         // The class prefix for compiled templates. Defaults to '__Mustache_'.
      *         'template_class_prefix' => '__MyTemplates_',
      *
-     *         // A Mustache cache instance. Uses a NoopCache if not specified.
-     *         'cacher' => new Mustache_Cache_FilesystemCache(dirname(__FILE__).'/tmp/cache/mustache'),
-     *
      *         // A Mustache cache instance or a cache directory string for compiled templates.
      *         // Mustache will not cache templates unless this is set
      *         'cache' => dirname(__FILE__).'/tmp/cache/mustache',
