@@ -2,12 +2,12 @@
 
 class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
 {
-    private $directory;
+    private $baseDir;
     private $fileMode;
 
-    public function __construct($directory, $fileMode = null)
+    public function __construct($baseDir, $fileMode = null)
     {
-        $this->directory = $directory;
+        $this->baseDir = $baseDir;
         $this->fileMode = $fileMode;
     }
 
@@ -39,7 +39,7 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
 
     protected function getCacheFilename($name)
     {
-        return sprintf('%s/%s.php', $this->directory, md5($name));
+        return sprintf('%s/%s.php', $this->baseDir, $name);
     }
 
     private function buildDirectoryForFilename($fileName)
@@ -76,7 +76,7 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
                 $mode = isset($this->fileMode) ? $this->fileMode : (0666 & ~umask());
                 @chmod($fileName, $mode);
 
-                return $fileName;
+                return;
             }
 
             $this->log(

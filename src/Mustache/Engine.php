@@ -506,7 +506,7 @@ class Mustache_Engine
     public function getCache()
     {
         if (!isset($this->cache)) {
-            $this->cache = new Mustache_Cache_NoopCache();
+            $this->setCache(new Mustache_Cache_NoopCache());
         }
 
         return $this->cache;
@@ -613,9 +613,9 @@ class Mustache_Engine
 
         if (!isset($this->templates[$className])) {
             if (!class_exists($className, false)) {
-                if (!$this->getCache()->load($source)) {
+                if (!$this->getCache()->load($className)) {
                     $compiled = $this->compile($source);
-                    $this->getCache()->cache($source, $compiled);
+                    $this->getCache()->cache($className, $compiled);
                 }
             }
 
