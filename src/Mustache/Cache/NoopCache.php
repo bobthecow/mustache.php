@@ -12,7 +12,7 @@ class Mustache_Cache_NoopCache extends Mustache_Cache_AbstractCache
         $this->log(
             Mustache_Logger::WARNING,
             'Template cache disabled, evaluating "{className}" class at runtime',
-            array('className' => $className)
+            array('className' => $key)
         );
         eval("?>".$compiled);
     }
