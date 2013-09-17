@@ -487,7 +487,7 @@ class Mustache_Engine
     }
 
     /**
-     * Set the Mustache Tokenizer instance.
+     * Set the Mustache Cache instance.
      *
      * @param Mustache_Cache $cache
      */
