@@ -9,6 +9,13 @@
  * file that was distributed with this source code.
  */
 
+/**
+ * Abstract Mustache Cache class.
+ *
+ * Provides logging support to child implementations.
+ *
+ * @abstract
+ */
 abstract class Mustache_Cache_AbstractCache implements Mustache_Cache
 {
     private $logger = null;

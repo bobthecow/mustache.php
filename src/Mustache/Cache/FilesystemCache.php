@@ -9,17 +9,39 @@
  * file that was distributed with this source code.
  */
 
+/**
+ * Mustache Cache filesystem implementation.
+ *
+ * A FilesystemCache instance caches Mustache Template classes from the filesystem by name:
+ *
+ *     $cache = new Mustache_Cache_FilesystemCache(dirname(__FILE__).'/cache');
+ *     $cache->cache($className, $compiledSource);
+ *
+ * Benefits from any opcode caching that may be setup in your environment.
+ */
 class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
 {
     private $baseDir;
     private $fileMode;
 
+    /**
+     * Filesystem cache constructor.
+     *
+     * @param string $baseDir Directory for compiled templates.
+     * @param int $fileMode Override default permissions for cache files. Defaults to using the system-defined umask.
+     */
     public function __construct($baseDir, $fileMode = null)
     {
         $this->baseDir = $baseDir;
         $this->fileMode = $fileMode;
     }
 
+    /**
+     * Load the class from cache using `require_once`.
+     *
+     * @param  string $key
+     * @return boolean
+     */
     public function load($key)
     {
         $fileName = $this->getCacheFilename($key);
@@ -32,6 +54,13 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
         return true;
     }
 
+    /**
+     * Cache and load the compiled class
+     *
+     * @param  string $key
+     * @param  string $value
+     * @return void
+     */
     public function cache($key, $value)
     {
         $fileName = $this->getCacheFilename($key);
@@ -46,11 +75,26 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
         $this->load($key);
     }
 
+    /**
+     * Build the cache filename.
+     * Subclasses should override for custom cache directory structures.
+     *
+     * @param  string $name
+     * @return string
+     */
     protected function getCacheFilename($name)
     {
         return sprintf('%s/%s.php', $this->baseDir, $name);
     }
 
+    /**
+     * Create cache directory
+     *
+     * @param  string $fileName
+     * @return string
+     *
+     * @throws Mustache_Exception_RuntimeException If unable to create directory
+     */
     private function buildDirectoryForFilename($fileName)
     {
         $dirName = dirname($fileName);
@@ -69,6 +113,15 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
         return $dirName;
     }
 
+    /**
+     * Write cache file
+     *
+     * @param  string $fileName
+     * @param  string $value
+     * @return void
+     *
+     * @throws Mustache_Exception_RuntimeException If unable to write file
+     */
     private function writeFile($fileName, $value)
     {
         $dirName = $this->buildDirectoryForFilename($fileName);
