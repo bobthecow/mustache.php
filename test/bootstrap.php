@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-date_default_timezone_set('UTC');
-
 require dirname(__FILE__).'/../src/Mustache/Autoloader.php';
 Mustache_Autoloader::register();
 
