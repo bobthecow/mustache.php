@@ -20,7 +20,8 @@ interface Mustache_Cache
     /**
      * Load a compiled Mustache_Template class from cache.
      *
-     * @param  string $key
+     * @param string $key
+     *
      * @return boolean indicates successfully class load
      */
     public function load($key);
@@ -28,8 +29,9 @@ interface Mustache_Cache
     /**
      * Cache and load a compiled Mustache_Template class.
      *
-     * @param  string $key
-     * @param  string $value
+     * @param string $key
+     * @param string $value
+     *
      * @return void
      */
     public function cache($key, $value);

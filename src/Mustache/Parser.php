@@ -40,7 +40,7 @@ class Mustache_Parser
      * @throws Mustache_Exception_SyntaxException when nesting errors or mismatched section tags are encountered.
      *
      * @param array &$tokens Set of Mustache tokens
-     * @param array  $parent Parent token (default: null)
+     * @param array $parent  Parent token (default: null)
      *
      * @return array Mustache Token parse tree
      */
@@ -121,8 +121,8 @@ class Mustache_Parser
      *
      * Returns a whitespace token for indenting partials, if applicable.
      *
-     * @param array  $nodes  Parsed nodes.
-     * @param array  $tokens Tokens to be parsed.
+     * @param array $nodes  Parsed nodes.
+     * @param array $tokens Tokens to be parsed.
      *
      * @return array Resulting indent token, if any.
      */

@@ -53,7 +53,7 @@ class Mustache_Engine
      *         'template_class_prefix' => '__MyTemplates_',
      *
      *         // A Mustache cache instance or a cache directory string for compiled templates.
-     *         // Mustache will not cache templates unless this is set
+     *         // Mustache will not cache templates unless this is set.
      *         'cache' => dirname(__FILE__).'/tmp/cache/mustache',
      *
      *         // Override default permissions for cache files. Defaults to using the system-defined umask. It is
@@ -172,7 +172,7 @@ class Mustache_Engine
      * @see Mustache_Template::render
      *
      * @param string $template
-     * @param mixed  $context (default: array())
+     * @param mixed  $context  (default: array())
      *
      * @return string Rendered template
      */
@@ -689,9 +689,9 @@ class Mustache_Engine
     /**
      * Add a log record if logging is enabled.
      *
-     * @param  integer $level   The logging level
-     * @param  string  $message The log message
-     * @param  array   $context The log context
+     * @param integer $level   The logging level
+     * @param string  $message The log message
+     * @param array   $context The log context
      */
     private function log($level, $message, array $context = array())
     {

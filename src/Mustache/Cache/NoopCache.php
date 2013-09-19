@@ -20,7 +20,8 @@ class Mustache_Cache_NoopCache extends Mustache_Cache_AbstractCache
     /**
      * Loads nothing. Move along.
      *
-     * @param  string $key
+     * @param string $key
+     *
      * @return boolean
      */
     public function load($key)
@@ -31,8 +32,9 @@ class Mustache_Cache_NoopCache extends Mustache_Cache_AbstractCache
     /**
      * Loads the compiled Mustache Template class without caching.
      *
-     * @param  string $key
-     * @param  string $compiled
+     * @param string $key
+     * @param string $compiled
+     *
      * @return void
      */
     public function cache($key, $compiled)

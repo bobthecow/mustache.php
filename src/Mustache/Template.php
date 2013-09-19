@@ -158,9 +158,9 @@ abstract class Mustache_Template
      *
      * Invoke the value if it is callable, otherwise return the value.
      *
-     * @param  mixed            $value
-     * @param  Mustache_Context $context
-     * @param  string           $indent
+     * @param mixed            $value
+     * @param Mustache_Context $context
+     * @param string           $indent
      *
      * @return string
      */

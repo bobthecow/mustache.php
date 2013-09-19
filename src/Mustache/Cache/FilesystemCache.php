@@ -27,8 +27,8 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
     /**
      * Filesystem cache constructor.
      *
-     * @param string $baseDir Directory for compiled templates.
-     * @param int $fileMode Override default permissions for cache files. Defaults to using the system-defined umask.
+     * @param string $baseDir  Directory for compiled templates.
+     * @param int    $fileMode Override default permissions for cache files. Defaults to using the system-defined umask.
      */
     public function __construct($baseDir, $fileMode = null)
     {
@@ -39,7 +39,8 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
     /**
      * Load the class from cache using `require_once`.
      *
-     * @param  string $key
+     * @param string $key
+     *
      * @return boolean
      */
     public function load($key)
@@ -57,8 +58,9 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
     /**
      * Cache and load the compiled class
      *
-     * @param  string $key
-     * @param  string $value
+     * @param string $key
+     * @param string $value
+     *
      * @return void
      */
     public function cache($key, $value)
@@ -79,7 +81,8 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
      * Build the cache filename.
      * Subclasses should override for custom cache directory structures.
      *
-     * @param  string $name
+     * @param string $name
+     *
      * @return string
      */
     protected function getCacheFilename($name)
@@ -90,10 +93,11 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
     /**
      * Create cache directory
      *
-     * @param  string $fileName
-     * @return string
-     *
      * @throws Mustache_Exception_RuntimeException If unable to create directory
+     *
+     * @param string $fileName
+     *
+     * @return string
      */
     private function buildDirectoryForFilename($fileName)
     {
@@ -110,17 +114,19 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
                 throw new Mustache_Exception_RuntimeException(sprintf('Failed to create cache directory "%s".', $dirName));
             }
         }
+
         return $dirName;
     }
 
     /**
      * Write cache file
      *
-     * @param  string $fileName
-     * @param  string $value
-     * @return void
-     *
      * @throws Mustache_Exception_RuntimeException If unable to write file
+     *
+     * @param string $fileName
+     * @param string $value
+     *
+     * @return void
      */
     private function writeFile($fileName, $value)
     {

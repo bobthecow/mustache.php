@@ -42,7 +42,6 @@ EOS;
 
         $tpl = $m->loadTemplate($src);
 
-
         $data = new Mustache_Test_Functional_ClassWithLambda();
         $this->assertEquals($expected, $tpl->render($data));
     }
