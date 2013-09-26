@@ -262,7 +262,7 @@ class Mustache_Compiler
 
     const PARTIAL = '
         if ($partial = $this->mustache->loadPartial(%s)) {
-            $buffer .= $partial->renderInternal($context, %s);
+            $buffer .= $partial->renderInternal($context, $indent . %s);
         }
     ';
 
