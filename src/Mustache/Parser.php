@@ -63,6 +63,17 @@ class Mustache_Parser
                     $this->clearStandaloneLines($nodes, $tokens);
                     break;
 
+                case Mustache_Tokenizer::T_BLOCK:
+                    if (isset($this->pragmas[Mustache_Engine::PRAGMA_BLOCKS])) {
+                        $this->clearStandaloneLines($nodes, $tokens);
+                        $nodes[] = $this->buildTree($tokens, $token);
+                    } else {
+                        $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_ESCAPED;
+                        $token[Mustache_Tokenizer::NAME] = '$'.$token[Mustache_Tokenizer::NAME];
+                        $nodes[] = $token;
+                    }
+                    break;
+
                 case Mustache_Tokenizer::T_SECTION:
                 case Mustache_Tokenizer::T_INVERTED:
                     $this->clearStandaloneLines($nodes, $tokens);

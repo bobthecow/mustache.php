@@ -35,6 +35,7 @@ class Mustache_Tokenizer
     const T_UNESCAPED_2  = '&';
     const T_TEXT         = '_t';
     const T_PRAGMA       = '%';
+    const T_BLOCK        = '$';
 
     // Valid token types
     private static $tagTypes = array(
@@ -49,6 +50,7 @@ class Mustache_Tokenizer
         self::T_UNESCAPED    => true,
         self::T_UNESCAPED_2  => true,
         self::T_PRAGMA       => true,
+        self::T_BLOCK        => true,
     );
 
     // Interpolated tags
@@ -260,6 +262,27 @@ class Mustache_Tokenizer
         ));
 
         return $end + strlen($this->ctag) - 1;
+    }
+
+    private function getPragma($text)
+    {
+        $chunks = explode(' ', trim($text));
+        $pragma = array(
+            self::TYPE  => self::T_PRAGMA,
+            self::NAME  => array_shift($chunks),
+            self::VALUE => array(),
+        );
+
+        foreach ($chunks as $chunk) {
+            list($key, $val) = explode('=', $chunk, 2);
+            $pragma[self::VALUE][$key] = $val;
+        }
+
+        if (empty($pragma[self::VALUE])) {
+            unset($pragma[self::VALUE]);
+        }
+
+        return $pragma;
     }
 
     /**

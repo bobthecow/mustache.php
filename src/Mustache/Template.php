@@ -79,7 +79,7 @@ abstract class Mustache_Template
      *
      * @return string Rendered template
      */
-    abstract public function renderInternal(Mustache_Context $context, $indent = '');
+    abstract public function renderInternal(Mustache_Context $context, $indent = '', $escape = false);
 
     /**
      * Tests whether a value should be iterated over (e.g. in a section context).
