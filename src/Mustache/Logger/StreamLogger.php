@@ -70,7 +70,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      */
     public function setLevel($level)
     {
-        if (!array_key_exists($level, self::$levels)) {
+        if (!isset(self::$levels[$level])) {
             throw new Mustache_Exception_InvalidArgumentException(sprintf('Unexpected logging level: %s', $level));
         }
 
@@ -98,7 +98,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      */
     public function log($level, $message, array $context = array())
     {
-        if (!array_key_exists($level, self::$levels)) {
+        if (!isset(self::$levels[$level])) {
             throw new Mustache_Exception_InvalidArgumentException(sprintf('Unexpected logging level: %s', $level));
         }
 
