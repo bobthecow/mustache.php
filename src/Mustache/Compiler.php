@@ -33,9 +33,9 @@ class Mustache_Compiler
      * @param string $tree            Parse tree of Mustache tokens
      * @param string $name            Mustache Template class name
      * @param bool   $customEscape    (default: false)
-     * @param int    $entityFlags     (default: ENT_COMPAT)
      * @param string $charset         (default: 'UTF-8')
      * @param bool   $strictCallables (default: false)
+     * @param int    $entityFlags     (default: ENT_COMPAT)
      *
      * @return string Generated PHP source code
      */
