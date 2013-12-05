@@ -69,9 +69,9 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
             'b' => 'bee',
         );
 
-		$access	= new Mustache_Test_TestArrayAccess($arr);
-
         $string = 'some arbitrary string';
+
+        $access = new Mustache_Test_TestArrayAccess($arr);
 
         $context->push($dummy);
         $this->assertEquals('dummy', $context->find('name'));
