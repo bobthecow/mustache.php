@@ -134,7 +134,7 @@ class Mustache_Context
     {
         for ($i = count($stack) - 1; $i >= 0; $i--) {
             if (is_object($stack[$i])) {
-				if( $stack[$i] instanceof ArrayAccess) {
+                if( $stack[$i] instanceof ArrayAccess) {
                     if (isset($stack[$i][$id])) {
                         return $stack[$i][$id];
                     }
@@ -143,13 +143,12 @@ class Mustache_Context
                         return $stack[$i]->$id();
                     } elseif (isset($stack[$i]->$id)) {
                         return $stack[$i]->$id;
-					}
+                    }
                 }
             } elseif (is_array($stack[$i]) && array_key_exists($id, $stack[$i])) {
                 return $stack[$i][$id];
             }
         }
-
         return '';
     }
 }
