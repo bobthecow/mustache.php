@@ -98,7 +98,7 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('<foo>', $context->find('foo'));
         $this->assertEquals('<bar>', $context->findDot('bar'));
 
-		$context = new Mustache_Context($arr);
+        $context = new Mustache_Context($arr);
         $this->assertEquals('bee', $context->find('b'));
         $this->assertEquals('see', $context->findDot('a.b.c'));
         $this->assertEquals(null, $context->findDot('a.b.c.d'));
@@ -128,9 +128,9 @@ class Mustache_Test_TestDummy
 class Mustache_Test_TestArrayAccess  implements arrayaccess {
     private $container = array();
     public function __construct($array) {
-		foreach($array as $key => $value) {
-	        $this->container[$key] = $value;
-		}
+        foreach($array as $key => $value) {
+            $this->container[$key] = $value;
+        }
     }
     public function offsetSet($offset, $value) {
         if (is_null($offset)) {
