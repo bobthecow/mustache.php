@@ -109,6 +109,16 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('see', $context->findDot('a.b.c'));
         $this->assertEquals(null, $context->findDot('a.b.c.d'));
     }
+
+    public function testAccessorPriority()
+    {
+        $context = new Mustache_Context(new Mustache_Test_AllTheThings);
+
+        $this->assertEquals('win', $context->find('foo'), 'method beats property');
+        $this->assertEquals('win', $context->find('bar'), 'property beats ArrayAccess');
+        $this->assertEquals('win', $context->find('baz'), 'ArrayAccess stands alone');
+        $this->assertEquals('win', $context->find('qux'), 'ArrayAccess beats private property');
+    }
 }
 
 class Mustache_Test_TestDummy
@@ -164,5 +174,48 @@ class Mustache_Test_TestArrayAccess implements ArrayAccess
     public function offsetGet($offset)
     {
         return isset($this->container[$offset]) ? $this->container[$offset] : null;
+    }
+}
+
+class Mustache_Test_AllTheThings implements ArrayAccess
+{
+    public $foo  = 'fail';
+    public $bar  = 'win';
+    private $qux = 'fail';
+
+    public function foo()
+    {
+        return 'win';
+    }
+
+    public function offsetExists($offset)
+    {
+        return true;
+    }
+
+    public function offsetGet($offset)
+    {
+        switch ($offset) {
+            case 'foo':
+            case 'bar':
+                return 'fail';
+
+            case 'baz':
+            case 'qux':
+                return 'win';
+
+            default:
+                return 'lolwhut';
+        }
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        // nada
+    }
+
+    public function offsetUnset($offset)
+    {
+        // nada
     }
 }
