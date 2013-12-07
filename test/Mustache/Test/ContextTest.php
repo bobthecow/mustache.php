@@ -71,8 +71,6 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
 
         $string = 'some arbitrary string';
 
-        $access = new Mustache_Test_TestArrayAccess($arr);
-
         $context->push($dummy);
         $this->assertEquals('dummy', $context->find('name'));
 
@@ -97,8 +95,16 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('see', $context->findDot('a.b.c'));
         $this->assertEquals('<foo>', $context->find('foo'));
         $this->assertEquals('<bar>', $context->findDot('bar'));
+    }
 
-        $context = new Mustache_Context($arr);
+    public function testArrayAccessFind()
+    {
+        $access = new Mustache_Test_TestArrayAccess(array(
+            'a' => array('b' => array('c' => 'see')),
+            'b' => 'bee',
+        ));
+
+        $context = new Mustache_Context($access);
         $this->assertEquals('bee', $context->find('b'));
         $this->assertEquals('see', $context->findDot('a.b.c'));
         $this->assertEquals(null, $context->findDot('a.b.c.d'));
@@ -125,27 +131,38 @@ class Mustache_Test_TestDummy
     }
 }
 
-class Mustache_Test_TestArrayAccess  implements arrayaccess {
+class Mustache_Test_TestArrayAccess implements ArrayAccess
+{
     private $container = array();
-    public function __construct($array) {
-        foreach($array as $key => $value) {
+
+    public function __construct($array)
+    {
+        foreach ($array as $key => $value) {
             $this->container[$key] = $value;
         }
     }
-    public function offsetSet($offset, $value) {
+
+    public function offsetSet($offset, $value)
+    {
         if (is_null($offset)) {
             $this->container[] = $value;
         } else {
             $this->container[$offset] = $value;
         }
     }
-    public function offsetExists($offset) {
+
+    public function offsetExists($offset)
+    {
         return isset($this->container[$offset]);
     }
-    public function offsetUnset($offset) {
+
+    public function offsetUnset($offset)
+    {
         unset($this->container[$offset]);
     }
-    public function offsetGet($offset) {
+
+    public function offsetGet($offset)
+    {
         return isset($this->container[$offset]) ? $this->container[$offset] : null;
     }
 }
