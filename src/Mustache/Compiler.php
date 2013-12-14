@@ -188,9 +188,14 @@ class Mustache_Compiler
             $buffer = \'\';
             if (%s) {
                 $source = %s;
-                $buffer .= $this->mustache
-                    ->loadLambda((string) call_user_func($value, $source, $this->lambdaHelper)%s)
-                    ->renderInternal($context);
+                $result = call_user_func($value, $source, $this->lambdaHelper);
+                if (strpos($result, \'{{\') === false) {
+                    $buffer .= $result;
+                } else {
+                    $buffer .= $this->mustache
+                        ->loadLambda((string) $result%s)
+                        ->renderInternal($context);
+                }
             } elseif (!empty($value)) {
                 $values = $this->isIterable($value) ? $value : array($value);
                 foreach ($values as $value) {

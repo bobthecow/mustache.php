@@ -71,6 +71,35 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends PHPUnit_Framework
         $dracula->name  = 'Dracula';
         $this->assertEquals('Count Dracula', $tpl->render($dracula));
     }
+
+    public function testPassthroughOptimization()
+    {
+        $mustache = $this->getMock('Mustache_Engine', array('loadLambda'));
+        $mustache->expects($this->never())
+            ->method('loadLambda');
+
+        $tpl = $mustache->loadTemplate('{{#wrap}}NAME{{/wrap}}');
+
+        $foo = new Mustache_Test_Functional_Foo;
+        $foo->wrap = array($foo, 'wrapWithEm');
+
+        $this->assertEquals('<em>NAME</em>', $tpl->render($foo));
+    }
+
+    public function testWithoutPassthroughOptimization()
+    {
+        $mustache = $this->getMock('Mustache_Engine', array('loadLambda'));
+        $mustache->expects($this->once())
+            ->method('loadLambda')
+            ->will($this->returnValue($mustache->loadTemplate('<em>{{ name }}</em>')));
+
+        $tpl = $mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
+
+        $foo = new Mustache_Test_Functional_Foo;
+        $foo->wrap = array($foo, 'wrapWithEm');
+
+        $this->assertEquals('<em>' . $foo->name . '</em>', $tpl->render($foo));
+    }
 }
 
 class Mustache_Test_Functional_Foo
