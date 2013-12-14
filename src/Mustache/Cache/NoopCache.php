@@ -33,17 +33,17 @@ class Mustache_Cache_NoopCache extends Mustache_Cache_AbstractCache
      * Loads the compiled Mustache Template class without caching.
      *
      * @param string $key
-     * @param string $compiled
+     * @param string $value
      *
      * @return void
      */
-    public function cache($key, $compiled)
+    public function cache($key, $value)
     {
         $this->log(
             Mustache_Logger::WARNING,
             'Template cache disabled, evaluating "{className}" class at runtime',
             array('className' => $key)
         );
-        eval("?>".$compiled);
+        eval('?>' . $value);
     }
 }
