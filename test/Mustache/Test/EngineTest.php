@@ -45,6 +45,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
                 'bar' => 'BAR',
             ),
             'escape'  => 'strtoupper',
+            'entity_flags' => ENT_QUOTES,
             'charset' => 'ISO-8859-1',
         ));
 
@@ -54,6 +55,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('{{ foo }}', $partialsLoader->load('foo'));
         $this->assertContains('__whot__', $mustache->getTemplateClassName('{{ foo }}'));
         $this->assertEquals('strtoupper', $mustache->getEscape());
+        $this->assertEquals(ENT_QUOTES, $mustache->getEntityFlags());
         $this->assertEquals('ISO-8859-1', $mustache->getCharset());
         $this->assertTrue($mustache->hasHelper('foo'));
         $this->assertTrue($mustache->hasHelper('bar'));
