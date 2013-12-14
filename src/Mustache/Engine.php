@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2012 Justin Hileman
+ * (c) 2013 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -23,7 +23,7 @@
  */
 class Mustache_Engine
 {
-    const VERSION        = '2.4.1';
+    const VERSION        = '2.5.0';
     const SPEC_VERSION   = '1.1.2';
 
     const PRAGMA_FILTERS = 'FILTERS';
@@ -33,8 +33,9 @@ class Mustache_Engine
 
     // Environment
     private $templateClassPrefix = '__Mustache_';
-    private $cache = null;
-    private $cacheFileMode = null;
+    private $cache;
+    private $lambdaCache;
+    private $cacheLambdaTemplates = false;
     private $loader;
     private $partialsLoader;
     private $helpers;
@@ -53,12 +54,17 @@ class Mustache_Engine
      *         // The class prefix for compiled templates. Defaults to '__Mustache_'.
      *         'template_class_prefix' => '__MyTemplates_',
      *
-     *         // A cache directory for compiled templates. Mustache will not cache templates unless this is set
+     *         // A Mustache cache instance or a cache directory string for compiled templates.
+     *         // Mustache will not cache templates unless this is set.
      *         'cache' => dirname(__FILE__).'/tmp/cache/mustache',
      *
      *         // Override default permissions for cache files. Defaults to using the system-defined umask. It is
      *         // *strongly* recommended that you configure your umask properly rather than overriding permissions here.
      *         'cache_file_mode' => 0666,
+     *
+     *         // Optionally, enable caching for lambda section templates. This is generally not recommended, as lambda
+     *         // sections are often too dynamic to benefit from caching.
+     *         'cache_lambda_templates' => true,
      *
      *         // A Mustache template loader instance. Uses a StringLoader if not specified.
      *         'loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/views'),
@@ -112,11 +118,18 @@ class Mustache_Engine
         }
 
         if (isset($options['cache'])) {
-            $this->cache = $options['cache'];
+            $cache = $options['cache'];
+
+            if (is_string($cache)) {
+                $mode  = isset($options['cache_file_mode']) ? $options['cache_file_mode'] : null;
+                $cache = new Mustache_Cache_FilesystemCache($cache, $mode);
+            }
+
+            $this->setCache($cache);
         }
 
-        if (isset($options['cache_file_mode'])) {
-            $this->cacheFileMode = $options['cache_file_mode'];
+        if (isset($options['cache_lambda_templates'])) {
+            $this->cacheLambdaTemplates = (bool) $options['cache_lambda_templates'];
         }
 
         if (isset($options['loader'])) {
@@ -169,7 +182,7 @@ class Mustache_Engine
      * @see Mustache_Template::render
      *
      * @param string $template
-     * @param mixed  $context (default: array())
+     * @param mixed  $context  (default: array())
      *
      * @return string Rendered template
      */
@@ -388,6 +401,10 @@ class Mustache_Engine
             throw new Mustache_Exception_InvalidArgumentException('Expected an instance of Mustache_Logger or Psr\\Log\\LoggerInterface.');
         }
 
+        if ($this->getCache()->getLogger() === null) {
+            $this->getCache()->setLogger($logger);
+        }
+
         $this->logger = $logger;
     }
 
@@ -480,6 +497,58 @@ class Mustache_Engine
     }
 
     /**
+     * Set the Mustache Cache instance.
+     *
+     * @param Mustache_Cache $cache
+     */
+    public function setCache(Mustache_Cache $cache)
+    {
+        if (isset($this->logger) && $cache->getLogger() === null) {
+            $cache->setLogger($this->getLogger());
+        }
+
+        $this->cache = $cache;
+    }
+
+    /**
+     * Get the current Mustache Cache instance.
+     *
+     * If no Cache instance has been explicitly specified, this method will instantiate and return a new one.
+     *
+     * @return Mustache_Cache
+     */
+    public function getCache()
+    {
+        if (!isset($this->cache)) {
+            $this->setCache(new Mustache_Cache_NoopCache());
+        }
+
+        return $this->cache;
+    }
+
+    /**
+     * Get the current Lambda Cache instance.
+     *
+     * If 'cache_lambda_templates' is enabled, this is the default cache instance. Otherwise, it is a NoopCache.
+     *
+     * @see Mustache_Engine::getCache
+     *
+     * @return Mustache_Cache
+     */
+    protected function getLambdaCache()
+    {
+        if ($this->cacheLambdaTemplates) {
+            return $this->getCache();
+        }
+
+        if (!isset($this->lambdaCache)) {
+            $this->lambdaCache = new Mustache_Cache_NoopCache();
+        }
+
+        return $this->lambdaCache;
+    }
+
+    /**
      * Helper method to generate a Mustache template class.
      *
      * @param string $source
@@ -560,46 +629,37 @@ class Mustache_Engine
             $source = $delims . "\n" . $source;
         }
 
-        return $this->loadSource($source);
+        return $this->loadSource($source, $this->getLambdaCache());
     }
 
     /**
      * Instantiate and return a Mustache Template instance by source.
      *
+     * Optionally provide a Mustache_Cache instance. This is used internally by Mustache_Engine::loadLambda to respect
+     * the 'cache_lambda_templates' configuration option.
+     *
      * @see Mustache_Engine::loadTemplate
      * @see Mustache_Engine::loadPartial
      * @see Mustache_Engine::loadLambda
      *
-     * @param string $source
+     * @param string         $source
+     * @param Mustache_Cache $cache  (default: null)
      *
      * @return Mustache_Template
      */
-    private function loadSource($source)
+    private function loadSource($source, Mustache_Cache $cache = null)
     {
         $className = $this->getTemplateClassName($source);
 
         if (!isset($this->templates[$className])) {
+            if ($cache === null) {
+                $cache = $this->getCache();
+            }
+
             if (!class_exists($className, false)) {
-                if ($fileName = $this->getCacheFilename($source)) {
-                    if (!is_file($fileName)) {
-                        $this->log(
-                            Mustache_Logger::DEBUG,
-                            'Writing "{className}" class to template cache: "{fileName}"',
-                            array('className' => $className, 'fileName' => $fileName)
-                        );
-
-                        $this->writeCacheFile($fileName, $this->compile($source));
-                    }
-
-                    require_once $fileName;
-                } else {
-                    $this->log(
-                        Mustache_Logger::WARNING,
-                        'Template cache disabled, evaluating "{className}" class at runtime',
-                        array('className' => $className)
-                    );
-
-                    eval('?>'.$this->compile($source));
+                if (!$this->getCache()->load($className)) {
+                    $compiled = $this->compile($source);
+                    $this->getCache()->cache($className, $compiled);
                 }
             }
 
@@ -667,77 +727,11 @@ class Mustache_Engine
     }
 
     /**
-     * Helper method to generate a Mustache Template class cache filename.
-     *
-     * @param string $source
-     *
-     * @return string Mustache Template class cache filename
-     */
-    private function getCacheFilename($source)
-    {
-        if ($this->cache) {
-            return sprintf('%s/%s.php', $this->cache, $this->getTemplateClassName($source));
-        }
-    }
-
-    /**
-     * Helper method to dump a generated Mustache Template subclass to the file cache.
-     *
-     * @throws Mustache_Exception_RuntimeException if unable to create the cache directory or write to $fileName.
-     *
-     * @param string $fileName
-     * @param string $source
-     *
-     * @codeCoverageIgnore
-     */
-    private function writeCacheFile($fileName, $source)
-    {
-        $dirName = dirname($fileName);
-        if (!is_dir($dirName)) {
-            $this->log(
-                Mustache_Logger::INFO,
-                'Creating Mustache template cache directory: "{dirName}"',
-                array('dirName' => $dirName)
-            );
-
-            @mkdir($dirName, 0777, true);
-            if (!is_dir($dirName)) {
-                throw new Mustache_Exception_RuntimeException(sprintf('Failed to create cache directory "%s".', $dirName));
-            }
-
-        }
-
-        $this->log(
-            Mustache_Logger::DEBUG,
-            'Caching compiled template to "{fileName}"',
-            array('fileName' => $fileName)
-        );
-
-        $tempFile = tempnam($dirName, basename($fileName));
-        if (false !== @file_put_contents($tempFile, $source)) {
-            if (@rename($tempFile, $fileName)) {
-                $mode = isset($this->cacheFileMode) ? $this->cacheFileMode : (0666 & ~umask());
-                @chmod($fileName, $mode);
-
-                return;
-            }
-
-            $this->log(
-                Mustache_Logger::ERROR,
-                'Unable to rename Mustache temp cache file: "{tempName}" -> "{fileName}"',
-                array('tempName' => $tempFile, 'fileName' => $fileName)
-            );
-        }
-
-        throw new Mustache_Exception_RuntimeException(sprintf('Failed to write cache file "%s".', $fileName));
-    }
-
-    /**
      * Add a log record if logging is enabled.
      *
-     * @param  integer $level   The logging level
-     * @param  string  $message The log message
-     * @param  array   $context The log context
+     * @param integer $level   The logging level
+     * @param string  $message The log message
+     * @param array   $context The log context
      */
     private function log($level, $message, array $context = array())
     {

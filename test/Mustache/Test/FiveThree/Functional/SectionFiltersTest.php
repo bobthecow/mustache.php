@@ -13,7 +13,7 @@
  * @group filters
  * @group functional
  */
-class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_FiveThree_Functional_SectionFiltersTest extends PHPUnit_Framework_TestCase
 {
 
     private $mustache;
@@ -25,39 +25,45 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
 
     public function testSingleFilter()
     {
-        $tpl = $this->mustache->loadTemplate('{{% FILTERS }}{{ date | longdate }}');
+        $tpl = $this->mustache->loadTemplate('{{% FILTERS }}{{# word | echo }}{{ . }}!{{/ word | echo }}');
 
-        $this->mustache->addHelper('longdate', function(\DateTime $value) {
-            return $value->format('Y-m-d h:m:s');
+        $this->mustache->addHelper('echo', function($value) {
+            return array($value, $value, $value);
         });
 
-        $foo = new \StdClass;
-        $foo->date = new DateTime('1/1/2000');
-
-        $this->assertEquals('2000-01-01 12:01:00', $tpl->render($foo));
+        $this->assertEquals('bacon!bacon!bacon!', $tpl->render(array('word' => 'bacon')));
     }
+
+    const CHAINED_FILTERS_TPL = <<<EOS
+{{% FILTERS }}
+{{# word | echo | with_index }}
+{{ key }}: {{ value }}
+{{/ word | echo | with_index }}
+EOS;
 
     public function testChainedFilters()
     {
-        $tpl = $this->mustache->loadTemplate('{{% FILTERS }}{{ date | longdate | withbrackets }}');
+        $tpl = $this->mustache->loadTemplate(self::CHAINED_FILTERS_TPL);
 
-        $this->mustache->addHelper('longdate', function(\DateTime $value) {
-            return $value->format('Y-m-d h:m:s');
+        $this->mustache->addHelper('echo', function($value) {
+            return array($value, $value, $value);
         });
 
-        $this->mustache->addHelper('withbrackets', function($value) {
-            return sprintf('[[%s]]', $value);
+        $this->mustache->addHelper('with_index', function($value) {
+            return array_map(function($k, $v) {
+                return array(
+                    'key'   => $k,
+                    'value' => $v,
+                );
+            }, array_keys($value), $value);
         });
 
-        $foo = new \StdClass;
-        $foo->date = new DateTime('1/1/2000');
-
-        $this->assertEquals('[[2000-01-01 12:01:00]]', $tpl->render($foo));
+        $this->assertEquals("0: bacon\n1: bacon\n2: bacon\n", $tpl->render(array('word' => 'bacon')));
     }
 
     public function testInterpolateFirst()
     {
-        $tpl = $this->mustache->loadTemplate('{{% FILTERS }}{{ foo | bar }}');
+        $tpl = $this->mustache->loadTemplate('{{% FILTERS }}{{# foo | bar }}{{ . }}{{/ foo | bar }}');
         $this->assertEquals('win!', $tpl->render(array(
             'foo' => 'FOO',
             'bar' => function($value) {
@@ -73,7 +79,7 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
     public function testThrowsExceptionForBrokenPipes($tpl, $data)
     {
         $this->mustache
-            ->loadTemplate(sprintf('{{%% FILTERS }}{{ %s }}', $tpl))
+            ->loadTemplate(sprintf('{{%% FILTERS }}{{# %s }}{{ . }}{{/ %s }}', $tpl, $tpl))
                 ->render($data);
     }
 
@@ -91,4 +97,5 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
             array('foo | bar.baz', array('foo' => 'FOO', 'bar' => function() { return 'BAR'; }, 'baz' => function() { return 'BAZ'; })),
         );
     }
+
 }

@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2012 Justin Hileman
+ * (c) 2013 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -133,11 +133,13 @@ class Mustache_Context
     private function findVariableInStack($id, array $stack)
     {
         for ($i = count($stack) - 1; $i >= 0; $i--) {
-            if (is_object($stack[$i]) && !$stack[$i] instanceof Closure) {
+            if (is_object($stack[$i]) && !($stack[$i] instanceof Closure)) {
                 if (method_exists($stack[$i], $id)) {
                     return $stack[$i]->$id();
                 } elseif (isset($stack[$i]->$id)) {
                     return $stack[$i]->$id;
+                } elseif ($stack[$i] instanceof ArrayAccess && isset($stack[$i][$id])) {
+                    return $stack[$i][$id];
                 }
             } elseif (is_array($stack[$i]) && array_key_exists($id, $stack[$i])) {
                 return $stack[$i][$id];

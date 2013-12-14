@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2012 Justin Hileman
+ * (c) 2013 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -45,6 +45,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
                 'bar' => 'BAR',
             ),
             'escape'  => 'strtoupper',
+            'entity_flags' => ENT_QUOTES,
             'charset' => 'ISO-8859-1',
         ));
 
@@ -54,10 +55,12 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('{{ foo }}', $partialsLoader->load('foo'));
         $this->assertContains('__whot__', $mustache->getTemplateClassName('{{ foo }}'));
         $this->assertEquals('strtoupper', $mustache->getEscape());
+        $this->assertEquals(ENT_QUOTES, $mustache->getEntityFlags());
         $this->assertEquals('ISO-8859-1', $mustache->getCharset());
         $this->assertTrue($mustache->hasHelper('foo'));
         $this->assertTrue($mustache->hasHelper('bar'));
         $this->assertFalse($mustache->hasHelper('baz'));
+        $this->assertInstanceOf('Mustache_Cache_FilesystemCache', $mustache->getCache());
     }
 
     public static function getFoo()
@@ -95,6 +98,7 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $parser    = new Mustache_Parser;
         $compiler  = new Mustache_Compiler;
         $mustache  = new Mustache_Engine;
+        $cache     = new Mustache_Cache_FilesystemCache(self::$tempDir);
 
         $this->assertNotSame($logger, $mustache->getLogger());
         $mustache->setLogger($logger);
@@ -119,6 +123,10 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $this->assertNotSame($compiler, $mustache->getCompiler());
         $mustache->setCompiler($compiler);
         $this->assertSame($compiler, $mustache->getCompiler());
+
+        $this->assertNotSame($cache, $mustache->getCache());
+        $mustache->setCache($cache);
+        $this->assertSame($cache, $mustache->getCache());
     }
 
     /**
@@ -134,10 +142,29 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $source    = '{{ foo }}';
         $template  = $mustache->loadTemplate($source);
         $className = $mustache->getTemplateClassName($source);
-        $fileName  = self::$tempDir . '/' . $className . '.php';
+
         $this->assertInstanceOf($className, $template);
-        $this->assertFileExists($fileName);
-        $this->assertContains("\nclass $className extends Mustache_Template", file_get_contents($fileName));
+    }
+
+    public function testLambdaCache()
+    {
+        $mustache = new MustacheStub(array(
+            'cache' => self::$tempDir,
+            'cache_lambda_templates' => true,
+        ));
+
+        $this->assertNotInstanceOf('Mustache_Cache_NoopCache', $mustache->getProtectedLambdaCache());
+        $this->assertSame($mustache->getCache(), $mustache->getProtectedLambdaCache());
+    }
+
+    public function testWithoutLambdaCache()
+    {
+        $mustache = new MustacheStub(array(
+            'cache' => self::$tempDir
+        ));
+
+        $this->assertInstanceOf('Mustache_Cache_NoopCache', $mustache->getProtectedLambdaCache());
+        $this->assertNotSame($mustache->getCache(), $mustache->getProtectedLambdaCache());
     }
 
     /**
@@ -348,10 +375,16 @@ class MustacheStub extends Mustache_Engine
 {
     public $source;
     public $template;
+
     public function loadTemplate($source)
     {
         $this->source = $source;
 
         return $this->template;
+    }
+
+    public function getProtectedLambdaCache()
+    {
+        return $this->getLambdaCache();
     }
 }

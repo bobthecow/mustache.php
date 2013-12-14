@@ -73,7 +73,6 @@ class Mustache_Test_FiveThree_Functional_StrictCallablesTest extends PHPUnit_Fra
         );
     }
 
-
     /**
      * @group wip
      * @dataProvider strictCallables

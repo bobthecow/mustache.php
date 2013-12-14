@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2012 Justin Hileman
+ * (c) 2013 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -96,6 +96,29 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('<foo>', $context->find('foo'));
         $this->assertEquals('<bar>', $context->findDot('bar'));
     }
+
+    public function testArrayAccessFind()
+    {
+        $access = new Mustache_Test_TestArrayAccess(array(
+            'a' => array('b' => array('c' => 'see')),
+            'b' => 'bee',
+        ));
+
+        $context = new Mustache_Context($access);
+        $this->assertEquals('bee', $context->find('b'));
+        $this->assertEquals('see', $context->findDot('a.b.c'));
+        $this->assertEquals(null, $context->findDot('a.b.c.d'));
+    }
+
+    public function testAccessorPriority()
+    {
+        $context = new Mustache_Context(new Mustache_Test_AllTheThings);
+
+        $this->assertEquals('win', $context->find('foo'), 'method beats property');
+        $this->assertEquals('win', $context->find('bar'), 'property beats ArrayAccess');
+        $this->assertEquals('win', $context->find('baz'), 'ArrayAccess stands alone');
+        $this->assertEquals('win', $context->find('qux'), 'ArrayAccess beats private property');
+    }
 }
 
 class Mustache_Test_TestDummy
@@ -115,5 +138,84 @@ class Mustache_Test_TestDummy
     public function bar()
     {
         return '<bar>';
+    }
+}
+
+class Mustache_Test_TestArrayAccess implements ArrayAccess
+{
+    private $container = array();
+
+    public function __construct($array)
+    {
+        foreach ($array as $key => $value) {
+            $this->container[$key] = $value;
+        }
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        if (is_null($offset)) {
+            $this->container[] = $value;
+        } else {
+            $this->container[$offset] = $value;
+        }
+    }
+
+    public function offsetExists($offset)
+    {
+        return isset($this->container[$offset]);
+    }
+
+    public function offsetUnset($offset)
+    {
+        unset($this->container[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        return isset($this->container[$offset]) ? $this->container[$offset] : null;
+    }
+}
+
+class Mustache_Test_AllTheThings implements ArrayAccess
+{
+    public $foo  = 'fail';
+    public $bar  = 'win';
+    private $qux = 'fail';
+
+    public function foo()
+    {
+        return 'win';
+    }
+
+    public function offsetExists($offset)
+    {
+        return true;
+    }
+
+    public function offsetGet($offset)
+    {
+        switch ($offset) {
+            case 'foo':
+            case 'bar':
+                return 'fail';
+
+            case 'baz':
+            case 'qux':
+                return 'win';
+
+            default:
+                return 'lolwhut';
+        }
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        // nada
+    }
+
+    public function offsetUnset($offset)
+    {
+        // nada
     }
 }
