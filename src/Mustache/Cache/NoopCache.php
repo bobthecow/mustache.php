@@ -12,8 +12,8 @@
 /**
  * Mustache Cache in-memory implementation.
  *
- * In-memory implementation useful during development.
- * Not recommended for production use.
+ * The in-memory cache is used for uncached lambda section templates. It's also useful during development, but is not
+ * recommended for production use.
  */
 class Mustache_Cache_NoopCache extends Mustache_Cache_AbstractCache
 {

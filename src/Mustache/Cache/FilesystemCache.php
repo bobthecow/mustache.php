@@ -17,7 +17,7 @@
  *     $cache = new Mustache_Cache_FilesystemCache(dirname(__FILE__).'/cache');
  *     $cache->cache($className, $compiledSource);
  *
- * Benefits from any opcode caching that may be setup in your environment.
+ * The FilesystemCache benefits from any opcode caching that may be setup in your environment. So do that, k?
  */
 class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
 {
