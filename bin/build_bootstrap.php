@@ -34,6 +34,10 @@ if (file_exists($file)) {
 // and load the new one
 SymfonyClassCollectionLoader::load(array(
     'Mustache_Engine',
+    'Mustache_Cache',
+    'Mustache_Cache_AbstractCache',
+    'Mustache_Cache_FilesystemCache',
+    'Mustache_Cache_NoopCache',
     'Mustache_Compiler',
     'Mustache_Context',
     'Mustache_Exception',
