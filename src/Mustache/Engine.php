@@ -34,6 +34,8 @@ class Mustache_Engine
     // Environment
     private $templateClassPrefix = '__Mustache_';
     private $cache;
+    private $lambdaCache;
+    private $cacheLambdaTemplates = false;
     private $loader;
     private $partialsLoader;
     private $helpers;
@@ -59,6 +61,10 @@ class Mustache_Engine
      *         // Override default permissions for cache files. Defaults to using the system-defined umask. It is
      *         // *strongly* recommended that you configure your umask properly rather than overriding permissions here.
      *         'cache_file_mode' => 0666,
+     *
+     *         // Optionally, enable caching for lambda section templates. This is generally not recommended, as lambda
+     *         // sections are often too dynamic to benefit from caching.
+     *         'cache_lambda_templates' => true,
      *
      *         // A Mustache template loader instance. Uses a StringLoader if not specified.
      *         'loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/views'),
@@ -120,6 +126,10 @@ class Mustache_Engine
             }
 
             $this->setCache($cache);
+        }
+
+        if (isset($options['cache_lambda_templates'])) {
+            $this->cacheLambdaTemplates = (bool) $options['cache_lambda_templates'];
         }
 
         if (isset($options['loader'])) {
@@ -517,6 +527,28 @@ class Mustache_Engine
     }
 
     /**
+     * Get the current Lambda Cache instance.
+     *
+     * If 'cache_lambda_templates' is enabled, this is the default cache instance. Otherwise, it is a NoopCache.
+     *
+     * @see Mustache_Engine::getCache
+     *
+     * @return Mustache_Cache
+     */
+    protected function getLambdaCache()
+    {
+        if ($this->cacheLambdaTemplates) {
+            return $this->getCache();
+        }
+
+        if (!isset($this->lambdaCache)) {
+            $this->lambdaCache = new Mustache_Cache_NoopCache();
+        }
+
+        return $this->lambdaCache;
+    }
+
+    /**
      * Helper method to generate a Mustache template class.
      *
      * @param string $source
@@ -597,25 +629,33 @@ class Mustache_Engine
             $source = $delims . "\n" . $source;
         }
 
-        return $this->loadSource($source);
+        return $this->loadSource($source, $this->getLambdaCache());
     }
 
     /**
      * Instantiate and return a Mustache Template instance by source.
      *
+     * Optionally provide a Mustache_Cache instance. This is used internally by Mustache_Engine::loadLambda to respect
+     * the 'cache_lambda_templates' configuration option.
+     *
      * @see Mustache_Engine::loadTemplate
      * @see Mustache_Engine::loadPartial
      * @see Mustache_Engine::loadLambda
      *
-     * @param string $source
+     * @param string         $source
+     * @param Mustache_Cache $cache  (default: null)
      *
      * @return Mustache_Template
      */
-    private function loadSource($source)
+    private function loadSource($source, Mustache_Cache $cache = null)
     {
         $className = $this->getTemplateClassName($source);
 
         if (!isset($this->templates[$className])) {
+            if ($cache === null) {
+                $cache = $this->getCache();
+            }
+
             if (!class_exists($className, false)) {
                 if (!$this->getCache()->load($className)) {
                     $compiled = $this->compile($source);

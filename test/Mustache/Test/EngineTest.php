@@ -144,6 +144,27 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf($className, $template);
     }
 
+    public function testLambdaCache()
+    {
+        $mustache = new MustacheStub(array(
+            'cache' => self::$tempDir,
+            'cache_lambda_templates' => true,
+        ));
+
+        $this->assertNotInstanceOf('Mustache_Cache_NoopCache', $mustache->getProtectedLambdaCache());
+        $this->assertSame($mustache->getCache(), $mustache->getProtectedLambdaCache());
+    }
+
+    public function testWithoutLambdaCache()
+    {
+        $mustache = new MustacheStub(array(
+            'cache' => self::$tempDir
+        ));
+
+        $this->assertInstanceOf('Mustache_Cache_NoopCache', $mustache->getProtectedLambdaCache());
+        $this->assertNotSame($mustache->getCache(), $mustache->getProtectedLambdaCache());
+    }
+
     /**
      * @expectedException Mustache_Exception_InvalidArgumentException
      * @dataProvider getBadEscapers
@@ -352,10 +373,16 @@ class MustacheStub extends Mustache_Engine
 {
     public $source;
     public $template;
+
     public function loadTemplate($source)
     {
         $this->source = $source;
 
         return $this->template;
+    }
+
+    public function getProtectedLambdaCache()
+    {
+        return $this->getLambdaCache();
     }
 }
