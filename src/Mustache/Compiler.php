@@ -188,7 +188,7 @@ class Mustache_Compiler
             $buffer = \'\';
             if (%s) {
                 $source = %s;
-                $result = call_user_func($value, $source, $this->lambdaHelper);
+                $result = call_user_func($value, $source, $this->lambdaHelper, $context);
                 if (strpos($result, \'{{\') === false) {
                     $buffer .= $result;
                 } else {
