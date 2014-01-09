@@ -200,7 +200,7 @@ class Mustache_Tokenizer
      */
     private function flushBuffer()
     {
-        if (!empty($this->buffer)) {
+        if (strlen($this->buffer) > 0) {
             $this->tokens[] = array(
                 self::TYPE  => self::T_TEXT,
                 self::LINE  => $this->line,
