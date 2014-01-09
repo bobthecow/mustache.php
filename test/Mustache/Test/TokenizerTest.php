@@ -159,6 +159,35 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
 
                 )
             ),
+
+            // See https://github.com/bobthecow/mustache.php/issues/183
+            array(
+                "{{# a }}0{{/ a }}",
+                null,
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_SECTION,
+                        Mustache_Tokenizer::NAME  => 'a',
+                        Mustache_Tokenizer::OTAG  => '{{',
+                        Mustache_Tokenizer::CTAG  => '}}',
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::INDEX => 8,
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::VALUE => "0",
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_END_SECTION,
+                        Mustache_Tokenizer::NAME  => 'a',
+                        Mustache_Tokenizer::OTAG  => '{{',
+                        Mustache_Tokenizer::CTAG  => '}}',
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::INDEX => 9,
+                    ),
+                )
+            ),
         );
     }
 }
