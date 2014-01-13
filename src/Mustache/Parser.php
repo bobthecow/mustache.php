@@ -71,12 +71,20 @@ class Mustache_Parser
 
                 case Mustache_Tokenizer::T_END_SECTION:
                     if (!isset($parent)) {
-                        $msg = sprintf('Unexpected closing tag: /%s', $token[Mustache_Tokenizer::NAME]);
+                        $msg = sprintf(
+                            'Unexpected closing tag: /%s on line %s',
+                            $token[Mustache_Tokenizer::NAME],
+                            $token[Mustache_Tokenizer::LINE]
+                        );
                         throw new Mustache_Exception_SyntaxException($msg, $token);
                     }
 
                     if ($token[Mustache_Tokenizer::NAME] !== $parent[Mustache_Tokenizer::NAME]) {
-                        $msg = sprintf('Nesting error: %s vs. %s', $parent[Mustache_Tokenizer::NAME], $token[Mustache_Tokenizer::NAME]);
+                        $msg = sprintf(
+                            'Nesting error: %s vs. %s on line %s',
+                            $parent[Mustache_Tokenizer::NAME],
+                            $token[Mustache_Tokenizer::NAME], $token[Mustache_Tokenizer::LINE]
+                        );
                         throw new Mustache_Exception_SyntaxException($msg, $token);
                     }
 
@@ -109,7 +117,11 @@ class Mustache_Parser
         }
 
         if (isset($parent)) {
-            $msg = sprintf('Missing closing tag: %s', $parent[Mustache_Tokenizer::NAME]);
+            $msg = sprintf(
+                'Missing closing tag: %s on line %s',
+                $parent[Mustache_Tokenizer::NAME],
+                $parent[Mustache_Tokenizer::LINE]
+            );
             throw new Mustache_Exception_SyntaxException($msg, $parent);
         }
 
