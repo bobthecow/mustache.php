@@ -120,7 +120,7 @@ class Mustache_Parser
 
         if (isset($parent)) {
             $msg = sprintf(
-                'Missing closing tag: %s opened on line %s',
+                'Missing closing tag: %s opened on line %d',
                 $parent[Mustache_Tokenizer::NAME],
                 $parent[Mustache_Tokenizer::LINE]
             );
