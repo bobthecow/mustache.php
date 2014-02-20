@@ -79,6 +79,8 @@ class Mustache_Tokenizer
     private $line;
     private $otag;
     private $ctag;
+    private $otagLen;
+    private $ctagLen;
 
     /**
      * Scan and tokenize template source.
@@ -93,16 +95,14 @@ class Mustache_Tokenizer
         $this->reset();
 
         if ($delimiters = trim($delimiters)) {
-            list($otag, $ctag) = explode(' ', $delimiters);
-            $this->otag = $otag;
-            $this->ctag = $ctag;
+            $this->setDelimiters($delimiters);
         }
 
         $len = strlen($text);
         for ($i = 0; $i < $len; $i++) {
             switch ($this->state) {
                 case self::IN_TEXT:
-                    if ($this->tagChange($this->otag, $text, $i)) {
+                    if ($this->tagChange($this->otag, $this->otagLen, $text, $i)) {
                         $i--;
                         $this->flushBuffer();
                         $this->state = self::IN_TAG_TYPE;
@@ -117,7 +117,7 @@ class Mustache_Tokenizer
                     break;
 
                 case self::IN_TAG_TYPE:
-                    $i += strlen($this->otag) - 1;
+                    $i += $this->otagLen - 1;
                     $char = substr($text, $i + 1, 1);
                     if (isset(self::$tagTypes[$char])) {
                         $tag = $char;
@@ -143,18 +143,18 @@ class Mustache_Tokenizer
                     break;
 
                 default:
-                    if ($this->tagChange($this->ctag, $text, $i)) {
+                    if ($this->tagChange($this->ctag, $this->ctagLen, $text, $i)) {
                         $this->tokens[] = array(
                             self::TYPE  => $this->tagType,
                             self::NAME  => trim($this->buffer),
                             self::OTAG  => $this->otag,
                             self::CTAG  => $this->ctag,
                             self::LINE  => $this->line,
-                            self::INDEX => ($this->tagType == self::T_END_SECTION) ? $this->seenTag - strlen($this->otag) : $i + strlen($this->ctag)
+                            self::INDEX => ($this->tagType == self::T_END_SECTION) ? $this->seenTag - $this->otagLen : $i + $this->ctagLen
                         );
 
                         $this->buffer = '';
-                        $i += strlen($this->ctag) - 1;
+                        $i += $this->ctagLen - 1;
                         $this->state = self::IN_TEXT;
                         if ($this->tagType == self::T_UNESCAPED) {
                             if ($this->ctag == '}}') {
@@ -184,15 +184,17 @@ class Mustache_Tokenizer
      */
     private function reset()
     {
-        $this->state     = self::IN_TEXT;
-        $this->tagType   = null;
-        $this->tag       = null;
-        $this->buffer    = '';
-        $this->tokens    = array();
-        $this->seenTag   = false;
-        $this->line      = 0;
-        $this->otag      = '{{';
-        $this->ctag      = '}}';
+        $this->state   = self::IN_TEXT;
+        $this->tagType = null;
+        $this->tag     = null;
+        $this->buffer  = '';
+        $this->tokens  = array();
+        $this->seenTag = false;
+        $this->line    = 0;
+        $this->otag    = '{{';
+        $this->ctag    = '}}';
+        $this->otagLen = 2;
+        $this->ctagLen = 2;
     }
 
     /**
@@ -224,9 +226,7 @@ class Mustache_Tokenizer
         $close      = '='.$this->ctag;
         $closeIndex = strpos($text, $close, $index);
 
-        list($otag, $ctag) = explode(' ', trim(substr($text, $startIndex, $closeIndex - $startIndex)));
-        $this->otag = $otag;
-        $this->ctag = $ctag;
+        $this->setDelimiters(trim(substr($text, $startIndex, $closeIndex - $startIndex)));
 
         $this->tokens[] = array(
             self::TYPE => self::T_DELIM_CHANGE,
@@ -234,6 +234,20 @@ class Mustache_Tokenizer
         );
 
         return $closeIndex + strlen($close) - 1;
+    }
+
+    /**
+     * Set the current Mustache `otag` and `ctag` delimiters.
+     *
+     * @param string $delimiters
+     */
+    private function setDelimiters($delimiters)
+    {
+        list($otag, $ctag) = explode(' ', $delimiters);
+        $this->otag = $otag;
+        $this->ctag = $ctag;
+        $this->otagLen = strlen($otag);
+        $this->ctagLen = strlen($ctag);
     }
 
     /**
@@ -259,20 +273,21 @@ class Mustache_Tokenizer
             self::LINE => 0,
         ));
 
-        return $end + strlen($this->ctag) - 1;
+        return $end + $this->ctagLen - 1;
     }
 
     /**
      * Test whether it's time to change tags.
      *
-     * @param string $tag   Current tag name
-     * @param string $text  Mustache template source
-     * @param int    $index Current tokenizer index
+     * @param string $tag    Current tag name
+     * @param int    $tagLen Current tag name length
+     * @param string $text   Mustache template source
+     * @param int    $index  Current tokenizer index
      *
      * @return boolean True if this is a closing section tag
      */
-    private function tagChange($tag, $text, $index)
+    private function tagChange($tag, $tagLen, $text, $index)
     {
-        return substr($text, $index, strlen($tag)) === $tag;
+        return substr($text, $index, $tagLen) === $tag;
     }
 }
