@@ -35,7 +35,7 @@
  *         'mustache.loader' => new Mustache_Loader_InlineLoader(__FILE__, __COMPILER_HALT_OFFSET__)
  *     ));
  *
- *     $app->get('/{name}', function($name) use ($app) {
+ *     $app->get('/{name}', function ($name) use ($app) {
  *         return $app['mustache']->render('hello', compact('name'));
  *     })
  *     ->value('name', 'world');

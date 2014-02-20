@@ -79,12 +79,12 @@ class Mustache_Engine
      *         // An array of 'helpers'. Helpers can be global variables or objects, closures (e.g. for higher order
      *         // sections), or any other valid Mustache context value. They will be prepended to the context stack,
      *         // so they will be available in any template loaded by this Mustache instance.
-     *         'helpers' => array('i18n' => function($text) {
+     *         'helpers' => array('i18n' => function ($text) {
      *             // do something translatey here...
      *         }),
      *
      *         // An 'escape' callback, responsible for escaping double-mustache variables.
-     *         'escape' => function($value) {
+     *         'escape' => function ($value) {
      *             return htmlspecialchars($buffer, ENT_COMPAT, 'UTF-8');
      *         },
      *
