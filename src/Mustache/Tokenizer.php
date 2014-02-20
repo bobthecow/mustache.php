@@ -92,6 +92,14 @@ class Mustache_Tokenizer
      */
     public function scan($text, $delimiters = null)
     {
+        // Setting mbstring.func_overload makes things *really* slow.
+        // Let's do everyone a favor and scan this string as ASCII instead.
+        $encoding = null;
+        if (function_exists('mb_internal_encoding') && ini_get('mbstring.func_overload') & 2) {
+            $encoding = mb_internal_encoding();
+            mb_internal_encoding('ASCII');
+        }
+
         $this->reset();
 
         if ($delimiters = trim($delimiters)) {
@@ -107,7 +115,7 @@ class Mustache_Tokenizer
                         $this->flushBuffer();
                         $this->state = self::IN_TAG_TYPE;
                     } else {
-                        $char = substr($text, $i, 1);
+                        $char = $text[$i];
                         $this->buffer .= $char;
                         if ($char == "\n") {
                             $this->flushBuffer();
@@ -118,7 +126,7 @@ class Mustache_Tokenizer
 
                 case self::IN_TAG_TYPE:
                     $i += $this->otagLen - 1;
-                    $char = substr($text, $i + 1, 1);
+                    $char = $text[$i + 1];
                     if (isset(self::$tagTypes[$char])) {
                         $tag = $char;
                         $this->tagType = $tag;
@@ -168,13 +176,18 @@ class Mustache_Tokenizer
                             }
                         }
                     } else {
-                        $this->buffer .= substr($text, $i, 1);
+                        $this->buffer .= $text[$i];
                     }
                     break;
             }
         }
 
         $this->flushBuffer();
+
+        // Restore the user's encoding...
+        if ($encoding) {
+            mb_internal_encoding($encoding);
+        }
 
         return $this->tokens;
     }
