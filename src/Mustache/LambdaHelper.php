@@ -40,10 +40,13 @@ class Mustache_LambdaHelper
      *
      * @return Rendered template.
      */
-    public function render($string)
+    public function render($string, $context = NULL)
     {
-        return $this->mustache
-            ->loadLambda((string) $string)
-            ->renderInternal($this->context);
+        if ($context === NULL)
+            return $this->mustache
+                ->loadLambda((string) $string)
+                ->renderInternal($this->context);
+
+        return $this->mustache->render($string, $context);
     }
 }
