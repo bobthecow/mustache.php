@@ -45,6 +45,11 @@ class Mustache_Engine
     private $logger;
     private $strictCallables = false;
 
+    // Services
+    private $tokenizer;
+    private $parser;
+    private $compiler;
+
     /**
      * Mustache class constructor.
      *

@@ -31,6 +31,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
         self::EMERGENCY => 600,
     );
 
+    protected $level;
     protected $stream = null;
     protected $url    = null;
 

@@ -26,6 +26,7 @@
  */
 class Mustache_Loader_ArrayLoader implements Mustache_Loader, Mustache_Loader_MutableLoader
 {
+    private $templates;
 
     /**
      * ArrayLoader constructor.
