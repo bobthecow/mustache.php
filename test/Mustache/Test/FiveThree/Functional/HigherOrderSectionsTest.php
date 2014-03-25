@@ -28,7 +28,7 @@ class Mustache_Test_FiveThree_Functional_HigherOrderSectionsTest extends PHPUnit
 
         $foo = new Mustache_Test_FiveThree_Functional_Foo;
         $foo->name = 'Mario';
-        $foo->wrapper = function($text) {
+        $foo->wrapper = function ($text) {
             return sprintf('<div class="anonymous">%s</div>', $text);
         };
 
@@ -53,7 +53,7 @@ class Mustache_Test_FiveThree_Functional_HigherOrderSectionsTest extends PHPUnit
 
         $data = array(
             'name' => 'Bob',
-            'wrap' => function($text) {
+            'wrap' => function ($text) {
                 return sprintf('[[%s]]', $text);
             }
         );
@@ -70,7 +70,7 @@ class Mustache_Test_FiveThree_Functional_Foo
 
     public function __construct()
     {
-        $this->wrap = function($text) {
+        $this->wrap = function ($text) {
             return sprintf('<em>%s</em>', $text);
         };
     }

@@ -32,7 +32,7 @@ class Mustache_Test_FiveThree_Functional_StrictCallablesTest extends PHPUnit_Fra
 
     public function callables()
     {
-        $lambda = function($tpl, $mustache) {
+        $lambda = function ($tpl, $mustache) {
             return strtoupper($mustache->render($tpl));
         };
 
@@ -49,7 +49,7 @@ class Mustache_Test_FiveThree_Functional_StrictCallablesTest extends PHPUnit_Fra
                 'YOSHI',
             ),
             array(
-                function() { return 'Yoshi'; },
+                function () { return 'Yoshi'; },
                 $lambda,
                 'YOSHI',
             ),
@@ -91,14 +91,14 @@ class Mustache_Test_FiveThree_Functional_StrictCallablesTest extends PHPUnit_Fra
 
     public function strictCallables()
     {
-        $lambda = function($tpl, $mustache) {
+        $lambda = function ($tpl, $mustache) {
             return strtoupper($mustache->render($tpl));
         };
 
         return array(
             // Interpolation lambdas
             array(
-                function() { return 'Yoshi'; },
+                function () { return 'Yoshi'; },
                 $lambda,
                 'YOSHI',
             ),
@@ -116,7 +116,7 @@ class Mustache_Test_FiveThree_Functional_StrictCallablesTest extends PHPUnit_Fra
             ),
             array(
                 'Yoshi',
-                function($tpl, $mustache) {
+                function ($tpl, $mustache) {
                     return strtoupper($mustache->render($tpl));
                 },
                 'YOSHI',

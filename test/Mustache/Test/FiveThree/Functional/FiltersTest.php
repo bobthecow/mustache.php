@@ -27,7 +27,7 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
     {
         $tpl = $this->mustache->loadTemplate('{{% FILTERS }}{{ date | longdate }}');
 
-        $this->mustache->addHelper('longdate', function(\DateTime $value) {
+        $this->mustache->addHelper('longdate', function (\DateTime $value) {
             return $value->format('Y-m-d h:m:s');
         });
 
@@ -41,11 +41,11 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
     {
         $tpl = $this->mustache->loadTemplate('{{% FILTERS }}{{ date | longdate | withbrackets }}');
 
-        $this->mustache->addHelper('longdate', function(\DateTime $value) {
+        $this->mustache->addHelper('longdate', function (\DateTime $value) {
             return $value->format('Y-m-d h:m:s');
         });
 
-        $this->mustache->addHelper('withbrackets', function($value) {
+        $this->mustache->addHelper('withbrackets', function ($value) {
             return sprintf('[[%s]]', $value);
         });
 
@@ -60,7 +60,7 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
         $tpl = $this->mustache->loadTemplate('{{% FILTERS }}{{ foo | bar }}');
         $this->assertEquals('win!', $tpl->render(array(
             'foo' => 'FOO',
-            'bar' => function($value) {
+            'bar' => function ($value) {
                 return ($value === 'FOO') ? 'win!' : 'fail :(';
             },
         )));
@@ -84,11 +84,11 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
             array('foo | bar', array('foo' => 'FOO')),
             array('foo | bar', array('foo' => 'FOO', 'bar' => 'BAR')),
             array('foo | bar', array('foo' => 'FOO', 'bar' => array(1, 2))),
-            array('foo | bar | baz', array('foo' => 'FOO', 'bar' => function() { return 'BAR'; })),
-            array('foo | bar | baz', array('foo' => 'FOO', 'baz' => function() { return 'BAZ'; })),
-            array('foo | bar | baz', array('bar' => function() { return 'BAR'; })),
-            array('foo | bar | baz', array('baz' => function() { return 'BAZ'; })),
-            array('foo | bar.baz', array('foo' => 'FOO', 'bar' => function() { return 'BAR'; }, 'baz' => function() { return 'BAZ'; })),
+            array('foo | bar | baz', array('foo' => 'FOO', 'bar' => function () { return 'BAR'; })),
+            array('foo | bar | baz', array('foo' => 'FOO', 'baz' => function () { return 'BAZ'; })),
+            array('foo | bar | baz', array('bar' => function () { return 'BAR'; })),
+            array('foo | bar | baz', array('baz' => function () { return 'BAZ'; })),
+            array('foo | bar.baz', array('foo' => 'FOO', 'bar' => function () { return 'BAR'; }, 'baz' => function () { return 'BAZ'; })),
         );
     }
 }

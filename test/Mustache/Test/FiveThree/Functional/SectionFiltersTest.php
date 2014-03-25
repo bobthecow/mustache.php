@@ -27,7 +27,7 @@ class Mustache_Test_FiveThree_Functional_SectionFiltersTest extends PHPUnit_Fram
     {
         $tpl = $this->mustache->loadTemplate('{{% FILTERS }}{{# word | echo }}{{ . }}!{{/ word | echo }}');
 
-        $this->mustache->addHelper('echo', function($value) {
+        $this->mustache->addHelper('echo', function ($value) {
             return array($value, $value, $value);
         });
 
@@ -45,12 +45,12 @@ EOS;
     {
         $tpl = $this->mustache->loadTemplate(self::CHAINED_FILTERS_TPL);
 
-        $this->mustache->addHelper('echo', function($value) {
+        $this->mustache->addHelper('echo', function ($value) {
             return array($value, $value, $value);
         });
 
-        $this->mustache->addHelper('with_index', function($value) {
-            return array_map(function($k, $v) {
+        $this->mustache->addHelper('with_index', function ($value) {
+            return array_map(function ($k, $v) {
                 return array(
                     'key'   => $k,
                     'value' => $v,
@@ -66,7 +66,7 @@ EOS;
         $tpl = $this->mustache->loadTemplate('{{% FILTERS }}{{# foo | bar }}{{ . }}{{/ foo | bar }}');
         $this->assertEquals('win!', $tpl->render(array(
             'foo' => 'FOO',
-            'bar' => function($value) {
+            'bar' => function ($value) {
                 return ($value === 'FOO') ? 'win!' : 'fail :(';
             },
         )));
@@ -90,11 +90,11 @@ EOS;
             array('foo | bar', array('foo' => 'FOO')),
             array('foo | bar', array('foo' => 'FOO', 'bar' => 'BAR')),
             array('foo | bar', array('foo' => 'FOO', 'bar' => array(1, 2))),
-            array('foo | bar | baz', array('foo' => 'FOO', 'bar' => function() { return 'BAR'; })),
-            array('foo | bar | baz', array('foo' => 'FOO', 'baz' => function() { return 'BAZ'; })),
-            array('foo | bar | baz', array('bar' => function() { return 'BAR'; })),
-            array('foo | bar | baz', array('baz' => function() { return 'BAZ'; })),
-            array('foo | bar.baz', array('foo' => 'FOO', 'bar' => function() { return 'BAR'; }, 'baz' => function() { return 'BAZ'; })),
+            array('foo | bar | baz', array('foo' => 'FOO', 'bar' => function () { return 'BAR'; })),
+            array('foo | bar | baz', array('foo' => 'FOO', 'baz' => function () { return 'BAZ'; })),
+            array('foo | bar | baz', array('bar' => function () { return 'BAR'; })),
+            array('foo | bar | baz', array('baz' => function () { return 'BAZ'; })),
+            array('foo | bar.baz', array('foo' => 'FOO', 'bar' => function () { return 'BAR'; }, 'baz' => function () { return 'BAZ'; })),
         );
     }
 

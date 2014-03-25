@@ -51,7 +51,7 @@ class Mustache_Test_Functional_ClassWithLambda
 {
     public function _t()
     {
-        return function($val) {
+        return function ($val) {
             return strtoupper($val);
         };
     }

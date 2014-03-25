@@ -55,7 +55,7 @@ class Mustache_Test_FiveThree_Functional_MustacheSpecTest extends Mustache_Test_
                 }
 
                 $func = $val['php'];
-                $data[$key] = function($text = null) use ($func) {
+                $data[$key] = function ($text = null) use ($func) {
                     return eval($func);
                 };
             } elseif (is_array($val)) {
