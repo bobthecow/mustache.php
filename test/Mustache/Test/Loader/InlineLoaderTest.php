@@ -35,7 +35,7 @@ class Mustache_Test_Loader_InlineLoaderTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidOffsetThrowsException()
     {
-        $loader = new Mustache_Loader_InlineLoader(__FILE__, 'notanumber');
+        new Mustache_Loader_InlineLoader(__FILE__, 'notanumber');
     }
 
     /**
@@ -43,7 +43,7 @@ class Mustache_Test_Loader_InlineLoaderTest extends PHPUnit_Framework_TestCase
      */
     public function testInvalidFileThrowsException()
     {
-        $loader = new Mustache_Loader_InlineLoader('notarealfile', __COMPILER_HALT_OFFSET__);
+        new Mustache_Loader_InlineLoader('notarealfile', __COMPILER_HALT_OFFSET__);
     }
 }
 

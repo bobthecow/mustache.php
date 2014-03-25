@@ -95,7 +95,6 @@ class Mustache_Parser
                     $parent[Mustache_Tokenizer::NODES] = $nodes;
 
                     return $parent;
-                    break;
 
                 case Mustache_Tokenizer::T_PARTIAL:
                 case Mustache_Tokenizer::T_PARTIAL_2:
@@ -158,7 +157,6 @@ class Mustache_Parser
             }
         }
 
-        $next = null;
         if ($next = reset($tokens)) {
             // If we're on a new line, bail.
             if ($next[Mustache_Tokenizer::LINE] !== $this->lineNum) {
