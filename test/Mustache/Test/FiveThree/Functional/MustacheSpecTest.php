@@ -62,7 +62,7 @@ class Mustache_Test_FiveThree_Functional_MustacheSpecTest extends PHPUnit_Framew
                 }
 
                 $func = $val['php'];
-                $data[$key] = function() use ($func) {
+                $data[$key] = function($text = null) use ($func) {
                     return eval($func);
                 };
             } elseif (is_array($val)) {
