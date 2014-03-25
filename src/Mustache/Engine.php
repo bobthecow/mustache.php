@@ -50,6 +50,23 @@ class Mustache_Engine
     private $parser;
     private $compiler;
 
+    private static $optionProperties = array(
+        'template_class_prefix'  => 'templateClassPrefix',
+        'cache_lambda_templates' => 'cacheLambdaTemplates',
+        'escape'                 => 'escape',
+        'entity_flags'           => 'entityFlags',
+        'charset'                => 'charset',
+        'strict_callables'       => 'strictCallables',
+    );
+
+    private static $optionSetters = array(
+        'loader'          => 'setLoader',
+        'partials_loader' => 'setPartialsLoader',
+        'partials'        => 'setPartials',
+        'helpers'         => 'setHelpers',
+        'logger'          => 'setLogger',
+    );
+
     /**
      * Mustache class constructor.
      *
@@ -118,10 +135,6 @@ class Mustache_Engine
      */
     public function __construct(array $options = array())
     {
-        if (isset($options['template_class_prefix'])) {
-            $this->templateClassPrefix = $options['template_class_prefix'];
-        }
-
         if (isset($options['cache'])) {
             $cache = $options['cache'];
 
@@ -133,48 +146,22 @@ class Mustache_Engine
             $this->setCache($cache);
         }
 
-        if (isset($options['cache_lambda_templates'])) {
-            $this->cacheLambdaTemplates = (bool) $options['cache_lambda_templates'];
-        }
-
-        if (isset($options['loader'])) {
-            $this->setLoader($options['loader']);
-        }
-
-        if (isset($options['partials_loader'])) {
-            $this->setPartialsLoader($options['partials_loader']);
-        }
-
-        if (isset($options['partials'])) {
-            $this->setPartials($options['partials']);
-        }
-
-        if (isset($options['helpers'])) {
-            $this->setHelpers($options['helpers']);
-        }
-
         if (isset($options['escape'])) {
             if (!is_callable($options['escape'])) {
                 throw new Mustache_Exception_InvalidArgumentException('Mustache Constructor "escape" option must be callable');
             }
-
-            $this->escape = $options['escape'];
         }
 
-        if (isset($options['entity_flags'])) {
-          $this->entityFlags = $options['entity_flags'];
+        foreach (self::$optionProperties as $name => $property) {
+            if (isset($options[$name])) {
+                $this->$property = $options[$name];
+            }
         }
 
-        if (isset($options['charset'])) {
-            $this->charset = $options['charset'];
-        }
-
-        if (isset($options['logger'])) {
-            $this->setLogger($options['logger']);
-        }
-
-        if (isset($options['strict_callables'])) {
-            $this->strictCallables = $options['strict_callables'];
+        foreach (self::$optionSetters as $name => $setter) {
+            if (isset($options[$name])) {
+                $this->$setter($options[$name]);
+            }
         }
     }
 
