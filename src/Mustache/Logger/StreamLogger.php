@@ -37,8 +37,8 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
     /**
      * @throws InvalidArgumentException if the logging level is unknown.
      *
-     * @param string  $stream Resource instance or URL
-     * @param integer $level  The minimum logging level at which this handler will be triggered
+     * @param resource|string $stream Resource instance or URL
+     * @param integer         $level  The minimum logging level at which this handler will be triggered
      */
     public function __construct($stream, $level = Mustache_Logger::ERROR)
     {

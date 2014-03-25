@@ -38,7 +38,7 @@ class Mustache_LambdaHelper
      *
      * @param string $string
      *
-     * @return Rendered template.
+     * @return string Rendered template.
      */
     public function render($string)
     {

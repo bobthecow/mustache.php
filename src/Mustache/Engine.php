@@ -194,7 +194,7 @@ class Mustache_Engine
     /**
      * Get the current Mustache escape callback.
      *
-     * @return mixed Callable or null
+     * @return callable|null
      */
     public function getEscape()
     {

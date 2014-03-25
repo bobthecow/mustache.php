@@ -16,6 +16,9 @@ class Mustache_Exception_UnknownTemplateException extends InvalidArgumentExcepti
 {
     protected $templateName;
 
+    /**
+     * @param string $templateName
+     */
     public function __construct($templateName)
     {
         $this->templateName = $templateName;

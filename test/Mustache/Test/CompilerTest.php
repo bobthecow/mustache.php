@@ -142,6 +142,9 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
         $compiler->compile('', array(array(Mustache_Tokenizer::TYPE => 'invalid')), 'SomeClass');
     }
 
+    /**
+     * @param string $value
+     */
     private function createTextToken($value)
     {
         return array(

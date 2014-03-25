@@ -78,7 +78,8 @@ class Mustache_Test_FiveThree_Functional_MustacheSpecTest extends PHPUnit_Framew
      *
      * Loads YAML files from the spec and converts them to PHPisms.
      *
-     * @access public
+     * @param string $name
+     *
      * @return array
      */
     private function loadSpec($name)

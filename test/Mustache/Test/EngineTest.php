@@ -349,6 +349,9 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
         $this->assertContains("WARNING: Partial not found: \"bar\"", $log);
     }
 
+    /**
+     * @param string $path
+     */
     private static function rmdir($path)
     {
         $path = rtrim($path, '/').'/';

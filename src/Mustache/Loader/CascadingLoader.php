@@ -25,7 +25,7 @@ class Mustache_Loader_CascadingLoader implements Mustache_Loader
      *         new Mustache_Loader_FilesystemLoader(__DIR__.'/templates')
      *     ));
      *
-     * @param array $loaders An array of Mustache Loader instances
+     * @param Mustache_Loader[] $loaders An array of Mustache Loader instances
      */
     public function __construct(array $loaders = array())
     {

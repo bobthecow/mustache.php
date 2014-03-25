@@ -112,6 +112,9 @@ class Mustache_Test_Functional_Foo
         return sprintf('<em>%s</em>', $text);
     }
 
+    /**
+     * @param string $text
+     */
     public function wrapWithStrong($text)
     {
         return sprintf('<strong>%s</strong>', $text);

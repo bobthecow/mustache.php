@@ -44,6 +44,9 @@ class Mustache_Test_Cache_FilesystemCacheTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($loaded);
     }
 
+    /**
+     * @param string $path
+     */
     private static function rmdir($path)
     {
         $path = rtrim($path, '/').'/';
