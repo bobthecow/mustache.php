@@ -12,19 +12,8 @@
 /**
  * @group unit
  */
-class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
 {
-
-    private static $tempDir;
-
-    public static function setUpBeforeClass()
-    {
-        self::$tempDir = sys_get_temp_dir() . '/mustache_test';
-        if (file_exists(self::$tempDir)) {
-            self::rmdir(self::$tempDir);
-        }
-    }
-
     public function testConstructor()
     {
         $logger         = new Mustache_Logger_StreamLogger(tmpfile());
@@ -347,30 +336,6 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
 
         $this->assertContains("DEBUG: Instantiating template: ", $log);
         $this->assertContains("WARNING: Partial not found: \"bar\"", $log);
-    }
-
-    /**
-     * @param string $path
-     */
-    private static function rmdir($path)
-    {
-        $path = rtrim($path, '/').'/';
-        $handle = opendir($path);
-        while (($file = readdir($handle)) !== false) {
-            if ($file == '.' || $file == '..') {
-                continue;
-            }
-
-            $fullpath = $path.$file;
-            if (is_dir($fullpath)) {
-                self::rmdir($fullpath);
-            } else {
-                unlink($fullpath);
-            }
-        }
-
-        closedir($handle);
-        rmdir($path);
     }
 }
 
