@@ -298,44 +298,35 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
 
     public function testCacheWarningLogging()
     {
-        $name     = tempnam(sys_get_temp_dir(), 'mustache-test');
-        $mustache = new Mustache_Engine(array(
-            'logger'   => new Mustache_Logger_StreamLogger($name, Mustache_Logger::WARNING)
-        ));
-
-        $result = $mustache->render('{{ foo }}', array('foo' => 'FOO'));
-        $this->assertEquals('FOO', $result);
-
+        list($name, $mustache) = $this->getLoggedMustache(Mustache_Logger::WARNING);
+        $mustache->render('{{ foo }}', array('foo' => 'FOO'));
         $this->assertContains('WARNING: Template cache disabled, evaluating', file_get_contents($name));
     }
 
     public function testLoggingIsNotTooAnnoying()
     {
-        $name     = tempnam(sys_get_temp_dir(), 'mustache-test');
-        $mustache = new Mustache_Engine(array(
-            'logger'   => new Mustache_Logger_StreamLogger($name)
-        ));
-
-        $result = $mustache->render('{{ foo }}{{> bar }}', array('foo' => 'FOO'));
-        $this->assertEquals('FOO', $result);
-
+        list($name, $mustache) = $this->getLoggedMustache();
+        $mustache->render('{{ foo }}{{> bar }}', array('foo' => 'FOO'));
         $this->assertEmpty(file_get_contents($name));
     }
 
     public function testVerboseLoggingIsVerbose()
     {
+        list($name, $mustache) = $this->getLoggedMustache(Mustache_Logger::DEBUG);
+        $mustache->render('{{ foo }}{{> bar }}', array('foo' => 'FOO'));
+        $log = file_get_contents($name);
+        $this->assertContains("DEBUG: Instantiating template: ",     $log);
+        $this->assertContains("WARNING: Partial not found: \"bar\"", $log);
+    }
+
+    private function getLoggedMustache($level = Mustache_Logger::ERROR)
+    {
         $name     = tempnam(sys_get_temp_dir(), 'mustache-test');
         $mustache = new Mustache_Engine(array(
-            'logger'   => new Mustache_Logger_StreamLogger($name, Mustache_Logger::DEBUG)
+            'logger' => new Mustache_Logger_StreamLogger($name, $level)
         ));
 
-        $result = $mustache->render('{{ foo }}{{> bar }}', array('foo' => 'FOO'));
-        $this->assertEquals('FOO', $result);
-
-        $log = file_get_contents($name);
-
-        $this->assertContains("DEBUG: Instantiating template: ", $log);
-        $this->assertContains("WARNING: Partial not found: \"bar\"", $log);
+        return array($name, $mustache);
     }
 }
 
