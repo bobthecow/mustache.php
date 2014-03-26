@@ -100,36 +100,31 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends Mustache_Test_Fun
         $this->assertEquals('<em>' . $foo->name . '</em>', $tpl->render($foo));
     }
 
-    public function testEnablingLambdaCacheActuallyWorks()
+    /**
+     * @dataProvider cacheLambdaTemplatesData
+     */
+    public function testCacheLambdaTemplatesOptionWorks($dirName, $tplPrefix, $enable, $expect)
     {
-        $cacheDir = $this->setUpCacheDir('test_enabling_lambda_cache');
+        $cacheDir = $this->setUpCacheDir($dirName);
         $mustache = new Mustache_Engine(array(
-            'template_class_prefix'  => '_TestEnablingLambdaCache_',
+            'template_class_prefix'  => $tplPrefix,
             'cache'                  => $cacheDir,
-            'cache_lambda_templates' => true,
+            'cache_lambda_templates' => $enable,
         ));
 
         $tpl = $mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
         $foo = new Mustache_Test_Functional_Foo;
         $foo->wrap = array($foo, 'wrapWithEm');
         $this->assertEquals('<em>' . $foo->name . '</em>', $tpl->render($foo));
-        $this->assertCount(2, glob($cacheDir . '/*.php'));
+        $this->assertCount($expect, glob($cacheDir . '/*.php'));
     }
 
-    public function testDisablingLambdaCacheActuallyWorks()
+    public function cacheLambdaTemplatesData()
     {
-        $cacheDir = $this->setUpCacheDir('test_disabling_lambda_cache');
-        $mustache = new Mustache_Engine(array(
-            'template_class_prefix'  => '_TestDisablingLambdaCache_',
-            'cache'                  => $cacheDir,
-            'cache_lambda_templates' => false,
-        ));
-
-        $tpl = $mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
-        $foo = new Mustache_Test_Functional_Foo;
-        $foo->wrap = array($foo, 'wrapWithEm');
-        $this->assertEquals('<em>' . $foo->name . '</em>', $tpl->render($foo));
-        $this->assertCount(1, glob($cacheDir . '/*.php'));
+        return array(
+            array('test_enabling_lambda_cache',  '_TestEnablingLambdaCache_',  true,  2),
+            array('test_disabling_lambda_cache', '_TestDisablingLambdaCache_', false, 1),
+        );
     }
 
     protected function setUpCacheDir($name)
