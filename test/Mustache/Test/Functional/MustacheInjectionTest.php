@@ -45,11 +45,6 @@ class Mustache_Test_Functional_MustacheInjectionTest extends PHPUnit_Framework_T
             'c' => 'FAIL'
         );
 
-        $partialData = array(
-            'a' => '{{ b }}',
-            'b' => 'FAIL'
-        );
-
         $lambdaInterpolationData = array(
             'a' => array($this, 'lambdaInterpolationCallback'),
             'b' => '{{ c }}',
