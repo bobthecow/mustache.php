@@ -18,9 +18,9 @@ class Mustache_Test_FiveThree_Functional_StrictCallablesTest extends PHPUnit_Fra
     /**
      * @dataProvider callables
      */
-    public function testStrictCallablesDisabled($name, $section, $expected)
+    public function testStrictCallables($strict, $name, $section, $expected)
     {
-        $mustache = new Mustache_Engine(array('strict_callables' => false));
+        $mustache = new Mustache_Engine(array('strict_callables' => $strict));
         $tpl      = $mustache->loadTemplate('{{# section }}{{ name }}{{/ section }}');
 
         $data = new StdClass;
@@ -39,16 +39,19 @@ class Mustache_Test_FiveThree_Functional_StrictCallablesTest extends PHPUnit_Fra
         return array(
             // Interpolation lambdas
             array(
+                false,
                 array($this, 'instanceName'),
                 $lambda,
                 'YOSHI',
             ),
             array(
+                false,
                 array(__CLASS__, 'staticName'),
                 $lambda,
                 'YOSHI',
             ),
             array(
+                false,
                 function () { return 'Yoshi'; },
                 $lambda,
                 'YOSHI',
@@ -56,64 +59,47 @@ class Mustache_Test_FiveThree_Functional_StrictCallablesTest extends PHPUnit_Fra
 
             // Section lambdas
             array(
+                false,
                 'Yoshi',
                 array($this, 'instanceCallable'),
                 'YOSHI',
             ),
             array(
+                false,
                 'Yoshi',
                 array(__CLASS__, 'staticCallable'),
                 'YOSHI',
             ),
             array(
+                false,
                 'Yoshi',
                 $lambda,
                 'YOSHI',
             ),
-        );
-    }
 
-    /**
-     * @dataProvider strictCallables
-     */
-    public function testStrictCallablesEnabled($name, $section, $expected)
-    {
-        $mustache = new Mustache_Engine(array('strict_callables' => true));
-        $tpl      = $mustache->loadTemplate('{{# section }}{{ name }}{{/ section }}');
-
-        $data = new StdClass;
-        $data->name    = $name;
-        $data->section = $section;
-
-        $this->assertEquals($expected, $tpl->render($data));
-    }
-
-    public function strictCallables()
-    {
-        $lambda = function ($tpl, $mustache) {
-            return strtoupper($mustache->render($tpl));
-        };
-
-        return array(
-            // Interpolation lambdas
+            // Strict interpolation lambdas
             array(
+                true,
                 function () { return 'Yoshi'; },
                 $lambda,
                 'YOSHI',
             ),
 
-            // Section lambdas
+            // Strict section lambdas
             array(
+                true,
                 'Yoshi',
                 array($this, 'instanceCallable'),
                 'YoshiYoshi',
             ),
             array(
+                true,
                 'Yoshi',
                 array(__CLASS__, 'staticCallable'),
                 'YoshiYoshi',
             ),
             array(
+                true,
                 'Yoshi',
                 function ($tpl, $mustache) {
                     return strtoupper($mustache->render($tpl));
