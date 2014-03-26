@@ -662,9 +662,9 @@ class Mustache_Engine
             }
 
             if (!class_exists($className, false)) {
-                if (!$this->getCache()->load($className)) {
+                if (!$cache->load($className)) {
                     $compiled = $this->compile($source);
-                    $this->getCache()->cache($className, $compiled);
+                    $cache->cache($className, $compiled);
                 }
             }
 
