@@ -24,7 +24,7 @@ abstract class Mustache_Test_FunctionalTestCase extends PHPUnit_Framework_TestCa
     /**
      * @param string $path
      */
-    private static function rmdir($path)
+    protected static function rmdir($path)
     {
         $path = rtrim($path, '/').'/';
         $handle = opendir($path);

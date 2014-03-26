@@ -13,9 +13,8 @@
  * @group lambdas
  * @group functional
  */
-class Mustache_Test_Functional_HigherOrderSectionsTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_Functional_HigherOrderSectionsTest extends Mustache_Test_FunctionalTestCase
 {
-
     private $mustache;
 
     public function setUp()
@@ -99,6 +98,49 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends PHPUnit_Framework
         $foo->wrap = array($foo, 'wrapWithEm');
 
         $this->assertEquals('<em>' . $foo->name . '</em>', $tpl->render($foo));
+    }
+
+    public function testEnablingLambdaCacheActuallyWorks()
+    {
+        $cacheDir = $this->setUpCacheDir('test_enabling_lambda_cache');
+        $mustache = new Mustache_Engine(array(
+            'template_class_prefix'  => '_TestEnablingLambdaCache_',
+            'cache'                  => $cacheDir,
+            'cache_lambda_templates' => true,
+        ));
+
+        $tpl = $mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
+        $foo = new Mustache_Test_Functional_Foo;
+        $foo->wrap = array($foo, 'wrapWithEm');
+        $this->assertEquals('<em>' . $foo->name . '</em>', $tpl->render($foo));
+        $this->assertCount(2, glob($cacheDir . '/*.php'));
+    }
+
+    public function testDisablingLambdaCacheActuallyWorks()
+    {
+        $cacheDir = $this->setUpCacheDir('test_disabling_lambda_cache');
+        $mustache = new Mustache_Engine(array(
+            'template_class_prefix'  => '_TestDisablingLambdaCache_',
+            'cache'                  => $cacheDir,
+            'cache_lambda_templates' => false,
+        ));
+
+        $tpl = $mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
+        $foo = new Mustache_Test_Functional_Foo;
+        $foo->wrap = array($foo, 'wrapWithEm');
+        $this->assertEquals('<em>' . $foo->name . '</em>', $tpl->render($foo));
+        $this->assertCount(1, glob($cacheDir . '/*.php'));
+    }
+
+    protected function setUpCacheDir($name)
+    {
+        $cacheDir = self::$tempDir . '/' . $name;
+        if (file_exists($cacheDir)) {
+            self::rmdir($cacheDir);
+        }
+        mkdir($cacheDir, 0777, true);
+
+        return $cacheDir;
     }
 }
 
