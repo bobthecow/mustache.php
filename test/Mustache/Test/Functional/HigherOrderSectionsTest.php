@@ -22,24 +22,26 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends Mustache_Test_Fun
         $this->mustache = new Mustache_Engine;
     }
 
-    public function testRuntimeSectionCallback()
+    /**
+     * @dataProvider sectionCallbackData
+     */
+    public function testSectionCallback($data, $tpl, $expect)
     {
-        $tpl = $this->mustache->loadTemplate('{{#doublewrap}}{{name}}{{/doublewrap}}');
+        $this->assertEquals($expect, $this->mustache->render($tpl, $data));
+    }
 
+    public function sectionCallbackData()
+    {
         $foo = new Mustache_Test_Functional_Foo;
         $foo->doublewrap = array($foo, 'wrapWithBoth');
 
-        $this->assertEquals(sprintf('<strong><em>%s</em></strong>', $foo->name), $tpl->render($foo));
-    }
+        $bar = new Mustache_Test_Functional_Foo;
+        $bar->trimmer = array(get_class($bar), 'staticTrim');
 
-    public function testStaticSectionCallback()
-    {
-        $tpl = $this->mustache->loadTemplate('{{#trimmer}}    {{name}}    {{/trimmer}}');
-
-        $foo = new Mustache_Test_Functional_Foo;
-        $foo->trimmer = array(get_class($foo), 'staticTrim');
-
-        $this->assertEquals($foo->name, $tpl->render($foo));
+        return array(
+            array($foo, '{{#doublewrap}}{{name}}{{/doublewrap}}', sprintf('<strong><em>%s</em></strong>', $foo->name)),
+            array($bar, '{{#trimmer}}   {{name}}   {{/trimmer}}', $bar->name),
+        );
     }
 
     public function testViewArraySectionCallback()
