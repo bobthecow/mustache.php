@@ -9,4 +9,4 @@ php:
 
 matrix:
   allow_failures:
-    php: hhvm # See https://github.com/facebook/hhvm/pull/1860
+    - php: hhvm # See https://github.com/facebook/hhvm/pull/1860
