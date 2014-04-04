@@ -168,7 +168,7 @@ class Mustache_Compiler
             {
                 $this->lambdaHelper = new Mustache_LambdaHelper($this->mustache, $context);
                 $buffer = \'\';
-                $new_context = array();
+                $newContext = array();
         %s
 
                 return $buffer;
@@ -183,7 +183,7 @@ class Mustache_Compiler
             public function renderInternal(Mustache_Context $context, $indent = \'\')
             {
                 $buffer = \'\';
-                $new_context = array();
+                $newContext = array();
         %s
 
                 return $buffer;
@@ -252,7 +252,7 @@ class Mustache_Compiler
     const PARENT_ARG = '
         // %s parent_arg
         $value = $this->section%s($context, $indent, true);
-        $new_context[%s] = %s$value;
+        $newContext[%s] = %s$value;
     ';
 
     private function parentArg($nodes, $id, $start, $end, $otag, $ctag, $level)
@@ -400,7 +400,7 @@ class Mustache_Compiler
     const PARENT = '
 
         if ($parent = $this->mustache->LoadPartial(%s)) {
-            $context->push($new_context);
+            $context->push($newContext);
             $buffer .= $parent->renderInternal($context, $indent);
             $context->pop();
         }
