@@ -17,6 +17,7 @@
 class Mustache_Compiler
 {
 
+    private $pragmas;
     private $sections;
     private $source;
     private $indentNextLine;
@@ -24,7 +25,6 @@ class Mustache_Compiler
     private $entityFlags;
     private $charset;
     private $strictCallables;
-    private $pragmas;
 
     /**
      * Compile a Mustache token parse tree into PHP source code.
@@ -94,10 +94,42 @@ class Mustache_Compiler
                     break;
 
                 case Mustache_Tokenizer::T_PARTIAL:
-                case Mustache_Tokenizer::T_PARTIAL_2:
                     $code .= $this->partial(
                         $node[Mustache_Tokenizer::NAME],
                         isset($node[Mustache_Tokenizer::INDENT]) ? $node[Mustache_Tokenizer::INDENT] : '',
+                        $level
+                    );
+                    break;
+
+                case Mustache_Tokenizer::T_PARENT:
+                    $code .= $this->parent(
+                        $node[Mustache_Tokenizer::NAME],
+                        isset($node[Mustache_Tokenizer::INDENT]) ? $node[Mustache_Tokenizer::INDENT] : '',
+                        $level,
+                        $node['nodes']
+                    );
+                    break;
+
+                case Mustache_Tokenizer::T_PARENT_ARG:
+                    $code .= $this->parentArg(
+                        $node[Mustache_Tokenizer::NODES],
+                        $node[Mustache_Tokenizer::NAME],
+                        $node[Mustache_Tokenizer::INDEX],
+                        $node[Mustache_Tokenizer::END],
+                        $node[Mustache_Tokenizer::OTAG],
+                        $node[Mustache_Tokenizer::CTAG],
+                        $level
+                    );
+                    break;
+
+                case Mustache_Tokenizer::T_PARENT_VAR:
+                    $code .= $this->parentVar(
+                        $node[Mustache_Tokenizer::NODES],
+                        $node[Mustache_Tokenizer::NAME],
+                        $node[Mustache_Tokenizer::INDEX],
+                        $node[Mustache_Tokenizer::END],
+                        $node[Mustache_Tokenizer::OTAG],
+                        $node[Mustache_Tokenizer::CTAG],
                         $level
                     );
                     break;
@@ -136,6 +168,7 @@ class Mustache_Compiler
             {
                 $this->lambdaHelper = new Mustache_LambdaHelper($this->mustache, $context);
                 $buffer = \'\';
+                $new_context = array();
         %s
 
                 return $buffer;
@@ -150,6 +183,7 @@ class Mustache_Compiler
             public function renderInternal(Mustache_Context $context, $indent = \'\')
             {
                 $buffer = \'\';
+                $new_context = array();
         %s
 
                 return $buffer;
@@ -171,9 +205,69 @@ class Mustache_Compiler
         $code     = $this->walk($tree);
         $sections = implode("\n", $this->sections);
         $klass    = empty($this->sections) ? self::KLASS_NO_LAMBDAS : self::KLASS;
+
         $callable = $this->strictCallables ? $this->prepare(self::STRICT_CALLABLE) : '';
 
         return sprintf($this->prepare($klass, 0, false, true), $name, $callable, $code, $sections);
+    }
+
+    const PARENT_VAR = '
+        $value = $this->resolveValue($context->%s(%s), $context, $indent);
+        if($value && !is_array($value) && !is_object($value)) {
+            $buffer .= %s;
+        } else {
+            %s
+        }
+    ';
+
+    private function parentVar($nodes, $id, $start, $end, $otag, $ctag, $level)
+    {
+        $method = 'findFromParent';
+        $id_str = var_export($id, true);
+        $value  = $this->getEscape();
+
+        return sprintf($this->prepare(self::PARENT_VAR, $level), $method, $id_str, $value, $this->walk($nodes, 2));
+    }
+
+    function parentArgSection($nodes, $start, $end, $otag, $ctag, $level)
+    {
+        $source   = var_export(substr($this->source, $start, $end - $start), true);
+        $callable = $this->getCallable();
+
+        if ($otag !== '{{' || $ctag !== '}}') {
+            $delims = ', '.var_export(sprintf('{{= %s %s =}}', $otag, $ctag), true);
+        } else {
+            $delims = '';
+        }
+
+        $key    = ucfirst(md5($delims."\n".$source));
+
+        if (!isset($this->sections[$key])) {
+            $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $callable, $source, $delims, $this->walk($nodes, 2));
+        }
+
+        return $key;
+    }
+
+    const PARENT_ARG = '
+        // %s parent_arg
+        $value = $this->section%s($context, $indent, true);
+        $new_context[%s] = %s$value;
+    ';
+
+    private function parentArg($nodes, $id, $start, $end, $otag, $ctag, $level)
+    {
+        $key = $this->parentArgSection($nodes, $start, $end, $otag, $ctag, $level);
+        $filters = '';
+
+        if (isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS])) {
+            list($id, $filters) = $this->getFilters($id, $level);
+        }
+
+        $method   = $this->getFindMethod($id);
+        $id       = var_export($id, true);
+
+        return sprintf($this->prepare(self::PARENT_ARG, $level), $key, $key, $id, $this->flushIndent());
     }
 
     const SECTION_CALL = '
@@ -199,7 +293,8 @@ class Mustache_Compiler
             } elseif (!empty($value)) {
                 $values = $this->isIterable($value) ? $value : array($value);
                 foreach ($values as $value) {
-                    $context->push($value);%s
+                    $context->push($value);
+                    %s
                     $context->pop();
                 }
             }
@@ -297,6 +392,32 @@ class Mustache_Compiler
     {
         return sprintf(
             $this->prepare(self::PARTIAL, $level),
+            var_export($id, true),
+            var_export($indent, true)
+        );
+    }
+
+    const PARENT = '
+
+        if ($parent = $this->mustache->LoadPartial(%s)) {
+            $context->push($new_context);
+            $buffer .= $parent->renderInternal($context, $indent);
+            $context->pop();
+        }
+    ';
+
+    private function parent($id, $indent, $level, $children)
+    {
+        $block = '';
+
+        $real_children = array_filter($children, function($ch) {
+            return $ch[Mustache_Tokenizer::TYPE] == Mustache_Tokenizer::T_PARENT_ARG;
+        });
+
+        $block = $this->walk($real_children, $level);
+
+        return $block. sprintf(
+            $this->prepare(self::PARENT, $level),
             var_export($id, true),
             var_export($indent, true)
         );

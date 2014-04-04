@@ -120,6 +120,18 @@ class Mustache_Context
         return $value;
     }
 
+    public function findFromParent($id)
+    {
+        $stack = $this->stack;
+        foreach($stack as $context) {
+            if (is_array($context) && array_key_exists($id, $context)) {
+                return $context[$id];
+            }
+        }
+
+        return '';
+    }
+
     /**
      * Helper function to find a variable in the Context stack.
      *

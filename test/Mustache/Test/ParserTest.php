@@ -88,6 +88,7 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::VALUE => 'bar'
                     ),
                 ),
+
                 array(
                     array(
                         Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
@@ -116,6 +117,118 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
                 ),
             ),
 
+            array(
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_PARENT,
+                        Mustache_Tokenizer::NAME => 'foo',
+                        Mustache_Tokenizer::OTAG => '{{',
+                        Mustache_Tokenizer::CTAG => '}}',
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::INDEX => 8
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_PARENT_VAR,
+                        Mustache_Tokenizer::NAME => 'bar',
+                        Mustache_Tokenizer::OTAG => '{{',
+                        Mustache_Tokenizer::CTAG => '}}',
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::INDEX => 16
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_TEXT,
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::VALUE => 'baz'
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_END_SECTION,
+                        Mustache_Tokenizer::NAME => 'bar',
+                        Mustache_Tokenizer::OTAG => '{{',
+                        Mustache_Tokenizer::CTAG => '}}',
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::INDEX => 19
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_END_SECTION,
+                        Mustache_Tokenizer::NAME => 'foo',
+                        Mustache_Tokenizer::OTAG => '{{',
+                        Mustache_Tokenizer::CTAG => '}}',
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::INDEX => 27
+                    )
+                ),
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_PARENT,
+                        Mustache_Tokenizer::NAME => 'foo',
+                        Mustache_Tokenizer::OTAG => '{{',
+                        Mustache_Tokenizer::CTAG => '}}',
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::INDEX => 8,
+                        Mustache_Tokenizer::END => 27,
+                        Mustache_Tokenizer::NODES => array(
+                            array(
+                                Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_PARENT_ARG,
+                                Mustache_Tokenizer::NAME => 'bar',
+                                Mustache_Tokenizer::OTAG => '{{',
+                                Mustache_Tokenizer::CTAG => '}}',
+                                Mustache_Tokenizer::LINE => 0,
+                                Mustache_Tokenizer::INDEX => 16,
+                                Mustache_Tokenizer::END => 19,
+                                Mustache_Tokenizer::NODES => array(
+                                    array(
+                                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_TEXT,
+                                        Mustache_Tokenizer::LINE => 0,
+                                        Mustache_Tokenizer::VALUE => 'baz'
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            ),
+
+            array(
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_PARENT_VAR,
+                        Mustache_Tokenizer::NAME => 'foo',
+                        Mustache_Tokenizer::OTAG => '{{',
+                        Mustache_Tokenizer::CTAG => '}}',
+                        Mustache_Tokenizer::LINE => 0,
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_TEXT,
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::VALUE => 'bar'
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_END_SECTION,
+                        Mustache_Tokenizer::NAME => 'foo',
+                        Mustache_Tokenizer::OTAG => '{{',
+                        Mustache_Tokenizer::CTAG => '}}',
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::INDEX => 11,
+                    ),
+                ),
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_PARENT_VAR,
+                        Mustache_Tokenizer::NAME => 'foo',
+                        Mustache_Tokenizer::OTAG => '{{',
+                        Mustache_Tokenizer::CTAG => '}}',
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::END => 11,
+                        Mustache_Tokenizer::NODES => array(
+                            array(
+                                Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_TEXT,
+                                Mustache_Tokenizer::LINE => 0,
+                                Mustache_Tokenizer::VALUE => 'bar'
+                            )
+                        )
+                    )
+                )
+            )
         );
     }
 

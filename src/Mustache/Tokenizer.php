@@ -28,13 +28,15 @@ class Mustache_Tokenizer
     const T_END_SECTION  = '/';
     const T_COMMENT      = '!';
     const T_PARTIAL      = '>';
-    const T_PARTIAL_2    = '<';
+    const T_PARENT       = '<';
     const T_DELIM_CHANGE = '=';
     const T_ESCAPED      = '_v';
     const T_UNESCAPED    = '{';
     const T_UNESCAPED_2  = '&';
     const T_TEXT         = '_t';
     const T_PRAGMA       = '%';
+    const T_PARENT_VAR   = '$';
+    const T_PARENT_ARG   = '$arg';
 
     // Valid token types
     private static $tagTypes = array(
@@ -43,12 +45,13 @@ class Mustache_Tokenizer
         self::T_END_SECTION  => true,
         self::T_COMMENT      => true,
         self::T_PARTIAL      => true,
-        self::T_PARTIAL_2    => true,
+        self::T_PARENT       => true,
         self::T_DELIM_CHANGE => true,
         self::T_ESCAPED      => true,
         self::T_UNESCAPED    => true,
         self::T_UNESCAPED_2  => true,
         self::T_PRAGMA       => true,
+        self::T_PARENT_VAR   => true,
     );
 
     // Interpolated tags

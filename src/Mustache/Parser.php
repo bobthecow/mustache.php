@@ -95,15 +95,25 @@ class Mustache_Parser
                     $parent[Mustache_Tokenizer::NODES] = $nodes;
 
                     return $parent;
-                    break;
 
                 case Mustache_Tokenizer::T_PARTIAL:
-                case Mustache_Tokenizer::T_PARTIAL_2:
-                    // store the whitespace prefix for laters!
+                    //store the whitespace prefix for laters!
                     if ($indent = $this->clearStandaloneLines($nodes, $tokens)) {
                         $token[Mustache_Tokenizer::INDENT] = $indent[Mustache_Tokenizer::VALUE];
                     }
                     $nodes[] = $token;
+                    break;
+
+                case Mustache_Tokenizer::T_PARENT:
+                    $nodes[] = $this->buildTree($tokens, $token);
+                    break;
+
+                case Mustache_Tokenizer::T_PARENT_VAR:
+                    if ($parent[Mustache_Tokenizer::TYPE] == Mustache_Tokenizer::T_PARENT) {
+                        $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_PARENT_ARG;
+                    }
+                    $this->clearStandaloneLines($nodes, $tokens);
+                    $nodes[] = $this->buildTree($tokens, $token);
                     break;
 
                 case Mustache_Tokenizer::T_PRAGMA:
