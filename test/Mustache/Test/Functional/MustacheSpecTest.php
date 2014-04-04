@@ -128,21 +128,6 @@ class Mustache_Test_Functional_MustacheSpecTest extends PHPUnit_Framework_TestCa
     }
 
     /**
-     * @group inheritance
-     * @dataProvider loadInheritanceSpec
-     */
-    public function testInheritanceSpec($desc, $source, $partials, $data, $expected)
-    {
-        $template = self::loadTemplate($source, $partials);
-        $this->assertEquals($expected, $template->render($data), $desc);
-    }
-
-    public function loadInheritanceSpec()
-    {
-        return $this->loadSpec('inheritance');
-    }
-
-    /**
      * Data provider for the mustache spec test.
      *
      * Loads YAML files from the spec and converts them to PHPisms.
