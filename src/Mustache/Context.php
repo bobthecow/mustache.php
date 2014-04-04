@@ -122,8 +122,7 @@ class Mustache_Context
 
     public function findFromParent($id)
     {
-        $stack = $this->stack;
-        foreach($stack as $context) {
+        foreach($this->stack as $context) {
             if (is_array($context) && array_key_exists($id, $context)) {
                 return $context[$id];
             }
