@@ -410,9 +410,7 @@ class Mustache_Compiler
     {
         $block = '';
 
-        $real_children = array_filter($children, function($ch) {
-            return $ch[Mustache_Tokenizer::TYPE] == Mustache_Tokenizer::T_PARENT_ARG;
-        });
+        $real_children = array_filter($children, array(__CLASS__, 'return_only_parent_args'));
 
         $block = $this->walk($real_children, $level);
 
@@ -421,6 +419,11 @@ class Mustache_Compiler
             var_export($id, true),
             var_export($indent, true)
         );
+    }
+
+    private static function return_only_parent_args($child)
+    {
+        return $child[Mustache_Tokenizer::TYPE] == Mustache_Tokenizer::T_PARENT_ARG;
     }
 
     const VARIABLE = '
