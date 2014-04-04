@@ -106,7 +106,7 @@ class Mustache_Compiler
                         $node[Mustache_Tokenizer::NAME],
                         isset($node[Mustache_Tokenizer::INDENT]) ? $node[Mustache_Tokenizer::INDENT] : '',
                         $level,
-                        $node['nodes']
+                        $node[Mustache_Tokenizer::NODES]
                     );
                     break;
 
