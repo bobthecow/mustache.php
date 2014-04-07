@@ -229,26 +229,6 @@ class Mustache_Compiler
         return sprintf($this->prepare(self::PARENT_VAR, $level), $method, $id_str, $value, $this->walk($nodes, 2));
     }
 
-    function parentArgSection($nodes, $start, $end, $otag, $ctag, $level)
-    {
-        $source   = var_export(substr($this->source, $start, $end - $start), true);
-        $callable = $this->getCallable();
-
-        if ($otag !== '{{' || $ctag !== '}}') {
-            $delims = ', '.var_export(sprintf('{{= %s %s =}}', $otag, $ctag), true);
-        } else {
-            $delims = '';
-        }
-
-        $key    = ucfirst(md5($delims."\n".$source));
-
-        if (!isset($this->sections[$key])) {
-            $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $callable, $source, $delims, $this->walk($nodes, 2));
-        }
-
-        return $key;
-    }
-
     const PARENT_ARG = '
         // %s parent_arg
         $value = $this->section%s($context, $indent, true);
@@ -257,7 +237,7 @@ class Mustache_Compiler
 
     private function parentArg($nodes, $id, $start, $end, $otag, $ctag, $level)
     {
-        $key = $this->parentArgSection($nodes, $start, $end, $otag, $ctag, $level);
+        $key = $this->section($nodes, $id, $start, $end, $otag, $ctag, $level, true);
         $filters = '';
 
         if (isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS])) {
@@ -315,7 +295,7 @@ class Mustache_Compiler
      *
      * @return string Generated section PHP source code
      */
-    private function section($nodes, $id, $start, $end, $otag, $ctag, $level)
+    private function section($nodes, $id, $start, $end, $otag, $ctag, $level, $arg=false)
     {
         $filters = '';
 
@@ -323,8 +303,6 @@ class Mustache_Compiler
             list($id, $filters) = $this->getFilters($id, $level);
         }
 
-        $method   = $this->getFindMethod($id);
-        $id       = var_export($id, true);
         $source   = var_export(substr($this->source, $start, $end - $start), true);
         $callable = $this->getCallable();
 
@@ -340,7 +318,13 @@ class Mustache_Compiler
             $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $callable, $source, $delims, $this->walk($nodes, 2));
         }
 
-        return sprintf($this->prepare(self::SECTION_CALL, $level), $id, $method, $id, $filters, $key);
+        if ($arg === true) {
+            return $key;
+        } else {
+            $method   = $this->getFindMethod($id);
+            $id = var_export($id, true);
+            return sprintf($this->prepare(self::SECTION_CALL, $level), $id, $method, $id, $filters, $key);
+        }
     }
 
     const INVERTED_SECTION = '
