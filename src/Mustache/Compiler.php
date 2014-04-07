@@ -110,8 +110,8 @@ class Mustache_Compiler
                     );
                     break;
 
-                case Mustache_Tokenizer::T_PARENT_ARG:
-                    $code .= $this->parentArg(
+                case Mustache_Tokenizer::T_BLOCK_ARG:
+                    $code .= $this->blockArg(
                         $node[Mustache_Tokenizer::NODES],
                         $node[Mustache_Tokenizer::NAME],
                         $node[Mustache_Tokenizer::INDEX],
@@ -122,8 +122,8 @@ class Mustache_Compiler
                     );
                     break;
 
-                case Mustache_Tokenizer::T_PARENT_VAR:
-                    $code .= $this->parentVar(
+                case Mustache_Tokenizer::T_BLOCK_VAR:
+                    $code .= $this->blockVar(
                         $node[Mustache_Tokenizer::NODES],
                         $node[Mustache_Tokenizer::NAME],
                         $node[Mustache_Tokenizer::INDEX],
@@ -154,7 +154,6 @@ class Mustache_Compiler
                     throw new Mustache_Exception_SyntaxException(sprintf('Unknown token type: %s', $node[Mustache_Tokenizer::TYPE]), $node);
             }
         }
-
         return $code;
     }
 
@@ -211,7 +210,7 @@ class Mustache_Compiler
         return sprintf($this->prepare($klass, 0, false, true), $name, $callable, $code, $sections);
     }
 
-    const PARENT_VAR = '
+    const BLOCK_VAR = '
         $value = $this->resolveValue($context->%s(%s), $context, $indent);
         if($value && !is_array($value) && !is_object($value)) {
             $buffer .= %s;
@@ -220,22 +219,22 @@ class Mustache_Compiler
         }
     ';
 
-    private function parentVar($nodes, $id, $start, $end, $otag, $ctag, $level)
+    private function blockVar($nodes, $id, $start, $end, $otag, $ctag, $level)
     {
-        $method = 'findFromParent';
+        $method = 'findInBlock';
         $id_str = var_export($id, true);
         $value  = $this->getEscape();
 
-        return sprintf($this->prepare(self::PARENT_VAR, $level), $method, $id_str, $value, $this->walk($nodes, 2));
+        return sprintf($this->prepare(self::BLOCK_VAR, $level), $method, $id_str, $value, $this->walk($nodes, 2));
     }
 
-    const PARENT_ARG = '
-        // %s parent_arg
+    const BLOCK_ARG = '
+        // %s block_arg
         $value = $this->section%s($context, $indent, true);
         $newContext[%s] = %s$value;
     ';
 
-    private function parentArg($nodes, $id, $start, $end, $otag, $ctag, $level)
+    private function blockArg($nodes, $id, $start, $end, $otag, $ctag, $level)
     {
         $key = $this->section($nodes, $id, $start, $end, $otag, $ctag, $level, true);
         $filters = '';
@@ -247,7 +246,7 @@ class Mustache_Compiler
         $method   = $this->getFindMethod($id);
         $id       = var_export($id, true);
 
-        return sprintf($this->prepare(self::PARENT_ARG, $level), $key, $key, $id, $this->flushIndent());
+        return sprintf($this->prepare(self::BLOCK_ARG, $level), $key, $key, $id, $this->flushIndent());
     }
 
     const SECTION_CALL = '
@@ -384,9 +383,9 @@ class Mustache_Compiler
     const PARENT = '
 
         if ($parent = $this->mustache->LoadPartial(%s)) {
-            $context->push($newContext);
+            $context->pushBlockContext($newContext);
             $buffer .= $parent->renderInternal($context, $indent);
-            $context->pop();
+            $context->popBlockContext();
         }
     ';
 
@@ -394,7 +393,7 @@ class Mustache_Compiler
     {
         $block = '';
 
-        $real_children = array_filter($children, array(__CLASS__, 'return_only_parent_args'));
+        $real_children = array_filter($children, array(__CLASS__, 'return_only_block_args'));
 
         $block = $this->walk($real_children, $level);
 
@@ -405,9 +404,9 @@ class Mustache_Compiler
         );
     }
 
-    private static function return_only_parent_args($child)
+    private static function return_only_block_args($child)
     {
-        return $child[Mustache_Tokenizer::TYPE] == Mustache_Tokenizer::T_PARENT_ARG;
+        return $child[Mustache_Tokenizer::TYPE] == Mustache_Tokenizer::T_BLOCK_ARG;
     }
 
     const VARIABLE = '

@@ -195,7 +195,7 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                 null,
                 array(
                     array(
-                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_PARENT_VAR,
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_BLOCK_VAR,
                         Mustache_Tokenizer::NAME => 'arg',
                         Mustache_Tokenizer::OTAG => '{{',
                         Mustache_Tokenizer::CTAG => '}}',

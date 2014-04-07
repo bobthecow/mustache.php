@@ -128,7 +128,7 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::INDEX => 8
                     ),
                     array(
-                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_PARENT_VAR,
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_BLOCK_VAR,
                         Mustache_Tokenizer::NAME => 'bar',
                         Mustache_Tokenizer::OTAG => '{{',
                         Mustache_Tokenizer::CTAG => '}}',
@@ -168,7 +168,7 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::END => 27,
                         Mustache_Tokenizer::NODES => array(
                             array(
-                                Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_PARENT_ARG,
+                                Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_BLOCK_ARG,
                                 Mustache_Tokenizer::NAME => 'bar',
                                 Mustache_Tokenizer::OTAG => '{{',
                                 Mustache_Tokenizer::CTAG => '}}',
@@ -191,7 +191,7 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
             array(
                 array(
                     array(
-                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_PARENT_VAR,
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_BLOCK_VAR,
                         Mustache_Tokenizer::NAME => 'foo',
                         Mustache_Tokenizer::OTAG => '{{',
                         Mustache_Tokenizer::CTAG => '}}',
@@ -213,7 +213,7 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
                 ),
                 array(
                     array(
-                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_PARENT_VAR,
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_BLOCK_VAR,
                         Mustache_Tokenizer::NAME => 'foo',
                         Mustache_Tokenizer::OTAG => '{{',
                         Mustache_Tokenizer::CTAG => '}}',

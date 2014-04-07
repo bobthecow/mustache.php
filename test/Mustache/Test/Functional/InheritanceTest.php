@@ -137,6 +137,44 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         $this->assertEquals('test |override1 default| |override2 default|', $tpl->render($data));
     }
 
+    public function testDataDoesNotOverrideBlock()
+    {
+        $partials = array(
+            'include' => '{{$var}}var in include{{/var}}'
+        );
+
+        $this->mustache->setPartials($partials);
+
+        $tpl = $this->mustache->loadTemplate(
+            '{{<include}}{{$var}}var in template{{/var}}{{/include}}'
+        );
+
+        $data = array(
+            'var' => 'var in data'
+        );
+
+        $this->assertEquals('var in template', $tpl->render($data));
+    }
+
+    public function testDataDoesNotOverrideDefaultBlockValue()
+    {
+        $partials = array(
+            'include' => '{{$var}}var in include{{/var}}'
+        );
+
+        $this->mustache->setPartials($partials);
+
+        $tpl = $this->mustache->loadTemplate(
+            '{{<include}}{{/include}}'
+        );
+
+        $data = array(
+            'var' => 'var in data'
+        );
+
+        $this->assertEquals('var in include', $tpl->render($data));
+    }
+
     public function testOverridePartialWithNewlines()
     {
          $partials = array(

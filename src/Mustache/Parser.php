@@ -108,9 +108,9 @@ class Mustache_Parser
                     $nodes[] = $this->buildTree($tokens, $token);
                     break;
 
-                case Mustache_Tokenizer::T_PARENT_VAR:
+                case Mustache_Tokenizer::T_BLOCK_VAR:
                     if ($parent[Mustache_Tokenizer::TYPE] == Mustache_Tokenizer::T_PARENT) {
-                        $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_PARENT_ARG;
+                        $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_BLOCK_ARG;
                     }
                     $this->clearStandaloneLines($nodes, $tokens);
                     $nodes[] = $this->buildTree($tokens, $token);
