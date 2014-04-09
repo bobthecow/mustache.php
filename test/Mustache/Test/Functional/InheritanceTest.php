@@ -322,7 +322,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         $this->assertEquals('hmm', $tpl->render($data));
     }
 
-    public function IgnoreTextInsideSuperTemplates()
+    public function testIgnoreTextInsideSuperTemplates()
     {
         $partials = array(
             'include' => '{{$foo}}default content{{/foo}}'
@@ -337,5 +337,28 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         $data = array();
 
         $this->assertEquals('default content', $tpl->render($data));
+    }
+
+    /**
+     * @expectedException Mustache_Exception_SyntaxException
+     * @expectedExceptionMessage Illegal content in < parent tag
+     */
+    public function testOnlyBlockTagsAllowedInParent()
+    {
+        $partials = array(
+           'foo' => '{{$baz}}default content{{/baz}}'
+       );
+
+        $this->mustache->setPartials($partials);
+
+        $tpl = $this->mustache->loadTemplate(
+            '{{< foo }}{{# bar }}{{$ baz }}{{/ baz }}{{/ bar }}{{/ foo }}'
+        );
+
+        $data = array(
+            'bar' => 'set by user'
+        );
+
+        $tpl->render($data);
     }
 }

@@ -246,7 +246,7 @@ class Mustache_Compiler
         $method   = $this->getFindMethod($id);
         $id       = var_export($id, true);
 
-        return sprintf($this->prepare(self::BLOCK_ARG, $level), $key, $key, $id, $this->flushIndent());
+        return sprintf($this->prepare(self::BLOCK_ARG, $level), $id, $key, $id, $this->flushIndent());
     }
 
     const SECTION_CALL = '

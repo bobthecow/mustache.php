@@ -60,11 +60,13 @@ class Mustache_Parser
 
             switch ($token[Mustache_Tokenizer::TYPE]) {
                 case Mustache_Tokenizer::T_DELIM_CHANGE:
+                    $this->checkIfTokenIsAllowedInParent($parent, $token);
                     $this->clearStandaloneLines($nodes, $tokens);
                     break;
 
                 case Mustache_Tokenizer::T_SECTION:
                 case Mustache_Tokenizer::T_INVERTED:
+                    $this->checkIfTokenIsAllowedInParent($parent, $token);
                     $this->clearStandaloneLines($nodes, $tokens);
                     $nodes[] = $this->buildTree($tokens, $token);
                     break;
@@ -97,6 +99,7 @@ class Mustache_Parser
                     return $parent;
 
                 case Mustache_Tokenizer::T_PARTIAL:
+                    $this->checkIfTokenIsAllowedInParent($parent, $token);
                     //store the whitespace prefix for laters!
                     if ($indent = $this->clearStandaloneLines($nodes, $tokens)) {
                         $token[Mustache_Tokenizer::INDENT] = $indent[Mustache_Tokenizer::VALUE];
@@ -105,11 +108,12 @@ class Mustache_Parser
                     break;
 
                 case Mustache_Tokenizer::T_PARENT:
+                    $this->checkIfTokenIsAllowedInParent($parent, $token);
                     $nodes[] = $this->buildTree($tokens, $token);
                     break;
 
                 case Mustache_Tokenizer::T_BLOCK_VAR:
-                    if ($parent[Mustache_Tokenizer::TYPE] == Mustache_Tokenizer::T_PARENT) {
+                    if ($parent[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_PARENT) {
                         $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_BLOCK_ARG;
                     }
                     $this->clearStandaloneLines($nodes, $tokens);
@@ -214,5 +218,12 @@ class Mustache_Parser
         }
 
         return false;
+    }
+
+    private function checkIfTokenIsAllowedInParent($parent, $token)
+    {
+        if ($parent[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_PARENT) {
+            throw new Mustache_Exception_SyntaxException('Illegal content in < parent tag', $token);
+        }
     }
 }
