@@ -14,6 +14,71 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         $this->mustache = new Mustache_Engine;
     }
 
+    public function getIllegalInheritanceExamples()
+    {
+        return array(
+            array(
+                array(
+                    'foo' => '{{$baz}}default content{{/baz}}',
+                ),
+                array(
+                    'bar' => 'set by user'
+                ),
+                '{{< foo }}{{# bar }}{{$ baz }}{{/ baz }}{{/ bar }}{{/ foo }}',
+            ),
+            array(
+                array(
+                    'foo' => '{{$baz}}default content{{/baz}}'
+                ),
+                array(
+                ),
+                '{{<foo}}{{^bar}}{{$baz}}set by template{{/baz}}{{/bar}}{{/foo}}',
+            ),
+            array(
+                array(
+                    'foo' => '{{$baz}}default content{{/baz}}',
+                    'qux' => 'I am a partial'
+                ),
+                array(
+                ),
+                '{{<foo}}{{>qux}}{{$baz}}set by template{{/baz}}{{/foo}}'
+            ),
+            array(
+                array(
+                    'foo' => '{{$baz}}default content{{/baz}}'
+                ),
+                array(
+                ),
+                '{{<foo}}{{=<% %>=}}<%={{ }}=%>{{/foo}}'
+            )
+        );
+    }
+
+    public function getLegalInheritanceExamples()
+    {
+        return array(
+            array(
+                array(
+                    'foo' => '{{$baz}}default content{{/baz}}',
+                ),
+                array(
+                    'bar' => 'set by user'
+                ),
+                '{{<foo}}{{bar}}{{$baz}}override{{/baz}}{{/foo}}',
+                'override'
+            ),
+            array(
+                array(
+                    'foo' => '{{$baz}}default content{{/baz}}'
+                ),
+                array(
+                ),
+                '{{<foo}}{{! ignore me }}{{$baz}}set by template{{/baz}}{{/foo}}',
+                'set by template'
+            )
+        );
+    }
+
     public function testDefaultContent()
     {
         $tpl = $this->mustache->loadTemplate('{{$title}}Default title{{/title}}');
@@ -339,26 +404,27 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         $this->assertEquals('default content', $tpl->render($data));
     }
 
+    
+
     /**
+     * @dataProvider getIllegalInheritanceExamples
      * @expectedException Mustache_Exception_SyntaxException
      * @expectedExceptionMessage Illegal content in < parent tag
      */
-    public function testOnlyBlockTagsAllowedInParent()
+    public function testIllegalInheritanceExamples($partials, $data, $template)
     {
-        $partials = array(
-           'foo' => '{{$baz}}default content{{/baz}}'
-       );
-
         $this->mustache->setPartials($partials);
-
-        $tpl = $this->mustache->loadTemplate(
-            '{{< foo }}{{# bar }}{{$ baz }}{{/ baz }}{{/ bar }}{{/ foo }}'
-        );
-
-        $data = array(
-            'bar' => 'set by user'
-        );
-
+        $tpl = $this->mustache->loadTemplate($template);
         $tpl->render($data);
+    }
+
+    /**
+     * @dataProvider getLegalInheritanceExamples
+     */
+    public function testLegalInheritanceExamples($partials, $data, $template, $expect)
+    {
+        $this->mustache->setPartials($partials);
+        $tpl = $this->mustache->loadTemplate($template);
+        $this->assertSame($expect, $tpl->render($data));
     }
 }
