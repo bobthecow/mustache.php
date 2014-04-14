@@ -211,9 +211,9 @@ class Mustache_Compiler
     }
 
     const BLOCK_VAR = '
-        $value = $this->resolveValue($context->%s(%s), $context, $indent);
+        $value = $this->resolveValue($context->findInBlock(%s), $context, $indent);
         if($value && !is_array($value) && !is_object($value)) {
-            $buffer .= %s;
+            $buffer .= $value;
         } else {
             %s
         }
@@ -221,11 +221,9 @@ class Mustache_Compiler
 
     private function blockVar($nodes, $id, $start, $end, $otag, $ctag, $level)
     {
-        $method = 'findInBlock';
         $id_str = var_export($id, true);
-        $value  = $this->getEscape();
 
-        return sprintf($this->prepare(self::BLOCK_VAR, $level), $method, $id_str, $value, $this->walk($nodes, 2));
+        return sprintf($this->prepare(self::BLOCK_VAR, $level), $id_str, $this->walk($nodes, 2));
     }
 
     const BLOCK_ARG = '
