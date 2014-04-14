@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2013 Justin Hileman
+ * (c) 2010-2014 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -71,12 +71,22 @@ class Mustache_Parser
 
                 case Mustache_Tokenizer::T_END_SECTION:
                     if (!isset($parent)) {
-                        $msg = sprintf('Unexpected closing tag: /%s', $token[Mustache_Tokenizer::NAME]);
+                        $msg = sprintf(
+                            'Unexpected closing tag: /%s on line %d',
+                            $token[Mustache_Tokenizer::NAME],
+                            $token[Mustache_Tokenizer::LINE]
+                        );
                         throw new Mustache_Exception_SyntaxException($msg, $token);
                     }
 
                     if ($token[Mustache_Tokenizer::NAME] !== $parent[Mustache_Tokenizer::NAME]) {
-                        $msg = sprintf('Nesting error: %s vs. %s', $parent[Mustache_Tokenizer::NAME], $token[Mustache_Tokenizer::NAME]);
+                        $msg = sprintf(
+                            'Nesting error: %s (on line %d) vs. %s (on line %d)',
+                            $parent[Mustache_Tokenizer::NAME],
+                            $parent[Mustache_Tokenizer::LINE],
+                            $token[Mustache_Tokenizer::NAME],
+                            $token[Mustache_Tokenizer::LINE]
+                        );
                         throw new Mustache_Exception_SyntaxException($msg, $token);
                     }
 
@@ -85,7 +95,6 @@ class Mustache_Parser
                     $parent[Mustache_Tokenizer::NODES] = $nodes;
 
                     return $parent;
-                    break;
 
                 case Mustache_Tokenizer::T_PARTIAL:
                 case Mustache_Tokenizer::T_PARTIAL_2:
@@ -109,7 +118,11 @@ class Mustache_Parser
         }
 
         if (isset($parent)) {
-            $msg = sprintf('Missing closing tag: %s', $parent[Mustache_Tokenizer::NAME]);
+            $msg = sprintf(
+                'Missing closing tag: %s opened on line %d',
+                $parent[Mustache_Tokenizer::NAME],
+                $parent[Mustache_Tokenizer::LINE]
+            );
             throw new Mustache_Exception_SyntaxException($msg, $parent);
         }
 
@@ -144,7 +157,6 @@ class Mustache_Parser
             }
         }
 
-        $next = null;
         if ($next = reset($tokens)) {
             // If we're on a new line, bail.
             if ($next[Mustache_Tokenizer::LINE] !== $this->lineNum) {

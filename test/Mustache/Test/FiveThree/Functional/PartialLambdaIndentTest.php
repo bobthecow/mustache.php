@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2013 Justin Hileman
+ * (c) 2010-2014 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -51,7 +51,7 @@ class Mustache_Test_Functional_ClassWithLambda
 {
     public function _t()
     {
-        return function($val) {
+        return function ($val) {
             return strtoupper($val);
         };
     }

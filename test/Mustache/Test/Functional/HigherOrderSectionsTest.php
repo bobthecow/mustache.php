@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2013 Justin Hileman
+ * (c) 2010-2014 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,9 +13,8 @@
  * @group lambdas
  * @group functional
  */
-class Mustache_Test_Functional_HigherOrderSectionsTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_Functional_HigherOrderSectionsTest extends Mustache_Test_FunctionalTestCase
 {
-
     private $mustache;
 
     public function setUp()
@@ -23,24 +22,26 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends PHPUnit_Framework
         $this->mustache = new Mustache_Engine;
     }
 
-    public function testRuntimeSectionCallback()
+    /**
+     * @dataProvider sectionCallbackData
+     */
+    public function testSectionCallback($data, $tpl, $expect)
     {
-        $tpl = $this->mustache->loadTemplate('{{#doublewrap}}{{name}}{{/doublewrap}}');
+        $this->assertEquals($expect, $this->mustache->render($tpl, $data));
+    }
 
+    public function sectionCallbackData()
+    {
         $foo = new Mustache_Test_Functional_Foo;
         $foo->doublewrap = array($foo, 'wrapWithBoth');
 
-        $this->assertEquals(sprintf('<strong><em>%s</em></strong>', $foo->name), $tpl->render($foo));
-    }
+        $bar = new Mustache_Test_Functional_Foo;
+        $bar->trimmer = array(get_class($bar), 'staticTrim');
 
-    public function testStaticSectionCallback()
-    {
-        $tpl = $this->mustache->loadTemplate('{{#trimmer}}    {{name}}    {{/trimmer}}');
-
-        $foo = new Mustache_Test_Functional_Foo;
-        $foo->trimmer = array(get_class($foo), 'staticTrim');
-
-        $this->assertEquals($foo->name, $tpl->render($foo));
+        return array(
+            array($foo, '{{#doublewrap}}{{name}}{{/doublewrap}}', sprintf('<strong><em>%s</em></strong>', $foo->name)),
+            array($bar, '{{#trimmer}}   {{name}}   {{/trimmer}}', $bar->name),
+        );
     }
 
     public function testViewArraySectionCallback()
@@ -100,6 +101,44 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends PHPUnit_Framework
 
         $this->assertEquals('<em>' . $foo->name . '</em>', $tpl->render($foo));
     }
+
+    /**
+     * @dataProvider cacheLambdaTemplatesData
+     */
+    public function testCacheLambdaTemplatesOptionWorks($dirName, $tplPrefix, $enable, $expect)
+    {
+        $cacheDir = $this->setUpCacheDir($dirName);
+        $mustache = new Mustache_Engine(array(
+            'template_class_prefix'  => $tplPrefix,
+            'cache'                  => $cacheDir,
+            'cache_lambda_templates' => $enable,
+        ));
+
+        $tpl = $mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
+        $foo = new Mustache_Test_Functional_Foo;
+        $foo->wrap = array($foo, 'wrapWithEm');
+        $this->assertEquals('<em>' . $foo->name . '</em>', $tpl->render($foo));
+        $this->assertCount($expect, glob($cacheDir . '/*.php'));
+    }
+
+    public function cacheLambdaTemplatesData()
+    {
+        return array(
+            array('test_enabling_lambda_cache',  '_TestEnablingLambdaCache_',  true,  2),
+            array('test_disabling_lambda_cache', '_TestDisablingLambdaCache_', false, 1),
+        );
+    }
+
+    protected function setUpCacheDir($name)
+    {
+        $cacheDir = self::$tempDir . '/' . $name;
+        if (file_exists($cacheDir)) {
+            self::rmdir($cacheDir);
+        }
+        mkdir($cacheDir, 0777, true);
+
+        return $cacheDir;
+    }
 }
 
 class Mustache_Test_Functional_Foo
@@ -112,6 +151,9 @@ class Mustache_Test_Functional_Foo
         return sprintf('<em>%s</em>', $text);
     }
 
+    /**
+     * @param string $text
+     */
     public function wrapWithStrong($text)
     {
         return sprintf('<strong>%s</strong>', $text);

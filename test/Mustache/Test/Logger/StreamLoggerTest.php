@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2013 Justin Hileman
+ * (c) 2010-2014 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,23 +14,26 @@
  */
 class Mustache_Test_Logger_StreamLoggerTest extends PHPUnit_Framework_TestCase
 {
-    public function testAcceptsFilename()
+    /**
+     * @dataProvider acceptsStreamData
+     */
+    public function testAcceptsStream($name, $stream)
     {
-        $name   = tempnam(sys_get_temp_dir(), 'mustache-test');
-        $logger = new Mustache_Logger_StreamLogger($name);
+        $logger = new Mustache_Logger_StreamLogger($stream);
         $logger->log(Mustache_Logger::CRITICAL, 'message');
 
         $this->assertEquals("CRITICAL: message\n", file_get_contents($name));
     }
 
-    public function testAcceptsResource()
+    public function acceptsStreamData()
     {
-        $name   = tempnam(sys_get_temp_dir(), 'mustache-test');
-        $file   = fopen($name, 'a');
-        $logger = new Mustache_Logger_StreamLogger($file);
-        $logger->log(Mustache_Logger::CRITICAL, 'message');
+        $one = tempnam(sys_get_temp_dir(), 'mustache-test');
+        $two = tempnam(sys_get_temp_dir(), 'mustache-test');
 
-        $this->assertEquals("CRITICAL: message\n", file_get_contents($name));
+        return array(
+            array($one, $one),
+            array($two, fopen($two, 'a')),
+        );
     }
 
     /**

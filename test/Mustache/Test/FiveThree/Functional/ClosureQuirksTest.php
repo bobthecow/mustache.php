@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2013 Justin Hileman
+ * (c) 2010-2014 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,7 +13,7 @@
  * @group lambdas
  * @group functional
  */
-class Mustache_Test_FiveThree_Functional_ClosuresQuirksTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_FiveThree_Functional_ClosureQuirksTest extends PHPUnit_Framework_TestCase
 {
     private $mustache;
 
@@ -25,6 +25,6 @@ class Mustache_Test_FiveThree_Functional_ClosuresQuirksTest extends PHPUnit_Fram
     public function testClosuresDontLikeItWhenYouTouchTheirProperties()
     {
         $tpl = $this->mustache->loadTemplate('{{ foo.bar }}');
-        $this->assertEquals('', $tpl->render(array('foo' => function() { return 'FOO'; })));
+        $this->assertEquals('', $tpl->render(array('foo' => function () { return 'FOO'; })));
     }
 }

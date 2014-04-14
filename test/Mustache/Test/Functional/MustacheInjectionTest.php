@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2013 Justin Hileman
+ * (c) 2010-2014 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -23,123 +23,58 @@ class Mustache_Test_Functional_MustacheInjectionTest extends PHPUnit_Framework_T
         $this->mustache = new Mustache_Engine;
     }
 
-    // interpolation
-
-    public function testInterpolationInjection()
+    /**
+     * @dataProvider injectionData
+     */
+    public function testInjection($tpl, $data, $partials, $expect)
     {
-        $tpl = $this->mustache->loadTemplate('{{ a }}');
+        $this->mustache->setPartials($partials);
+        $this->assertEquals($expect, $this->mustache->render($tpl, $data));
+    }
 
-        $data = array(
+    public function injectionData()
+    {
+        $interpolationData = array(
             'a' => '{{ b }}',
             'b' => 'FAIL'
         );
 
-        $this->assertEquals('{{ b }}', $tpl->render($data));
-    }
-
-    public function testUnescapedInterpolationInjection()
-    {
-        $tpl = $this->mustache->loadTemplate('{{{ a }}}');
-
-        $data = array(
-            'a' => '{{ b }}',
-            'b' => 'FAIL'
-        );
-
-        $this->assertEquals('{{ b }}', $tpl->render($data));
-    }
-
-    // sections
-
-    public function testSectionInjection()
-    {
-        $tpl = $this->mustache->loadTemplate('{{# a }}{{ b }}{{/ a }}');
-
-        $data = array(
+        $sectionData = array(
             'a' => true,
             'b' => '{{ c }}',
             'c' => 'FAIL'
         );
 
-        $this->assertEquals('{{ c }}', $tpl->render($data));
-    }
-
-    public function testUnescapedSectionInjection()
-    {
-        $tpl = $this->mustache->loadTemplate('{{# a }}{{{ b }}}{{/ a }}');
-
-        $data = array(
-            'a' => true,
-            'b' => '{{ c }}',
-            'c' => 'FAIL'
-        );
-
-        $this->assertEquals('{{ c }}', $tpl->render($data));
-    }
-
-    // partials
-
-    public function testPartialInjection()
-    {
-        $tpl = $this->mustache->loadTemplate('{{> partial }}');
-        $this->mustache->setPartials(array(
-            'partial' => '{{ a }}',
-        ));
-
-        $data = array(
-            'a' => '{{ b }}',
-            'b' => 'FAIL'
-        );
-
-        $this->assertEquals('{{ b }}', $tpl->render($data));
-    }
-
-    public function testPartialUnescapedInjection()
-    {
-        $tpl = $this->mustache->loadTemplate('{{> partial }}');
-        $this->mustache->setPartials(array(
-            'partial' => '{{{ a }}}',
-        ));
-
-        $data = array(
-            'a' => '{{ b }}',
-            'b' => 'FAIL'
-        );
-
-        $this->assertEquals('{{ b }}', $tpl->render($data));
-    }
-
-    // lambdas
-
-    public function testLambdaInterpolationInjection()
-    {
-        $tpl = $this->mustache->loadTemplate('{{ a }}');
-
-        $data = array(
+        $lambdaInterpolationData = array(
             'a' => array($this, 'lambdaInterpolationCallback'),
             'b' => '{{ c }}',
             'c' => 'FAIL'
         );
 
-        $this->assertEquals('{{ c }}', $tpl->render($data));
-    }
-
-    public static function lambdaInterpolationCallback()
-    {
-        return '{{ b }}';
-    }
-
-    public function testLambdaSectionInjection()
-    {
-        $tpl = $this->mustache->loadTemplate('{{# a }}b{{/ a }}');
-
-        $data = array(
+        $lambdaSectionData = array(
             'a' => array($this, 'lambdaSectionCallback'),
             'b' => '{{ c }}',
             'c' => 'FAIL'
         );
 
-        $this->assertEquals('{{ c }}', $tpl->render($data));
+        return array(
+            array('{{ a }}',   $interpolationData, array(), '{{ b }}'),
+            array('{{{ a }}}', $interpolationData, array(), '{{ b }}'),
+
+            array('{{# a }}{{ b }}{{/ a }}',   $sectionData, array(), '{{ c }}'),
+            array('{{# a }}{{{ b }}}{{/ a }}', $sectionData, array(), '{{ c }}'),
+
+            array('{{> partial }}', $interpolationData, array('partial' => '{{ a }}'),   '{{ b }}'),
+            array('{{> partial }}', $interpolationData, array('partial' => '{{{ a }}}'), '{{ b }}'),
+
+            array('{{ a }}',           $lambdaInterpolationData, array(), '{{ c }}'),
+            array('{{# a }}b{{/ a }}', $lambdaSectionData,       array(), '{{ c }}'),
+        );
+    }
+
+    public static function lambdaInterpolationCallback()
+    {
+        return '{{ b }}';
     }
 
     public static function lambdaSectionCallback($text)

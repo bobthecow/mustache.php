@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2013 Justin Hileman
+ * (c) 2010-2014 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -31,14 +31,15 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
         self::EMERGENCY => 600,
     );
 
+    protected $level;
     protected $stream = null;
     protected $url    = null;
 
     /**
      * @throws InvalidArgumentException if the logging level is unknown.
      *
-     * @param string  $stream Resource instance or URL
-     * @param integer $level  The minimum logging level at which this handler will be triggered
+     * @param resource|string $stream Resource instance or URL
+     * @param integer         $level  The minimum logging level at which this handler will be triggered
      */
     public function __construct($stream, $level = Mustache_Logger::ERROR)
     {

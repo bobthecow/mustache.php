@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2013 Justin Hileman
+ * (c) 2010-2014 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -23,7 +23,7 @@
  */
 class Mustache_Engine
 {
-    const VERSION        = '2.5.1';
+    const VERSION        = '2.6.0';
     const SPEC_VERSION   = '1.1.2';
 
     const PRAGMA_FILTERS = 'FILTERS';
@@ -44,6 +44,11 @@ class Mustache_Engine
     private $charset = 'UTF-8';
     private $logger;
     private $strictCallables = false;
+
+    // Services
+    private $tokenizer;
+    private $parser;
+    private $compiler;
 
     /**
      * Mustache class constructor.
@@ -79,12 +84,12 @@ class Mustache_Engine
      *         // An array of 'helpers'. Helpers can be global variables or objects, closures (e.g. for higher order
      *         // sections), or any other valid Mustache context value. They will be prepended to the context stack,
      *         // so they will be available in any template loaded by this Mustache instance.
-     *         'helpers' => array('i18n' => function($text) {
+     *         'helpers' => array('i18n' => function ($text) {
      *             // do something translatey here...
      *         }),
      *
      *         // An 'escape' callback, responsible for escaping double-mustache variables.
-     *         'escape' => function($value) {
+     *         'escape' => function ($value) {
      *             return htmlspecialchars($buffer, ENT_COMPAT, 'UTF-8');
      *         },
      *
@@ -194,7 +199,7 @@ class Mustache_Engine
     /**
      * Get the current Mustache escape callback.
      *
-     * @return mixed Callable or null
+     * @return callable|null
      */
     public function getEscape()
     {
@@ -657,9 +662,9 @@ class Mustache_Engine
             }
 
             if (!class_exists($className, false)) {
-                if (!$this->getCache()->load($className)) {
+                if (!$cache->load($className)) {
                     $compiled = $this->compile($source);
-                    $this->getCache()->cache($className, $compiled);
+                    $cache->cache($className, $compiled);
                 }
             }
 

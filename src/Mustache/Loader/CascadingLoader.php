@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2013 Justin Hileman
+ * (c) 2010-2014 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,7 +25,7 @@ class Mustache_Loader_CascadingLoader implements Mustache_Loader
      *         new Mustache_Loader_FilesystemLoader(__DIR__.'/templates')
      *     ));
      *
-     * @param array $loaders An array of Mustache Loader instances
+     * @param Mustache_Loader[] $loaders
      */
     public function __construct(array $loaders = array())
     {
@@ -38,7 +38,7 @@ class Mustache_Loader_CascadingLoader implements Mustache_Loader
     /**
      * Add a Loader instance.
      *
-     * @param Mustache_Loader $loader A Mustache Loader instance
+     * @param Mustache_Loader $loader
      */
     public function addLoader(Mustache_Loader $loader)
     {

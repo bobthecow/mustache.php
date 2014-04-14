@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2013 Justin Hileman
+ * (c) 2010-2014 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,19 +12,8 @@
 /**
  * @group unit
  */
-class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
 {
-
-    private static $tempDir;
-
-    public static function setUpBeforeClass()
-    {
-        self::$tempDir = sys_get_temp_dir() . '/mustache_test';
-        if (file_exists(self::$tempDir)) {
-            self::rmdir(self::$tempDir);
-        }
-    }
-
     public function testConstructor()
     {
         $logger         = new Mustache_Logger_StreamLogger(tmpfile());
@@ -309,65 +298,35 @@ class Mustache_Test_EngineTest extends PHPUnit_Framework_TestCase
 
     public function testCacheWarningLogging()
     {
-        $name     = tempnam(sys_get_temp_dir(), 'mustache-test');
-        $mustache = new Mustache_Engine(array(
-            'logger'   => new Mustache_Logger_StreamLogger($name, Mustache_Logger::WARNING)
-        ));
-
-        $result = $mustache->render('{{ foo }}', array('foo' => 'FOO'));
-        $this->assertEquals('FOO', $result);
-
+        list($name, $mustache) = $this->getLoggedMustache(Mustache_Logger::WARNING);
+        $mustache->render('{{ foo }}', array('foo' => 'FOO'));
         $this->assertContains('WARNING: Template cache disabled, evaluating', file_get_contents($name));
     }
 
     public function testLoggingIsNotTooAnnoying()
     {
-        $name     = tempnam(sys_get_temp_dir(), 'mustache-test');
-        $mustache = new Mustache_Engine(array(
-            'logger'   => new Mustache_Logger_StreamLogger($name)
-        ));
-
-        $result = $mustache->render('{{ foo }}{{> bar }}', array('foo' => 'FOO'));
-        $this->assertEquals('FOO', $result);
-
+        list($name, $mustache) = $this->getLoggedMustache();
+        $mustache->render('{{ foo }}{{> bar }}', array('foo' => 'FOO'));
         $this->assertEmpty(file_get_contents($name));
     }
 
     public function testVerboseLoggingIsVerbose()
     {
-        $name     = tempnam(sys_get_temp_dir(), 'mustache-test');
-        $mustache = new Mustache_Engine(array(
-            'logger'   => new Mustache_Logger_StreamLogger($name, Mustache_Logger::DEBUG)
-        ));
-
-        $result = $mustache->render('{{ foo }}{{> bar }}', array('foo' => 'FOO'));
-        $this->assertEquals('FOO', $result);
-
+        list($name, $mustache) = $this->getLoggedMustache(Mustache_Logger::DEBUG);
+        $mustache->render('{{ foo }}{{> bar }}', array('foo' => 'FOO'));
         $log = file_get_contents($name);
-
-        $this->assertContains("DEBUG: Instantiating template: ", $log);
+        $this->assertContains("DEBUG: Instantiating template: ",     $log);
         $this->assertContains("WARNING: Partial not found: \"bar\"", $log);
     }
 
-    private static function rmdir($path)
+    private function getLoggedMustache($level = Mustache_Logger::ERROR)
     {
-        $path = rtrim($path, '/').'/';
-        $handle = opendir($path);
-        while (($file = readdir($handle)) !== false) {
-            if ($file == '.' || $file == '..') {
-                continue;
-            }
+        $name     = tempnam(sys_get_temp_dir(), 'mustache-test');
+        $mustache = new Mustache_Engine(array(
+            'logger' => new Mustache_Logger_StreamLogger($name, $level)
+        ));
 
-            $fullpath = $path.$file;
-            if (is_dir($fullpath)) {
-                self::rmdir($fullpath);
-            } else {
-                unlink($fullpath);
-            }
-        }
-
-        closedir($handle);
-        rmdir($path);
+        return array($name, $mustache);
     }
 }
 
