@@ -47,8 +47,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
                 array(
                     'foo' => '{{$baz}}default content{{/baz}}'
                 ),
-                array(
-                ),
+                array(),
                 '{{<foo}}{{=<% %>=}}<%={{ }}=%>{{/foo}}'
             )
         );
@@ -75,6 +74,14 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
                 ),
                 '{{<foo}}{{! ignore me }}{{$baz}}set by template{{/baz}}{{/foo}}',
                 'set by template'
+            ),
+            array(
+                array(
+                    'foo' => '{{$baz}}defualt content{{/baz}}'
+                ),
+                array(),
+                '{{<foo}}set by template{{$baz}}also set by template{{/baz}}{{/foo}}',
+                'also set by template'
             )
         );
     }
