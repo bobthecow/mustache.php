@@ -61,7 +61,6 @@ abstract class Mustache_Template
      * @param mixed $context Array or object rendering context (default: array())
      *
      * @return string Rendered template
-     * TODO construct a parent context stack here and pass it in
      */
     public function render($context = array())
     {
