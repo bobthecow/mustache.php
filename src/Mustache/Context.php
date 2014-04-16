@@ -1,4 +1,5 @@
 <?php
+namespace Mustache;
 
 /*
  * This file is part of Mustache.php.
@@ -12,7 +13,7 @@
 /**
  * Mustache Template rendering Context.
  */
-class Mustache_Context
+class Context
 {
     private $stack = array();
 
@@ -123,7 +124,7 @@ class Mustache_Context
     /**
      * Helper function to find a variable in the Context stack.
      *
-     * @see Mustache_Context::find
+     * @see \Mustache\Context::find
      *
      * @param string $id    Variable name
      * @param array  $stack Context stack

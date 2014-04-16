@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Logger;
 
 /*
  * This file is part of Mustache.php.
@@ -18,7 +19,7 @@
  *
  * Hint: Try `php://stderr` for your stream URL.
  */
-class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
+class StreamLogger extends \Mustache\Logger\AbstractLogger
 {
     protected static $levels = array(
         self::DEBUG     => 100,
@@ -41,7 +42,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      * @param resource|string $stream Resource instance or URL
      * @param integer         $level  The minimum logging level at which this handler will be triggered
      */
-    public function __construct($stream, $level = Mustache_Logger::ERROR)
+    public function __construct($stream, $level = \Mustache\Logger::ERROR)
     {
         $this->setLevel($level);
 
@@ -65,14 +66,14 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
     /**
      * Set the minimum logging level.
      *
-     * @throws Mustache_Exception_InvalidArgumentException if the logging level is unknown.
+     * @throws \Mustache\Exception\InvalidArgumentException if the logging level is unknown.
      *
      * @param integer $level The minimum logging level which will be written
      */
     public function setLevel($level)
     {
         if (!array_key_exists($level, self::$levels)) {
-            throw new Mustache_Exception_InvalidArgumentException(sprintf('Unexpected logging level: %s', $level));
+            throw new \Mustache\Exception\InvalidArgumentException(sprintf('Unexpected logging level: %s', $level));
         }
 
         $this->level = $level;
@@ -91,7 +92,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
     /**
      * Logs with an arbitrary level.
      *
-     * @throws Mustache_Exception_InvalidArgumentException if the logging level is unknown.
+     * @throws \Mustache\Exception\InvalidArgumentException if the logging level is unknown.
      *
      * @param mixed  $level
      * @param string $message
@@ -100,7 +101,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
     public function log($level, $message, array $context = array())
     {
         if (!array_key_exists($level, self::$levels)) {
-            throw new Mustache_Exception_InvalidArgumentException(sprintf('Unexpected logging level: %s', $level));
+            throw new \Mustache\Exception\InvalidArgumentException(sprintf('Unexpected logging level: %s', $level));
         }
 
         if (self::$levels[$level] >= self::$levels[$this->level]) {
@@ -111,8 +112,8 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
     /**
      * Write a record to the log.
      *
-     * @throws Mustache_Exception_LogicException   If neither a stream resource nor url is present.
-     * @throws Mustache_Exception_RuntimeException If the stream url cannot be opened.
+     * @throws \Mustache\Exception\LogicException   If neither a stream resource nor url is present.
+     * @throws \Mustache\Exception\RuntimeException If the stream url cannot be opened.
      *
      * @param integer $level   The logging level
      * @param string  $message The log message
@@ -122,13 +123,13 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
     {
         if (!is_resource($this->stream)) {
             if (!isset($this->url)) {
-                throw new Mustache_Exception_LogicException('Missing stream url, the stream can not be opened. This may be caused by a premature call to close().');
+                throw new \Mustache\Exception\LogicException('Missing stream url, the stream can not be opened. This may be caused by a premature call to close().');
             }
 
             $this->stream = fopen($this->url, 'a');
             if (!is_resource($this->stream)) {
                 // @codeCoverageIgnoreStart
-                throw new Mustache_Exception_RuntimeException(sprintf('The stream or file "%s" could not be opened.', $this->url));
+                throw new \Mustache\Exception\RuntimeException(sprintf('The stream or file "%s" could not be opened.', $this->url));
                 // @codeCoverageIgnoreEnd
             }
         }

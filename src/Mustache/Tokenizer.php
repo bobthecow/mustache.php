@@ -1,4 +1,5 @@
 <?php
+namespace Mustache;
 
 /*
  * This file is part of Mustache.php.
@@ -14,7 +15,7 @@
  *
  * This class is responsible for turning raw template source into a set of Mustache tokens.
  */
-class Mustache_Tokenizer
+class Tokenizer
 {
 
     // Finite state machine states

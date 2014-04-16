@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Exception;
 
 /*
  * This file is part of Mustache.php.
@@ -12,7 +13,7 @@
 /**
  * Unknown filter exception.
  */
-class Mustache_Exception_UnknownFilterException extends UnexpectedValueException implements Mustache_Exception
+class UnknownFilterException extends \UnexpectedValueException implements \Mustache\Exception
 {
     protected $filterName;
 

@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Loader;
 
 /*
  * This file is part of Mustache.php.
@@ -12,7 +13,7 @@
 /**
  * Mustache Template mutable Loader interface.
  */
-interface Mustache_Loader_MutableLoader
+interface MutableLoader
 {
 
     /**

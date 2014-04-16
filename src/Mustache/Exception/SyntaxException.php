@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Exception;
 
 /*
  * This file is part of Mustache.php.
@@ -12,7 +13,7 @@
 /**
  * Mustache syntax exception.
  */
-class Mustache_Exception_SyntaxException extends LogicException implements Mustache_Exception
+class SyntaxException extends \LogicException implements \Mustache\Exception
 {
     protected $token;
 

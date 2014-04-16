@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Exception;
 
 /*
  * This file is part of Mustache.php.
@@ -12,7 +13,7 @@
 /**
  * Unknown helper exception.
  */
-class Mustache_Exception_UnknownHelperException extends InvalidArgumentException implements Mustache_Exception
+class UnknownHelperException extends \InvalidArgumentException implements \Mustache\Exception
 {
     protected $helperName;
 

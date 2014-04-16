@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Exception;
 
 /*
  * This file is part of Mustache.php.
@@ -12,7 +13,7 @@
 /**
  * Invalid argument exception.
  */
-class Mustache_Exception_InvalidArgumentException extends InvalidArgumentException implements Mustache_Exception
+class InvalidArgumentException extends \InvalidArgumentException implements \Mustache\Exception
 {
     // This space intentionally left blank.
 }
