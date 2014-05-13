@@ -23,7 +23,7 @@
 $baseDir = realpath(dirname(__FILE__).'/..');
 
 require $baseDir.'/src/Mustache/Autoloader.php';
-Mustache_Autoloader::register();
+\Mustache\Autoloader::register();
 
 // delete the old file
 $file = $baseDir.'/mustache.php';
@@ -33,36 +33,36 @@ if (file_exists($file)) {
 
 // and load the new one
 SymfonyClassCollectionLoader::load(array(
-    'Mustache_Engine',
-    'Mustache_Cache',
-    'Mustache_Cache_AbstractCache',
-    'Mustache_Cache_FilesystemCache',
-    'Mustache_Cache_NoopCache',
-    'Mustache_Compiler',
-    'Mustache_Context',
-    'Mustache_Exception',
-    'Mustache_Exception_InvalidArgumentException',
-    'Mustache_Exception_LogicException',
-    'Mustache_Exception_RuntimeException',
-    'Mustache_Exception_SyntaxException',
-    'Mustache_Exception_UnknownFilterException',
-    'Mustache_Exception_UnknownHelperException',
-    'Mustache_Exception_UnknownTemplateException',
-    'Mustache_HelperCollection',
-    'Mustache_LambdaHelper',
-    'Mustache_Loader',
-    'Mustache_Loader_ArrayLoader',
-    'Mustache_Loader_CascadingLoader',
-    'Mustache_Loader_FilesystemLoader',
-    'Mustache_Loader_InlineLoader',
-    'Mustache_Loader_MutableLoader',
-    'Mustache_Loader_StringLoader',
-    'Mustache_Logger',
-    'Mustache_Logger_AbstractLogger',
-    'Mustache_Logger_StreamLogger',
-    'Mustache_Parser',
-    'Mustache_Template',
-    'Mustache_Tokenizer',
+    '\Mustache\Engine',
+    '\Mustache\Cache',
+    '\Mustache\Cache\AbstractCache',
+    '\Mustache\Cache\FilesystemCache',
+    '\Mustache\Cache\NoopCache',
+    '\Mustache\Compiler',
+    '\Mustache\Context',
+    '\Mustache\Exception',
+    '\Mustache\Exception\InvalidArgumentException',
+    '\Mustache\Exception\LogicException',
+    '\Mustache\Exception\RuntimeException',
+    '\Mustache\Exception\SyntaxException',
+    '\Mustache\Exception\UnknownFilterException',
+    '\Mustache\Exception\UnknownHelperException',
+    '\Mustache\Exception\UnknownTemplateException',
+    '\Mustache\HelperCollection',
+    '\Mustache\LambdaHelper',
+    '\Mustache\Loader',
+    '\Mustache\Loader\ArrayLoader',
+    '\Mustache\Loader\CascadingLoader',
+    '\Mustache\Loader\FilesystemLoader',
+    '\Mustache\Loader\InlineLoader',
+    '\Mustache\Loader\MutableLoader',
+    '\Mustache\Loader\StringLoader',
+    '\Mustache\Logger',
+    '\Mustache\Logger\AbstractLogger',
+    '\Mustache\Logger\StreamLogger',
+    '\Mustache\Parser',
+    '\Mustache\Template',
+    '\Mustache\Tokenizer',
 ), dirname($file), basename($file, '.php'));
 
 /**
