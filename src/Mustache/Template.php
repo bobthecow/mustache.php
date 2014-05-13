@@ -16,7 +16,6 @@
  */
 abstract class Mustache_Template
 {
-
     /**
      * @var Mustache_Engine
      */

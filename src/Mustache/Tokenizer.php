@@ -16,7 +16,6 @@
  */
 class Mustache_Tokenizer
 {
-
     // Finite state machine states
     const IN_TEXT     = 0;
     const IN_TAG_TYPE = 1;
