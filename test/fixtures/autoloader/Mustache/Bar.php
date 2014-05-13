@@ -1,4 +1,5 @@
 <?php
+namespace Mustache;
 
 /*
  * This file is part of Mustache.php.
@@ -9,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-class Mustache_Bar
+class Bar
 {
     // nada
 }

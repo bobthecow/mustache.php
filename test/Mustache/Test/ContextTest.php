@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Test;
 
 /*
  * This file is part of Mustache.php.
@@ -12,40 +13,40 @@
 /**
  * @group unit
  */
-class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
+class ContextTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $one = new Mustache_Context;
+        $one = new \Mustache\Context;
         $this->assertSame('', $one->find('foo'));
         $this->assertSame('', $one->find('bar'));
 
-        $two = new Mustache_Context(array(
+        $two = new \Mustache\Context(array(
             'foo' => 'FOO',
             'bar' => '<BAR>'
         ));
         $this->assertEquals('FOO', $two->find('foo'));
         $this->assertEquals('<BAR>', $two->find('bar'));
 
-        $obj = new StdClass;
+        $obj = new \StdClass;
         $obj->name = 'NAME';
-        $three = new Mustache_Context($obj);
+        $three = new \Mustache\Context($obj);
         $this->assertSame($obj, $three->last());
         $this->assertEquals('NAME', $three->find('name'));
     }
 
     public function testPushPopAndLast()
     {
-        $context = new Mustache_Context;
+        $context = new \Mustache\Context;
         $this->assertFalse($context->last());
 
-        $dummy = new Mustache_Test_TestDummy;
+        $dummy = new \Mustache\Test\TestDummy;
         $context->push($dummy);
         $this->assertSame($dummy, $context->last());
         $this->assertSame($dummy, $context->pop());
         $this->assertFalse($context->last());
 
-        $obj = new StdClass;
+        $obj = new \StdClass;
         $context->push($dummy);
         $this->assertSame($dummy, $context->last());
         $context->push($obj);
@@ -57,11 +58,11 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
 
     public function testFind()
     {
-        $context = new Mustache_Context;
+        $context = new \Mustache\Context;
 
-        $dummy = new Mustache_Test_TestDummy;
+        $dummy = new \Mustache\Test\TestDummy;
 
-        $obj = new StdClass;
+        $obj = new \StdClass;
         $obj->name = 'obj';
 
         $arr = array(
@@ -99,12 +100,12 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
 
     public function testArrayAccessFind()
     {
-        $access = new Mustache_Test_TestArrayAccess(array(
+        $access = new \Mustache\Test\TestArrayAccess(array(
             'a' => array('b' => array('c' => 'see')),
             'b' => 'bee',
         ));
 
-        $context = new Mustache_Context($access);
+        $context = new \Mustache\Context($access);
         $this->assertEquals('bee', $context->find('b'));
         $this->assertEquals('see', $context->findDot('a.b.c'));
         $this->assertEquals(null, $context->findDot('a.b.c.d'));
@@ -112,7 +113,7 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
 
     public function testAccessorPriority()
     {
-        $context = new Mustache_Context(new Mustache_Test_AllTheThings);
+        $context = new \Mustache\Context(new \Mustache\Test\AllTheThings);
 
         $this->assertEquals('win', $context->find('foo'), 'method beats property');
         $this->assertEquals('win', $context->find('bar'), 'property beats ArrayAccess');
@@ -121,7 +122,7 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class Mustache_Test_TestDummy
+class TestDummy
 {
     public $name = 'dummy';
 
@@ -141,7 +142,7 @@ class Mustache_Test_TestDummy
     }
 }
 
-class Mustache_Test_TestArrayAccess implements ArrayAccess
+class TestArrayAccess implements \ArrayAccess
 {
     private $container = array();
 
@@ -177,7 +178,7 @@ class Mustache_Test_TestArrayAccess implements ArrayAccess
     }
 }
 
-class Mustache_Test_AllTheThings implements ArrayAccess
+class AllTheThings implements \ArrayAccess
 {
     public $foo  = 'fail';
     public $bar  = 'win';

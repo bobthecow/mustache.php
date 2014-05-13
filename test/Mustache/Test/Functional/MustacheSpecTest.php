@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Test\Functional;
 
 /*
  * This file is part of Mustache.php.
@@ -15,7 +16,7 @@
  * @group mustache-spec
  * @group functional
  */
-class Mustache_Test_Functional_MustacheSpecTest extends Mustache_Test_SpecTestCase
+class MustacheSpecTest extends \Mustache\Test\SpecTestCase
 {
     /**
      * For some reason data providers can't mark tests skipped, so this test exists

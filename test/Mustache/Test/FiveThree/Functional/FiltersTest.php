@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Test\FiveThree\Functional;
 
 /*
  * This file is part of Mustache.php.
@@ -13,13 +14,13 @@
  * @group filters
  * @group functional
  */
-class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_TestCase
+class FiltersTest extends \PHPUnit_Framework_TestCase
 {
     private $mustache;
 
     public function setUp()
     {
-        $this->mustache = new Mustache_Engine;
+        $this->mustache = new \Mustache\Engine;
     }
 
     /**
@@ -46,7 +47,7 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
             array(
                 '{{% FILTERS }}{{ date | longdate }}',
                 $helpers,
-                (object) array('date' => new DateTime('1/1/2000')),
+                (object) array('date' => new \DateTime('1/1/2000')),
                 '2000-01-01 12:01:00'
             ),
 
@@ -72,7 +73,7 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
         });
 
         $foo = new \StdClass;
-        $foo->date = new DateTime('1/1/2000');
+        $foo->date = new \DateTime('1/1/2000');
 
         $this->assertEquals('[[2000-01-01 12:01:00]]', $tpl->render($foo));
     }
@@ -128,7 +129,7 @@ EOS;
     }
 
     /**
-     * @expectedException Mustache_Exception_UnknownFilterException
+     * @expectedException \Mustache\Exception\UnknownFilterException
      * @dataProvider brokenPipeData
      */
     public function testThrowsExceptionForBrokenPipes($tpl, $data)

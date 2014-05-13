@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Test\FiveThree\Functional;
 
 /*
  * This file is part of Mustache.php.
@@ -13,13 +14,13 @@
  * @group lambdas
  * @group functional
  */
-class Mustache_Test_FiveThree_Functional_ClosureQuirksTest extends PHPUnit_Framework_TestCase
+class ClosureQuirksTest extends \PHPUnit_Framework_TestCase
 {
     private $mustache;
 
     public function setUp()
     {
-        $this->mustache = new Mustache_Engine;
+        $this->mustache = new \Mustache\Engine;
     }
 
     public function testClosuresDontLikeItWhenYouTouchTheirProperties()
