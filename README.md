@@ -15,7 +15,7 @@ A quick example:
 
 ```php
 <?php
-$m = new Mustache_Engine;
+$m = new \Mustache\Engine;
 echo $m->render('Hello {{planet}}', array('planet' => 'World!')); // "Hello World!"
 ```
 
@@ -52,7 +52,7 @@ And render it:
 
 ```php
 <?php
-$m = new Mustache_Engine;
+$m = new \Mustache\Engine;
 $chris = new Chris;
 echo $m->render($template, $chris);
 ```
