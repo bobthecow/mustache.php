@@ -114,7 +114,7 @@ abstract class Template
     protected function isIterable($value)
     {
         if (is_object($value)) {
-            return $value instanceof Traversable;
+            return $value instanceof \Traversable;
         } elseif (is_array($value)) {
             $i = 0;
             foreach ($value as $k => $v) {

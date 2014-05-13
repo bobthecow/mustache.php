@@ -29,7 +29,7 @@ class HelperCollection
     public function __construct($helpers = null)
     {
         if ($helpers !== null) {
-            if (!is_array($helpers) && !$helpers instanceof Traversable) {
+            if (!is_array($helpers) && !$helpers instanceof \Traversable) {
                 throw new \Mustache\Exception\InvalidArgumentException('HelperCollection constructor expects an array of helpers');
             }
 

@@ -314,7 +314,7 @@ class Engine
      */
     public function setHelpers($helpers)
     {
-        if (!is_array($helpers) && !$helpers instanceof Traversable) {
+        if (!is_array($helpers) && !$helpers instanceof \Traversable) {
             throw new \Mustache\Exception\InvalidArgumentException('setHelpers expects an array of helpers');
         }
 
