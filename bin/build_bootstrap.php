@@ -20,13 +20,13 @@
  * containing all Mustache library classes. This file can then be included in
  * your project, rather than requiring the Mustache Autoloader.
  */
-$baseDir = realpath(dirname(__FILE__).'/..');
+$baseDir = realpath(dirname(__FILE__) . '/..');
 
-require $baseDir.'/src/Mustache/Autoloader.php';
+require $baseDir . '/src/Mustache/Autoloader.php';
 Mustache_Autoloader::register();
 
 // delete the old file
-$file = $baseDir.'/mustache.php';
+$file = $baseDir . '/mustache.php';
 if (file_exists($file)) {
     unlink($file);
 }
@@ -121,9 +121,9 @@ EOS;
             $content .= preg_replace(array('/^\s*<\?php/', '/\?>\s*$/'), '', file_get_contents($r->getFileName()));
         }
 
-        $cache  = $cacheDir.'/'.$name.$extension;
+        $cache  = $cacheDir . '/' . $name . $extension;
         $header = sprintf(self::HEADER, strftime('%Y'));
-        self::writeCacheFile($cache, $header . substr(self::stripComments('<?php '.$content), 5));
+        self::writeCacheFile($cache, $header . substr(self::stripComments('<?php ' . $content), 5));
     }
 
     /**
