@@ -213,7 +213,7 @@ class Mustache_Engine
      */
     public function getEntityFlags()
     {
-      return $this->entityFlags;
+        return $this->entityFlags;
     }
 
     /**
