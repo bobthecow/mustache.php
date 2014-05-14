@@ -77,7 +77,7 @@ SymfonyClassCollectionLoader::load(array(
  */
 class SymfonyClassCollectionLoader
 {
-    static private $loaded;
+    private static $loaded;
 
     const HEADER = <<<EOS
 <?php
@@ -102,7 +102,7 @@ EOS;
      *
      * @throws InvalidArgumentException When class can't be loaded
      */
-    static public function load(array $classes, $cacheDir, $name, $extension = '.php')
+    public static function load(array $classes, $cacheDir, $name, $extension = '.php')
     {
         // each $name can only be loaded once per PHP process
         if (isset(self::$loaded[$name])) {
@@ -134,7 +134,7 @@ EOS;
      *
      * @throws RuntimeException when a cache file cannot be written
      */
-    static private function writeCacheFile($file, $content)
+    private static function writeCacheFile($file, $content)
     {
         $tmpFile = tempnam(dirname($file), basename($file));
         if (false !== @file_put_contents($tmpFile, $content) && @rename($tmpFile, $file)) {
@@ -156,7 +156,7 @@ EOS;
      *
      * @return string The PHP string with the comments removed
      */
-    static private function stripComments($source)
+    private static function stripComments($source)
     {
         if (!function_exists('token_get_all')) {
             return $source;
