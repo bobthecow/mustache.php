@@ -14,7 +14,6 @@
  */
 class Mustache_Autoloader
 {
-
     private $baseDir;
 
     /**

@@ -25,7 +25,6 @@
  */
 class Mustache_Loader_StringLoader implements Mustache_Loader
 {
-
     /**
      * Load a Template by source.
      *
