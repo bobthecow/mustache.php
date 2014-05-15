@@ -18,7 +18,7 @@ class FilesystemCacheTest extends \Mustache\Test\FunctionalTestCase
     public function testCacheGetNone()
     {
         $key = 'some key';
-        $cache = new \Mustache\Cache\FilesystemCache(self::$tempDir);;
+        $cache = new \Mustache\Cache\FilesystemCache(self::$tempDir);
         $loaded = $cache->load($key);
 
         $this->assertFalse($loaded);
@@ -28,7 +28,7 @@ class FilesystemCacheTest extends \Mustache\Test\FunctionalTestCase
     {
         $key = 'some key';
         $value = '<?php /* some value */';
-        $cache = new \Mustache\Cache\FilesystemCache(self::$tempDir);;
+        $cache = new \Mustache\Cache\FilesystemCache(self::$tempDir);
         $cache->cache($key, $value);
         $loaded = $cache->load($key);
 

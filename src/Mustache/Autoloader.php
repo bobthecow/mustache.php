@@ -15,7 +15,6 @@ namespace Mustache;
  */
 class Autoloader
 {
-
     private $baseDir;
 
     /**

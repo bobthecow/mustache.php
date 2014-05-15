@@ -15,7 +15,6 @@ namespace Mustache;
  */
 interface Loader
 {
-
     /**
      * Load a Template by name.
      *

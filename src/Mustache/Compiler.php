@@ -17,7 +17,6 @@ namespace Mustache;
  */
 class Compiler
 {
-
     private $sections;
     private $source;
     private $indentNextLine;

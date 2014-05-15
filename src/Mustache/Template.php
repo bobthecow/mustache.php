@@ -17,7 +17,6 @@ namespace Mustache;
  */
 abstract class Template
 {
-
     /**
      * @var \Mustache\Engine
      */

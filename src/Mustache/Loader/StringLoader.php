@@ -26,7 +26,6 @@ namespace Mustache\Loader;
  */
 class StringLoader implements \Mustache\Loader
 {
-
     /**
      * Load a Template by source.
      *
