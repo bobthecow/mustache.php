@@ -28,14 +28,16 @@ class HelperCollection
      */
     public function __construct($helpers = null)
     {
-        if ($helpers !== null) {
-            if (!is_array($helpers) && !$helpers instanceof \Traversable) {
-                throw new \Mustache\Exception\InvalidArgumentException('HelperCollection constructor expects an array of helpers');
-            }
+        if ($helpers === null) {
+            return;
+        }
 
-            foreach ($helpers as $name => $helper) {
-                $this->add($name, $helper);
-            }
+        if (!is_array($helpers) && !$helpers instanceof \Traversable) {
+            throw new \Mustache\Exception\InvalidArgumentException('HelperCollection constructor expects an array of helpers');
+        }
+
+        foreach ($helpers as $name => $helper) {
+            $this->add($name, $helper);
         }
     }
 

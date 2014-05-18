@@ -117,7 +117,7 @@ class Tokenizer
                     } else {
                         $char = $text[$i];
                         $this->buffer .= $char;
-                        if ($char == "\n") {
+                        if ($char === "\n") {
                             $this->flushBuffer();
                             $this->line++;
                         }
@@ -158,14 +158,14 @@ class Tokenizer
                             self::OTAG  => $this->otag,
                             self::CTAG  => $this->ctag,
                             self::LINE  => $this->line,
-                            self::INDEX => ($this->tagType == self::T_END_SECTION) ? $this->seenTag - $this->otagLen : $i + $this->ctagLen
+                            self::INDEX => ($this->tagType === self::T_END_SECTION) ? $this->seenTag - $this->otagLen : $i + $this->ctagLen
                         );
 
                         $this->buffer = '';
                         $i += $this->ctagLen - 1;
                         $this->state = self::IN_TEXT;
-                        if ($this->tagType == self::T_UNESCAPED) {
-                            if ($this->ctag == '}}') {
+                        if ($this->tagType === self::T_UNESCAPED) {
+                            if ($this->ctag === '}}') {
                                 $i++;
                             } else {
                                 // Clean up `{{{ tripleStache }}}` style tokens.

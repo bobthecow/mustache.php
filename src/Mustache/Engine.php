@@ -214,7 +214,7 @@ class Engine
      */
     public function getEntityFlags()
     {
-      return $this->entityFlags;
+        return $this->entityFlags;
     }
 
     /**
