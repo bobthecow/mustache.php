@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Test\FiveThree\Functional;
 
 /*
  * This file is part of Mustache.php.
@@ -13,17 +14,17 @@
  * @group lambdas
  * @group functional
  */
-class Mustache_Test_FiveThree_Functional_StrictCallablesTest extends PHPUnit_Framework_TestCase
+class StrictCallablesTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider callables
      */
     public function testStrictCallables($strict, $name, $section, $expected)
     {
-        $mustache = new Mustache_Engine(array('strict_callables' => $strict));
+        $mustache = new \Mustache\Engine(array('strict_callables' => $strict));
         $tpl      = $mustache->loadTemplate('{{# section }}{{ name }}{{/ section }}');
 
-        $data = new StdClass;
+        $data = new \StdClass;
         $data->name    = $name;
         $data->section = $section;
 

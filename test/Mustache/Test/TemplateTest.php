@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Test;
 
 /*
  * This file is part of Mustache.php.
@@ -12,22 +13,22 @@
 /**
  * @group unit
  */
-class Mustache_Test_TemplateTest extends PHPUnit_Framework_TestCase
+class TemplateTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $mustache = new Mustache_Engine;
-        $template = new Mustache_Test_TemplateStub($mustache);
+        $mustache = new \Mustache\Engine;
+        $template = new \Mustache\Test\TemplateStub($mustache);
         $this->assertSame($mustache, $template->getMustache());
     }
 
     public function testRendering()
     {
         $rendered = '<< wheee >>';
-        $mustache = new Mustache_Engine;
-        $template = new Mustache_Test_TemplateStub($mustache);
+        $mustache = new \Mustache\Engine;
+        $template = new \Mustache\Test\TemplateStub($mustache);
         $template->rendered = $rendered;
-        $context  = new Mustache_Context;
+        $context  = new \Mustache\Context;
 
         if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
             $this->assertEquals($rendered, $template());
@@ -39,7 +40,7 @@ class Mustache_Test_TemplateTest extends PHPUnit_Framework_TestCase
     }
 }
 
-class Mustache_Test_TemplateStub extends Mustache_Template
+class TemplateStub extends \Mustache\Template
 {
     public $rendered;
 
@@ -48,7 +49,7 @@ class Mustache_Test_TemplateStub extends Mustache_Template
         return $this->mustache;
     }
 
-    public function renderInternal(Mustache_Context $context, $indent = '', $escape = false)
+    public function renderInternal(\Mustache\Context $context, $indent = '', $escape = false)
     {
         return $this->rendered;
     }

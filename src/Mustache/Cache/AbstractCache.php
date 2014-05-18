@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Cache;
 
 /*
  * This file is part of Mustache.php.
@@ -16,14 +17,14 @@
  *
  * @abstract
  */
-abstract class Mustache_Cache_AbstractCache implements Mustache_Cache
+abstract class AbstractCache implements \Mustache\Cache
 {
     private $logger = null;
 
     /**
      * Get the current logger instance.
      *
-     * @return Mustache_Logger|Psr\Log\LoggerInterface
+     * @return \Mustache\Logger|Psr\Log\LoggerInterface
      */
     public function getLogger()
     {
@@ -33,12 +34,12 @@ abstract class Mustache_Cache_AbstractCache implements Mustache_Cache
     /**
      * Set a logger instance.
      *
-     * @param Mustache_Logger|Psr\Log\LoggerInterface $logger
+     * @param \Mustache\Logger|Psr\Log\LoggerInterface $logger
      */
     public function setLogger($logger = null)
     {
-        if ($logger !== null && !($logger instanceof Mustache_Logger || is_a($logger, 'Psr\\Log\\LoggerInterface'))) {
-            throw new Mustache_Exception_InvalidArgumentException('Expected an instance of Mustache_Logger or Psr\\Log\\LoggerInterface.');
+        if ($logger !== null && !($logger instanceof \Mustache\Logger || is_a($logger, 'Psr\\Log\\LoggerInterface'))) {
+            throw new \Mustache\Exception\InvalidArgumentException('Expected an instance of \Mustache\Logger or Psr\\Log\\LoggerInterface.');
         }
 
         $this->logger = $logger;

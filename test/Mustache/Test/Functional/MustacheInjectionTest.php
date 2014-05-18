@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Test\Functional;
 
 /*
  * This file is part of Mustache.php.
@@ -13,14 +14,14 @@
  * @group mustache_injection
  * @group functional
  */
-class Mustache_Test_Functional_MustacheInjectionTest extends PHPUnit_Framework_TestCase
+class MustacheInjectionTest extends \PHPUnit_Framework_TestCase
 {
 
     private $mustache;
 
     public function setUp()
     {
-        $this->mustache = new Mustache_Engine;
+        $this->mustache = new \Mustache\Engine;
     }
 
     /**

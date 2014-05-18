@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Test\FiveThree\Functional;
 
 /*
  * This file is part of Mustache.php.
@@ -13,7 +14,7 @@
  * @group lambdas
  * @group functional
  */
-class Mustache_Test_FiveThree_Functional_PartialLambdaIndentTest extends PHPUnit_Framework_TestCase
+class PartialLambdaIndentTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testLambdasInsidePartialsAreIndentedProperly()
@@ -36,18 +37,18 @@ EOS;
 
 EOS;
 
-        $m = new Mustache_Engine(array(
+        $m = new \Mustache\Engine(array(
             'partials' => array('input' => $partial)
         ));
 
         $tpl = $m->loadTemplate($src);
 
-        $data = new Mustache_Test_FiveThree_Functional_ClassWithLambda();
+        $data = new \Mustache\Test\FiveThree\Functional\ClassWithLambda();
         $this->assertEquals($expected, $tpl->render($data));
     }
 }
 
-class Mustache_Test_FiveThree_Functional_ClassWithLambda
+class ClassWithLambda
 {
     public function _t()
     {

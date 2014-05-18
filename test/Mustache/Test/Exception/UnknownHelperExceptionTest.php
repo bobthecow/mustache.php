@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Test\Exception;
 
 /*
  * This file is part of Mustache.php.
@@ -9,24 +10,24 @@
  * file that was distributed with this source code.
  */
 
-class Mustache_Test_Exception_UnknownHelperExceptionTest extends PHPUnit_Framework_TestCase
+class UnknownHelperExceptionTest extends \PHPUnit_Framework_TestCase
 {
     public function testInstance()
     {
-        $e = new Mustache_Exception_UnknownHelperException('alpha');
-        $this->assertTrue($e instanceof InvalidArgumentException);
-        $this->assertTrue($e instanceof Mustache_Exception);
+        $e = new \Mustache\Exception\UnknownHelperException('alpha');
+        $this->assertTrue($e instanceof \InvalidArgumentException);
+        $this->assertTrue($e instanceof \Mustache\Exception);
     }
 
     public function testMessage()
     {
-        $e = new Mustache_Exception_UnknownHelperException('beta');
+        $e = new \Mustache\Exception\UnknownHelperException('beta');
         $this->assertEquals('Unknown helper: beta', $e->getMessage());
     }
 
     public function testGetHelperName()
     {
-        $e = new Mustache_Exception_UnknownHelperException('gamma');
+        $e = new \Mustache\Exception\UnknownHelperException('gamma');
         $this->assertEquals('gamma', $e->getHelperName());
     }
 }

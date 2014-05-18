@@ -1,4 +1,5 @@
 <?php
+namespace Mustache;
 
 /*
  * This file is part of Mustache.php.
@@ -26,7 +27,7 @@
  * See https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
  * for the full interface specification.
  */
-interface Mustache_Logger
+interface Logger
 {
     /**
      * Psr\Log compatible log levels

@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Exception;
 
 /*
  * This file is part of Mustache.php.
@@ -12,7 +13,7 @@
 /**
  * Runtime exception.
  */
-class Mustache_Exception_RuntimeException extends RuntimeException implements Mustache_Exception
+class RuntimeException extends \RuntimeException implements \Mustache\Exception
 {
     // This space intentionally left blank.
 }

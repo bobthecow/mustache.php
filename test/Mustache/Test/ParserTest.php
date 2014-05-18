@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Test;
 
 /*
  * This file is part of Mustache.php.
@@ -12,7 +13,7 @@
 /**
  * @group unit
  */
-class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
+class ParserTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -20,7 +21,7 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
      */
     public function testParse($tokens, $expected)
     {
-        $parser = new Mustache_Parser;
+        $parser = new \Mustache\Parser;
         $this->assertEquals($expected, $parser->parse($tokens));
     }
 
@@ -34,84 +35,84 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
 
             array(
                 array(array(
-                    Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
-                    Mustache_Tokenizer::LINE  => 0,
-                    Mustache_Tokenizer::VALUE => 'text',
+                    \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_TEXT,
+                    \Mustache\Tokenizer::LINE  => 0,
+                    \Mustache\Tokenizer::VALUE => 'text',
                 )),
                 array(array(
-                    Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
-                    Mustache_Tokenizer::LINE  => 0,
-                    Mustache_Tokenizer::VALUE => 'text',
+                    \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_TEXT,
+                    \Mustache\Tokenizer::LINE  => 0,
+                    \Mustache\Tokenizer::VALUE => 'text',
                 )),
             ),
 
             array(
                 array(array(
-                    Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
-                    Mustache_Tokenizer::LINE => 0,
-                    Mustache_Tokenizer::NAME => 'name'
+                    \Mustache\Tokenizer::TYPE => \Mustache\Tokenizer::T_ESCAPED,
+                    \Mustache\Tokenizer::LINE => 0,
+                    \Mustache\Tokenizer::NAME => 'name'
                 )),
                 array(array(
-                    Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
-                    Mustache_Tokenizer::LINE => 0,
-                    Mustache_Tokenizer::NAME => 'name'
+                    \Mustache\Tokenizer::TYPE => \Mustache\Tokenizer::T_ESCAPED,
+                    \Mustache\Tokenizer::LINE => 0,
+                    \Mustache\Tokenizer::NAME => 'name'
                 )),
             ),
 
             array(
                 array(
                     array(
-                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::VALUE => 'foo'
+                        \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_TEXT,
+                        \Mustache\Tokenizer::LINE  => 0,
+                        \Mustache\Tokenizer::VALUE => 'foo'
                     ),
                     array(
-                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_INVERTED,
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::INDEX => 123,
-                        Mustache_Tokenizer::NAME  => 'parent'
+                        \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_INVERTED,
+                        \Mustache\Tokenizer::LINE  => 0,
+                        \Mustache\Tokenizer::INDEX => 123,
+                        \Mustache\Tokenizer::NAME  => 'parent'
                     ),
                     array(
-                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_ESCAPED,
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::NAME  => 'name'
+                        \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_ESCAPED,
+                        \Mustache\Tokenizer::LINE  => 0,
+                        \Mustache\Tokenizer::NAME  => 'name'
                     ),
                     array(
-                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_END_SECTION,
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::INDEX => 456,
-                        Mustache_Tokenizer::NAME  => 'parent'
+                        \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_END_SECTION,
+                        \Mustache\Tokenizer::LINE  => 0,
+                        \Mustache\Tokenizer::INDEX => 456,
+                        \Mustache\Tokenizer::NAME  => 'parent'
                     ),
                     array(
-                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::VALUE => 'bar'
+                        \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_TEXT,
+                        \Mustache\Tokenizer::LINE  => 0,
+                        \Mustache\Tokenizer::VALUE => 'bar'
                     ),
                 ),
                 array(
                     array(
-                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::VALUE => 'foo'
+                        \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_TEXT,
+                        \Mustache\Tokenizer::LINE  => 0,
+                        \Mustache\Tokenizer::VALUE => 'foo'
                     ),
                     array(
-                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_INVERTED,
-                        Mustache_Tokenizer::NAME  => 'parent',
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::INDEX => 123,
-                        Mustache_Tokenizer::END   => 456,
-                        Mustache_Tokenizer::NODES => array(
+                        \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_INVERTED,
+                        \Mustache\Tokenizer::NAME  => 'parent',
+                        \Mustache\Tokenizer::LINE  => 0,
+                        \Mustache\Tokenizer::INDEX => 123,
+                        \Mustache\Tokenizer::END   => 456,
+                        \Mustache\Tokenizer::NODES => array(
                             array(
-                                Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
-                                Mustache_Tokenizer::LINE => 0,
-                                Mustache_Tokenizer::NAME => 'name'
+                                \Mustache\Tokenizer::TYPE => \Mustache\Tokenizer::T_ESCAPED,
+                                \Mustache\Tokenizer::LINE => 0,
+                                \Mustache\Tokenizer::NAME => 'name'
                             ),
                         ),
                     ),
                     array(
-                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::VALUE => 'bar'
+                        \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_TEXT,
+                        \Mustache\Tokenizer::LINE  => 0,
+                        \Mustache\Tokenizer::VALUE => 'bar'
                     ),
                 ),
             ),
@@ -121,11 +122,11 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getBadParseTrees
-     * @expectedException Mustache_Exception_SyntaxException
+     * @expectedException \Mustache\Exception\SyntaxException
      */
     public function testParserThrowsExceptions($tokens)
     {
-        $parser = new Mustache_Parser;
+        $parser = new \Mustache\Parser;
         $parser->parse($tokens);
     }
 
@@ -136,10 +137,10 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
             array(
                 array(
                     array(
-                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_SECTION,
-                        Mustache_Tokenizer::NAME  => 'parent',
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::INDEX => 123,
+                        \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_SECTION,
+                        \Mustache\Tokenizer::NAME  => 'parent',
+                        \Mustache\Tokenizer::LINE  => 0,
+                        \Mustache\Tokenizer::INDEX => 123,
                     ),
                 ),
             ),
@@ -148,10 +149,10 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
             array(
                 array(
                     array(
-                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_INVERTED,
-                        Mustache_Tokenizer::NAME  => 'parent',
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::INDEX => 123,
+                        \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_INVERTED,
+                        \Mustache\Tokenizer::NAME  => 'parent',
+                        \Mustache\Tokenizer::LINE  => 0,
+                        \Mustache\Tokenizer::INDEX => 123,
                     ),
                 ),
             ),
@@ -160,10 +161,10 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
             array(
                 array(
                     array(
-                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_END_SECTION,
-                        Mustache_Tokenizer::NAME  => 'parent',
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::INDEX => 123,
+                        \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_END_SECTION,
+                        \Mustache\Tokenizer::NAME  => 'parent',
+                        \Mustache\Tokenizer::LINE  => 0,
+                        \Mustache\Tokenizer::INDEX => 123,
                     ),
                 ),
             ),
@@ -172,28 +173,28 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
             array(
                 array(
                     array(
-                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_SECTION,
-                        Mustache_Tokenizer::NAME  => 'parent',
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::INDEX => 123,
+                        \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_SECTION,
+                        \Mustache\Tokenizer::NAME  => 'parent',
+                        \Mustache\Tokenizer::LINE  => 0,
+                        \Mustache\Tokenizer::INDEX => 123,
                     ),
                     array(
-                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_SECTION,
-                        Mustache_Tokenizer::NAME  => 'child',
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::INDEX => 123,
+                        \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_SECTION,
+                        \Mustache\Tokenizer::NAME  => 'child',
+                        \Mustache\Tokenizer::LINE  => 0,
+                        \Mustache\Tokenizer::INDEX => 123,
                     ),
                     array(
-                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_END_SECTION,
-                        Mustache_Tokenizer::NAME  => 'parent',
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::INDEX => 123,
+                        \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_END_SECTION,
+                        \Mustache\Tokenizer::NAME  => 'parent',
+                        \Mustache\Tokenizer::LINE  => 0,
+                        \Mustache\Tokenizer::INDEX => 123,
                     ),
                     array(
-                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_END_SECTION,
-                        Mustache_Tokenizer::NAME  => 'child',
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::INDEX => 123,
+                        \Mustache\Tokenizer::TYPE  => \Mustache\Tokenizer::T_END_SECTION,
+                        \Mustache\Tokenizer::NAME  => 'child',
+                        \Mustache\Tokenizer::LINE  => 0,
+                        \Mustache\Tokenizer::INDEX => 123,
                     ),
                 ),
             ),

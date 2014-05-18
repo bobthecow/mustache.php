@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Test\Loader;
 
 /*
  * This file is part of Mustache.php.
@@ -12,11 +13,11 @@
 /**
  * @group unit
  */
-class Mustache_Test_Loader_StringLoaderTest extends PHPUnit_Framework_TestCase
+class StringLoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testLoadTemplates()
     {
-        $loader = new Mustache_Loader_StringLoader;
+        $loader = new \Mustache\Loader\StringLoader;
 
         $this->assertEquals('foo', $loader->load('foo'));
         $this->assertEquals('{{ bar }}', $loader->load('{{ bar }}'));

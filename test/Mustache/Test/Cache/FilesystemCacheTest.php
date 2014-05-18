@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Test\Cache;
 
 /*
  * This file is part of Mustache.php.
@@ -12,12 +13,12 @@
 /**
  * @group functional
  */
-class Mustache_Test_Cache_FilesystemCacheTest extends Mustache_Test_FunctionalTestCase
+class FilesystemCacheTest extends \Mustache\Test\FunctionalTestCase
 {
     public function testCacheGetNone()
     {
         $key = 'some key';
-        $cache = new Mustache_Cache_FilesystemCache(self::$tempDir);
+        $cache = new \Mustache\Cache\FilesystemCache(self::$tempDir);
         $loaded = $cache->load($key);
 
         $this->assertFalse($loaded);
@@ -27,7 +28,7 @@ class Mustache_Test_Cache_FilesystemCacheTest extends Mustache_Test_FunctionalTe
     {
         $key = 'some key';
         $value = '<?php /* some value */';
-        $cache = new Mustache_Cache_FilesystemCache(self::$tempDir);
+        $cache = new \Mustache\Cache\FilesystemCache(self::$tempDir);
         $cache->cache($key, $value);
         $loaded = $cache->load($key);
 

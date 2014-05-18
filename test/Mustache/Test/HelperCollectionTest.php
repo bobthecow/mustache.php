@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Test;
 
 /*
  * This file is part of Mustache.php.
@@ -9,14 +10,14 @@
  * file that was distributed with this source code.
  */
 
-class Mustache_Test_HelperCollectionTest extends PHPUnit_Framework_TestCase
+class HelperCollectionTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
         $foo = array($this, 'getFoo');
         $bar = 'BAR';
 
-        $helpers = new Mustache_HelperCollection(array(
+        $helpers = new \Mustache\HelperCollection(array(
             'foo' => $foo,
             'bar' => $bar,
         ));
@@ -35,7 +36,7 @@ class Mustache_Test_HelperCollectionTest extends PHPUnit_Framework_TestCase
         $foo = array($this, 'getFoo');
         $bar = 'BAR';
 
-        $helpers = new Mustache_HelperCollection;
+        $helpers = new \Mustache\HelperCollection;
         $this->assertTrue($helpers->isEmpty());
         $this->assertFalse($helpers->has('foo'));
         $this->assertFalse($helpers->has('bar'));
@@ -61,7 +62,7 @@ class Mustache_Test_HelperCollectionTest extends PHPUnit_Framework_TestCase
         $foo = array($this, 'getFoo');
         $bar = 'BAR';
 
-        $helpers = new Mustache_HelperCollection;
+        $helpers = new \Mustache\HelperCollection;
         $this->assertTrue($helpers->isEmpty());
         $this->assertFalse($helpers->has('foo'));
         $this->assertFalse($helpers->has('bar'));
@@ -99,7 +100,7 @@ class Mustache_Test_HelperCollectionTest extends PHPUnit_Framework_TestCase
             $this->setExpectedException($exception);
         }
 
-        $helpers = new Mustache_HelperCollection($helpers);
+        $helpers = new \Mustache\HelperCollection($helpers);
 
         foreach ($actions as $method => $args) {
             call_user_func_array(array($helpers, $method), $args);

@@ -1,4 +1,5 @@
 <?php
+namespace Mustache;
 
 /*
  * This file is part of Mustache.php.
@@ -12,7 +13,7 @@
 /**
  * A Mustache Exception interface.
  */
-interface Mustache_Exception
+interface Exception
 {
     // This space intentionally left blank.
 }

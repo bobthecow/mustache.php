@@ -1,4 +1,5 @@
 <?php
+namespace Mustache;
 
 /*
  * This file is part of Mustache.php.
@@ -12,7 +13,7 @@
 /**
  * Mustache class autoloader.
  */
-class Mustache_Autoloader
+class Autoloader
 {
     private $baseDir;
 
@@ -41,7 +42,7 @@ class Mustache_Autoloader
      *
      * @param string $baseDir Mustache library base directory (default: dirname(__FILE__).'/..')
      *
-     * @return Mustache_Autoloader Registered Autoloader instance
+     * @return \Mustache\Autoloader Registered Autoloader instance
      */
     public static function register($baseDir = null)
     {

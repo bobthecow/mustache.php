@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Test;
 
 /*
  * This file is part of Mustache.php.
@@ -9,7 +10,7 @@
  * file that was distributed with this source code.
  */
 
-abstract class Mustache_Test_FunctionalTestCase extends PHPUnit_Framework_TestCase
+abstract class FunctionalTestCase extends \PHPUnit_Framework_TestCase
 {
     protected static $tempDir;
 

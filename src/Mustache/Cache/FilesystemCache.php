@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Cache;
 
 /*
  * This file is part of Mustache.php.
@@ -14,12 +15,12 @@
  *
  * A FilesystemCache instance caches Mustache Template classes from the filesystem by name:
  *
- *     $cache = new Mustache_Cache_FilesystemCache(dirname(__FILE__).'/cache');
+ *     $cache = new \Mustache\Cache\FilesystemCache(dirname(__FILE__).'/cache');
  *     $cache->cache($className, $compiledSource);
  *
  * The FilesystemCache benefits from any opcode caching that may be setup in your environment. So do that, k?
  */
-class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
+class FilesystemCache extends \Mustache\Cache\AbstractCache
 {
     private $baseDir;
     private $fileMode;
@@ -68,7 +69,7 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
         $fileName = $this->getCacheFilename($key);
 
         $this->log(
-            Mustache_Logger::DEBUG,
+            \Mustache\Logger::DEBUG,
             'Writing to template cache: "{fileName}"',
             array('fileName' => $fileName)
         );
@@ -93,7 +94,7 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
     /**
      * Create cache directory
      *
-     * @throws Mustache_Exception_RuntimeException If unable to create directory
+     * @throws \Mustache\Exception\RuntimeException If unable to create directory
      *
      * @param string $fileName
      *
@@ -104,14 +105,14 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
         $dirName = dirname($fileName);
         if (!is_dir($dirName)) {
             $this->log(
-                Mustache_Logger::INFO,
+                \Mustache\Logger::INFO,
                 'Creating Mustache template cache directory: "{dirName}"',
                 array('dirName' => $dirName)
             );
 
             @mkdir($dirName, 0777, true);
             if (!is_dir($dirName)) {
-                throw new Mustache_Exception_RuntimeException(sprintf('Failed to create cache directory "%s".', $dirName));
+                throw new \Mustache\Exception\RuntimeException(sprintf('Failed to create cache directory "%s".', $dirName));
             }
         }
 
@@ -121,7 +122,7 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
     /**
      * Write cache file
      *
-     * @throws Mustache_Exception_RuntimeException If unable to write file
+     * @throws \Mustache\Exception\RuntimeException If unable to write file
      *
      * @param string $fileName
      * @param string $value
@@ -133,7 +134,7 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
         $dirName = $this->buildDirectoryForFilename($fileName);
 
         $this->log(
-            Mustache_Logger::DEBUG,
+            \Mustache\Logger::DEBUG,
             'Caching compiled template to "{fileName}"',
             array('fileName' => $fileName)
         );
@@ -148,12 +149,12 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
             }
 
             $this->log(
-                Mustache_Logger::ERROR,
+                \Mustache\Logger::ERROR,
                 'Unable to rename Mustache temp cache file: "{tempName}" -> "{fileName}"',
                 array('tempName' => $tempFile, 'fileName' => $fileName)
             );
         }
 
-        throw new Mustache_Exception_RuntimeException(sprintf('Failed to write cache file "%s".', $fileName));
+        throw new \Mustache\Exception\RuntimeException(sprintf('Failed to write cache file "%s".', $fileName));
     }
 }

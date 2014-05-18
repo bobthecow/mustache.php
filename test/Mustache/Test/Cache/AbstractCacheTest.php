@@ -1,4 +1,5 @@
 <?php
+namespace Mustache\Test\Cache;
 
 /*
  * This file is part of Mustache.php.
@@ -9,28 +10,28 @@
  * file that was distributed with this source code.
  */
 
-class Mustache_Test_Cache_AbstractCacheTest extends PHPUnit_Framework_TestCase
+class AbstractCacheTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetSetLogger()
     {
          $cache  = new CacheStub();
-         $logger = new Mustache_Logger_StreamLogger('php://stdout');
+         $logger = new \Mustache\Logger\StreamLogger('php://stdout');
          $cache->setLogger($logger);
          $this->assertSame($logger, $cache->getLogger());
     }
 
     /**
-     * @expectedException Mustache_Exception_InvalidArgumentException
+     * @expectedException \Mustache\Exception\InvalidArgumentException
      */
     public function testSetLoggerThrowsExceptions()
     {
         $cache  = new CacheStub();
-        $logger = new StdClass();
+        $logger = new \StdClass();
         $cache->setLogger($logger);
     }
 }
 
-class CacheStub extends Mustache_Cache_AbstractCache
+class CacheStub extends \Mustache\Cache\AbstractCache
 {
     public function load($key)
     {

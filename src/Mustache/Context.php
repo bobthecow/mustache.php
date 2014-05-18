@@ -1,4 +1,5 @@
 <?php
+namespace Mustache;
 
 /*
  * This file is part of Mustache.php.
@@ -12,7 +13,7 @@
 /**
  * Mustache Template rendering Context.
  */
-class Mustache_Context
+class Context
 {
     private $stack = array();
 
@@ -123,7 +124,7 @@ class Mustache_Context
     /**
      * Helper function to find a variable in the Context stack.
      *
-     * @see Mustache_Context::find
+     * @see \Mustache\Context::find
      *
      * @param string $id    Variable name
      * @param array  $stack Context stack
@@ -133,7 +134,7 @@ class Mustache_Context
     private function findVariableInStack($id, array $stack)
     {
         for ($i = count($stack) - 1; $i >= 0; $i--) {
-            if (is_object($stack[$i]) && !($stack[$i] instanceof Closure)) {
+            if (is_object($stack[$i]) && !($stack[$i] instanceof \Closure)) {
 
                 // Note that is_callable() *will not work here*
                 // See https://github.com/bobthecow/mustache.php/wiki/Magic-Methods
@@ -141,7 +142,7 @@ class Mustache_Context
                     return $stack[$i]->$id();
                 } elseif (isset($stack[$i]->$id)) {
                     return $stack[$i]->$id;
-                } elseif ($stack[$i] instanceof ArrayAccess && isset($stack[$i][$id])) {
+                } elseif ($stack[$i] instanceof \ArrayAccess && isset($stack[$i][$id])) {
                     return $stack[$i][$id];
                 }
             } elseif (is_array($stack[$i]) && array_key_exists($id, $stack[$i])) {
