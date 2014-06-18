@@ -163,7 +163,7 @@ class Mustache_Tokenizer
                         if ($this->tagType === self::T_UNESCAPED) {
                             // Clean up `{{{ tripleStache }}}` style tokens.
                             if ($this->ctag === '}}') {
-                                if (($i < $len + 1) && $text[$i+2] == '}') {
+                                if (($i+2 < $len) && $text[$i+2] == '}') {
                                     $i++;
                                 } else {
                                     $msg = sprintf(
