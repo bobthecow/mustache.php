@@ -42,12 +42,12 @@ EOS;
 
         $tpl = $m->loadTemplate($src);
 
-        $data = new Mustache_Test_Functional_ClassWithLambda();
+        $data = new Mustache_Test_FiveThree_Functional_ClassWithLambda();
         $this->assertEquals($expected, $tpl->render($data));
     }
 }
 
-class Mustache_Test_Functional_ClassWithLambda
+class Mustache_Test_FiveThree_Functional_ClassWithLambda
 {
     public function _t()
     {
