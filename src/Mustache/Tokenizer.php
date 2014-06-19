@@ -84,6 +84,8 @@ class Mustache_Tokenizer
     /**
      * Scan and tokenize template source.
      *
+     * @throws Mustache_Exception_SyntaxException when mismatched section tags are encountered.
+     *
      * @param string $text       Mustache template source to tokenize
      * @param string $delimiters Optionally, pass initial opening and closing delimiters (default: null)
      *
@@ -163,12 +165,12 @@ class Mustache_Tokenizer
                         if ($this->tagType === self::T_UNESCAPED) {
                             // Clean up `{{{ tripleStache }}}` style tokens.
                             if ($this->ctag === '}}') {
-                                if (($i+2 < $len) && $text[$i+2] == '}') {
+                                if (($i+2 < $len) && $text[$i + 2] === '}') {
                                     $i++;
                                 } else {
                                     $msg = sprintf(
                                         'Uneven closing tag encountered: on line %d',
-                                        $token[Mustache_Tokenizer::LINE]
+                                        $token[self::LINE]
                                     );
 
                                     throw new Mustache_Exception_SyntaxException($msg, $token);
