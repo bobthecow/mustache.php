@@ -24,6 +24,17 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
         $this->assertSame($expected, $tokenizer->scan($text, $delimiters));
     }
 
+    /**
+     * @expectedException Mustache_Exception_SyntaxException
+     */
+    public function testUnevenBracesThrowExceptions()
+    {
+        $tokenizer = new Mustache_Tokenizer;
+
+        $text = "{{{ name }}";
+        $tokenizer->scan($text, null);
+    }
+
     public function getTokens()
     {
         return array(
