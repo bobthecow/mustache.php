@@ -165,11 +165,12 @@ class Mustache_Tokenizer
                         if ($this->tagType === self::T_UNESCAPED) {
                             // Clean up `{{{ tripleStache }}}` style tokens.
                             if ($this->ctag === '}}') {
-                                if (($i+2 < $len) && $text[$i + 2] === '}') {
+                                if (($i + 2 < $len) && $text[$i + 2] === '}') {
                                     $i++;
                                 } else {
                                     $msg = sprintf(
-                                        'Uneven closing tag encountered: on line %d',
+                                        'Mismatched tag delimiters: %s on line %d',
+                                        $token[self::NAME],
                                         $token[self::LINE]
                                     );
 
@@ -181,8 +182,8 @@ class Mustache_Tokenizer
                                     $token[self::NAME] = trim(substr($lastName, 0, -1));
                                 } else {
                                     $msg = sprintf(
-                                        'Uneven closing tag encountered: %s on line %d',
-                                        substr($lastName, -1),
+                                        'Mismatched tag delimiters: %s on line %d',
+                                        $token[self::NAME],
                                         $token[self::LINE]
                                     );
 
