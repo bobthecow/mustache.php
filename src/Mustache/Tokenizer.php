@@ -16,7 +16,6 @@
  */
 class Mustache_Tokenizer
 {
-
     // Finite state machine states
     const IN_TEXT     = 0;
     const IN_TAG_TYPE = 1;
@@ -85,6 +84,8 @@ class Mustache_Tokenizer
     /**
      * Scan and tokenize template source.
      *
+     * @throws Mustache_Exception_SyntaxException when mismatched section tags are encountered.
+     *
      * @param string $text       Mustache template source to tokenize
      * @param string $delimiters Optionally, pass initial opening and closing delimiters (default: null)
      *
@@ -117,7 +118,7 @@ class Mustache_Tokenizer
                     } else {
                         $char = $text[$i];
                         $this->buffer .= $char;
-                        if ($char == "\n") {
+                        if ($char === "\n") {
                             $this->flushBuffer();
                             $this->line++;
                         }
@@ -152,29 +153,49 @@ class Mustache_Tokenizer
 
                 default:
                     if ($this->tagChange($this->ctag, $this->ctagLen, $text, $i)) {
-                        $this->tokens[] = array(
+                        $token = array(
                             self::TYPE  => $this->tagType,
                             self::NAME  => trim($this->buffer),
                             self::OTAG  => $this->otag,
                             self::CTAG  => $this->ctag,
                             self::LINE  => $this->line,
-                            self::INDEX => ($this->tagType == self::T_END_SECTION) ? $this->seenTag - $this->otagLen : $i + $this->ctagLen
+                            self::INDEX => ($this->tagType === self::T_END_SECTION) ? $this->seenTag - $this->otagLen : $i + $this->ctagLen
                         );
+
+                        if ($this->tagType === self::T_UNESCAPED) {
+                            // Clean up `{{{ tripleStache }}}` style tokens.
+                            if ($this->ctag === '}}') {
+                                if (($i + 2 < $len) && $text[$i + 2] === '}') {
+                                    $i++;
+                                } else {
+                                    $msg = sprintf(
+                                        'Mismatched tag delimiters: %s on line %d',
+                                        $token[self::NAME],
+                                        $token[self::LINE]
+                                    );
+
+                                    throw new Mustache_Exception_SyntaxException($msg, $token);
+                                }
+                            } else {
+                                $lastName = $token[self::NAME];
+                                if (substr($lastName, -1) === '}') {
+                                    $token[self::NAME] = trim(substr($lastName, 0, -1));
+                                } else {
+                                    $msg = sprintf(
+                                        'Mismatched tag delimiters: %s on line %d',
+                                        $token[self::NAME],
+                                        $token[self::LINE]
+                                    );
+
+                                    throw new Mustache_Exception_SyntaxException($msg, $token);
+                                }
+                            }
+                        }
 
                         $this->buffer = '';
                         $i += $this->ctagLen - 1;
                         $this->state = self::IN_TEXT;
-                        if ($this->tagType == self::T_UNESCAPED) {
-                            if ($this->ctag == '}}') {
-                                $i++;
-                            } else {
-                                // Clean up `{{{ tripleStache }}}` style tokens.
-                                $lastName = $this->tokens[count($this->tokens) - 1][self::NAME];
-                                if (substr($lastName, -1) === '}') {
-                                    $this->tokens[count($this->tokens) - 1][self::NAME] = trim(substr($lastName, 0, -1));
-                                }
-                            }
-                        }
+                        $this->tokens[] = $token;
                     } else {
                         $this->buffer .= $text[$i];
                     }

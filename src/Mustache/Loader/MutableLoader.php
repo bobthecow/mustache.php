@@ -14,7 +14,6 @@
  */
 interface Mustache_Loader_MutableLoader
 {
-
     /**
      * Set an associative array of Template sources for this loader.
      *

@@ -16,7 +16,6 @@
  */
 class Mustache_Compiler
 {
-
     private $sections;
     private $source;
     private $indentNextLine;

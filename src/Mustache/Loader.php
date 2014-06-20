@@ -14,7 +14,6 @@
  */
 interface Mustache_Loader
 {
-
     /**
      * Load a Template by name.
      *

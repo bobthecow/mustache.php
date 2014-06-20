@@ -134,6 +134,9 @@ class Mustache_Context
     {
         for ($i = count($stack) - 1; $i >= 0; $i--) {
             if (is_object($stack[$i]) && !($stack[$i] instanceof Closure)) {
+
+                // Note that is_callable() *will not work here*
+                // See https://github.com/bobthecow/mustache.php/wiki/Magic-Methods
                 if (method_exists($stack[$i], $id)) {
                     return $stack[$i]->$id();
                 } elseif (isset($stack[$i]->$id)) {

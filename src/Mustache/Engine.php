@@ -23,7 +23,7 @@
  */
 class Mustache_Engine
 {
-    const VERSION        = '2.6.0';
+    const VERSION        = '2.6.1';
     const SPEC_VERSION   = '1.1.2';
 
     const PRAGMA_FILTERS = 'FILTERS';
@@ -213,7 +213,7 @@ class Mustache_Engine
      */
     public function getEntityFlags()
     {
-      return $this->entityFlags;
+        return $this->entityFlags;
     }
 
     /**
