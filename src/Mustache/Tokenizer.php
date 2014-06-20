@@ -179,6 +179,14 @@ class Mustache_Tokenizer
                                 $lastName = $token[self::NAME];
                                 if (substr($lastName, -1) === '}') {
                                     $token[self::NAME] = trim(substr($lastName, 0, -1));
+                                } else {
+                                    $msg = sprintf(
+                                        'Uneven closing tag encountered: %s on line %d',
+                                        substr($lastName, -1),
+                                        $token[self::LINE]
+                                    );
+
+                                    throw new Mustache_Exception_SyntaxException($msg, $token);
                                 }
                             }
                         }
