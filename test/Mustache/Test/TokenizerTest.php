@@ -24,6 +24,28 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
         $this->assertSame($expected, $tokenizer->scan($text, $delimiters));
     }
 
+    /**
+     * @expectedException Mustache_Exception_SyntaxException
+     */
+    public function testUnevenBracesThrowExceptions()
+    {
+        $tokenizer = new Mustache_Tokenizer;
+
+        $text = "{{{ name }}";
+        $tokenizer->scan($text, null);
+    }
+
+    /**
+     * @expectedException Mustache_Exception_SyntaxException
+     */
+    public function testUnevenBracesWithCustomDelimiterThrowExceptions()
+    {
+        $tokenizer = new Mustache_Tokenizer;
+
+        $text = "<%{ name %>";
+        $tokenizer->scan($text, "<% %>");
+    }
+
     public function getTokens()
     {
         return array(
@@ -186,6 +208,69 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::LINE  => 0,
                         Mustache_Tokenizer::INDEX => 9,
                     ),
+                )
+            ),
+
+            // custom delimiters don't swallow the next character, even if it is a }, }}}, or the same delimiter
+            array(
+                "<% a %>} <% b %>%> <% c %>}}}",
+                "<% %>",
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME  => 'a',
+                        Mustache_Tokenizer::OTAG  => '<%',
+                        Mustache_Tokenizer::CTAG  => '%>',
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::INDEX => 7,
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::VALUE => "} ",
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME  => 'b',
+                        Mustache_Tokenizer::OTAG  => '<%',
+                        Mustache_Tokenizer::CTAG  => '%>',
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::INDEX => 16,
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::VALUE => "%> ",
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME  => 'c',
+                        Mustache_Tokenizer::OTAG  => '<%',
+                        Mustache_Tokenizer::CTAG  => '%>',
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::INDEX => 26,
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::VALUE => "}}}",
+                    ),
+                )
+            ),
+
+            // unescaped custom delimiters are properly parsed
+            array(
+                "<%{ a }%>",
+                "<% %>",
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_UNESCAPED,
+                        Mustache_Tokenizer::NAME  => 'a',
+                        Mustache_Tokenizer::OTAG  => '<%',
+                        Mustache_Tokenizer::CTAG  => '%>',
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::INDEX => 9,
+                    )
                 )
             ),
         );

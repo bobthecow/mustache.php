@@ -84,6 +84,8 @@ class Mustache_Tokenizer
     /**
      * Scan and tokenize template source.
      *
+     * @throws Mustache_Exception_SyntaxException when mismatched section tags are encountered.
+     *
      * @param string $text       Mustache template source to tokenize
      * @param string $delimiters Optionally, pass initial opening and closing delimiters (default: null)
      *
@@ -151,7 +153,7 @@ class Mustache_Tokenizer
 
                 default:
                     if ($this->tagChange($this->ctag, $this->ctagLen, $text, $i)) {
-                        $this->tokens[] = array(
+                        $token = array(
                             self::TYPE  => $this->tagType,
                             self::NAME  => trim($this->buffer),
                             self::OTAG  => $this->otag,
@@ -160,20 +162,39 @@ class Mustache_Tokenizer
                             self::INDEX => ($this->tagType === self::T_END_SECTION) ? $this->seenTag - $this->otagLen : $i + $this->ctagLen
                         );
 
-                        $this->buffer = '';
-                        $i += $this->ctagLen - 1;
-                        $this->state = self::IN_TEXT;
                         if ($this->tagType === self::T_UNESCAPED) {
+                            // Clean up `{{{ tripleStache }}}` style tokens.
                             if ($this->ctag === '}}') {
-                                $i++;
+                                if (($i+2 < $len) && $text[$i + 2] === '}') {
+                                    $i++;
+                                } else {
+                                    $msg = sprintf(
+                                        'Uneven closing tag encountered: on line %d',
+                                        $token[self::LINE]
+                                    );
+
+                                    throw new Mustache_Exception_SyntaxException($msg, $token);
+                                }
                             } else {
-                                // Clean up `{{{ tripleStache }}}` style tokens.
-                                $lastName = $this->tokens[count($this->tokens) - 1][self::NAME];
+                                $lastName = $token[self::NAME];
                                 if (substr($lastName, -1) === '}') {
-                                    $this->tokens[count($this->tokens) - 1][self::NAME] = trim(substr($lastName, 0, -1));
+                                    $token[self::NAME] = trim(substr($lastName, 0, -1));
+                                } else {
+                                    $msg = sprintf(
+                                        'Uneven closing tag encountered: %s on line %d',
+                                        substr($lastName, -1),
+                                        $token[self::LINE]
+                                    );
+
+                                    throw new Mustache_Exception_SyntaxException($msg, $token);
                                 }
                             }
                         }
+
+                        $this->buffer = '';
+                        $i += $this->ctagLen - 1;
+                        $this->state = self::IN_TEXT;
+                        $this->tokens[] = $token;
                     } else {
                         $this->buffer .= $text[$i];
                     }
