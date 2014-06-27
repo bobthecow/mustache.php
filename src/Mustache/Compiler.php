@@ -16,6 +16,8 @@
  */
 class Mustache_Compiler
 {
+
+    private $pragmas;
     private $sections;
     private $source;
     private $indentNextLine;
@@ -23,7 +25,6 @@ class Mustache_Compiler
     private $entityFlags;
     private $charset;
     private $strictCallables;
-    private $pragmas;
 
     /**
      * Compile a Mustache token parse tree into PHP source code.
@@ -93,10 +94,42 @@ class Mustache_Compiler
                     break;
 
                 case Mustache_Tokenizer::T_PARTIAL:
-                case Mustache_Tokenizer::T_PARTIAL_2:
                     $code .= $this->partial(
                         $node[Mustache_Tokenizer::NAME],
                         isset($node[Mustache_Tokenizer::INDENT]) ? $node[Mustache_Tokenizer::INDENT] : '',
+                        $level
+                    );
+                    break;
+
+                case Mustache_Tokenizer::T_PARENT:
+                    $code .= $this->parent(
+                        $node[Mustache_Tokenizer::NAME],
+                        isset($node[Mustache_Tokenizer::INDENT]) ? $node[Mustache_Tokenizer::INDENT] : '',
+                        $level,
+                        $node[Mustache_Tokenizer::NODES]
+                    );
+                    break;
+
+                case Mustache_Tokenizer::T_BLOCK_ARG:
+                    $code .= $this->blockArg(
+                        $node[Mustache_Tokenizer::NODES],
+                        $node[Mustache_Tokenizer::NAME],
+                        $node[Mustache_Tokenizer::INDEX],
+                        $node[Mustache_Tokenizer::END],
+                        $node[Mustache_Tokenizer::OTAG],
+                        $node[Mustache_Tokenizer::CTAG],
+                        $level
+                    );
+                    break;
+
+                case Mustache_Tokenizer::T_BLOCK_VAR:
+                    $code .= $this->blockVar(
+                        $node[Mustache_Tokenizer::NODES],
+                        $node[Mustache_Tokenizer::NAME],
+                        $node[Mustache_Tokenizer::INDEX],
+                        $node[Mustache_Tokenizer::END],
+                        $node[Mustache_Tokenizer::OTAG],
+                        $node[Mustache_Tokenizer::CTAG],
                         $level
                     );
                     break;
@@ -121,7 +154,6 @@ class Mustache_Compiler
                     throw new Mustache_Exception_SyntaxException(sprintf('Unknown token type: %s', $node[Mustache_Tokenizer::TYPE]), $node);
             }
         }
-
         return $code;
     }
 
@@ -135,6 +167,7 @@ class Mustache_Compiler
             {
                 $this->lambdaHelper = new Mustache_LambdaHelper($this->mustache, $context);
                 $buffer = \'\';
+                $newContext = array();
         %s
 
                 return $buffer;
@@ -149,6 +182,7 @@ class Mustache_Compiler
             public function renderInternal(Mustache_Context $context, $indent = \'\')
             {
                 $buffer = \'\';
+                $newContext = array();
         %s
 
                 return $buffer;
@@ -170,9 +204,47 @@ class Mustache_Compiler
         $code     = $this->walk($tree);
         $sections = implode("\n", $this->sections);
         $klass    = empty($this->sections) ? self::KLASS_NO_LAMBDAS : self::KLASS;
+
         $callable = $this->strictCallables ? $this->prepare(self::STRICT_CALLABLE) : '';
 
         return sprintf($this->prepare($klass, 0, false, true), $name, $callable, $code, $sections);
+    }
+
+    const BLOCK_VAR = '
+        $value = $this->resolveValue($context->findInBlock(%s), $context, $indent);
+        if($value && !is_array($value) && !is_object($value)) {
+            $buffer .= $value;
+        } else {
+            %s
+        }
+    ';
+
+    private function blockVar($nodes, $id, $start, $end, $otag, $ctag, $level)
+    {
+        $id_str = var_export($id, true);
+
+        return sprintf($this->prepare(self::BLOCK_VAR, $level), $id_str, $this->walk($nodes, 2));
+    }
+
+    const BLOCK_ARG = '
+        // %s block_arg
+        $value = $this->section%s($context, $indent, true);
+        $newContext[%s] = %s$value;
+    ';
+
+    private function blockArg($nodes, $id, $start, $end, $otag, $ctag, $level)
+    {
+        $key = $this->section($nodes, $id, $start, $end, $otag, $ctag, $level, true);
+        $filters = '';
+
+        if (isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS])) {
+            list($id, $filters) = $this->getFilters($id, $level);
+        }
+
+        $method   = $this->getFindMethod($id);
+        $id       = var_export($id, true);
+
+        return sprintf($this->prepare(self::BLOCK_ARG, $level), $id, $key, $id, $this->flushIndent());
     }
 
     const SECTION_CALL = '
@@ -198,7 +270,8 @@ class Mustache_Compiler
             } elseif (!empty($value)) {
                 $values = $this->isIterable($value) ? $value : array($value);
                 foreach ($values as $value) {
-                    $context->push($value);%s
+                    $context->push($value);
+                    %s
                     $context->pop();
                 }
             }
@@ -219,7 +292,7 @@ class Mustache_Compiler
      *
      * @return string Generated section PHP source code
      */
-    private function section($nodes, $id, $start, $end, $otag, $ctag, $level)
+    private function section($nodes, $id, $start, $end, $otag, $ctag, $level, $arg=false)
     {
         $filters = '';
 
@@ -227,8 +300,6 @@ class Mustache_Compiler
             list($id, $filters) = $this->getFilters($id, $level);
         }
 
-        $method   = $this->getFindMethod($id);
-        $id       = var_export($id, true);
         $source   = var_export(substr($this->source, $start, $end - $start), true);
         $callable = $this->getCallable();
 
@@ -244,7 +315,13 @@ class Mustache_Compiler
             $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $callable, $source, $delims, $this->walk($nodes, 2));
         }
 
-        return sprintf($this->prepare(self::SECTION_CALL, $level), $id, $method, $id, $filters, $key);
+        if ($arg === true) {
+            return $key;
+        } else {
+            $method   = $this->getFindMethod($id);
+            $id = var_export($id, true);
+            return sprintf($this->prepare(self::SECTION_CALL, $level), $id, $method, $id, $filters, $key);
+        }
     }
 
     const INVERTED_SECTION = '
@@ -299,6 +376,35 @@ class Mustache_Compiler
             var_export($id, true),
             var_export($indent, true)
         );
+    }
+
+    const PARENT = '
+
+        if ($parent = $this->mustache->LoadPartial(%s)) {
+            $context->pushBlockContext($newContext);
+            $buffer .= $parent->renderInternal($context, $indent);
+            $context->popBlockContext();
+        }
+    ';
+
+    private function parent($id, $indent, $level, $children)
+    {
+        $block = '';
+
+        $real_children = array_filter($children, array(__CLASS__, 'return_only_block_args'));
+
+        $block = $this->walk($real_children, $level);
+
+        return $block. sprintf(
+            $this->prepare(self::PARENT, $level),
+            var_export($id, true),
+            var_export($indent, true)
+        );
+    }
+
+    private static function return_only_block_args($child)
+    {
+        return $child[Mustache_Tokenizer::TYPE] == Mustache_Tokenizer::T_BLOCK_ARG;
     }
 
     const VARIABLE = '
