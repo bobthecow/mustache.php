@@ -117,6 +117,54 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
                 ),
             ),
 
+            // This *would* be an invalid inheritance parse tree, but that pragma
+            // isn't enabled so it'll thunk it back into an "escaped" token:
+            array(
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_BLOCK_VAR,
+                        Mustache_Tokenizer::NAME => 'foo',
+                        Mustache_Tokenizer::OTAG => '{{',
+                        Mustache_Tokenizer::CTAG => '}}',
+                        Mustache_Tokenizer::LINE => 0,
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_TEXT,
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::VALUE => 'bar'
+                    ),
+                ),
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME => '$foo',
+                        Mustache_Tokenizer::OTAG => '{{',
+                        Mustache_Tokenizer::CTAG => '}}',
+                        Mustache_Tokenizer::LINE => 0,
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_TEXT,
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::VALUE => 'bar'
+                    ),
+                ),
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getInheritanceTokenSets
+     */
+    public function testParseWithInheritance($tokens, $expected)
+    {
+        $parser = new Mustache_Parser;
+        $parser->setPragmas(array(Mustache_Engine::PRAGMA_BLOCKS));
+        $this->assertEquals($expected, $parser->parse($tokens));
+    }
+
+    public function getInheritanceTokenSets()
+    {
+        return array(
             array(
                 array(
                     array(
@@ -228,7 +276,7 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
                         )
                     )
                 )
-            )
+            ),
         );
     }
 
@@ -307,6 +355,33 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::NAME  => 'child',
                         Mustache_Tokenizer::LINE  => 0,
                         Mustache_Tokenizer::INDEX => 123,
+                    ),
+                ),
+            ),
+
+            // This *would* be a valid inheritance parse tree, but that pragma
+            // isn't enabled here so it's going to fail :)
+            array(
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_BLOCK_VAR,
+                        Mustache_Tokenizer::NAME => 'foo',
+                        Mustache_Tokenizer::OTAG => '{{',
+                        Mustache_Tokenizer::CTAG => '}}',
+                        Mustache_Tokenizer::LINE => 0,
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_TEXT,
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::VALUE => 'bar'
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_END_SECTION,
+                        Mustache_Tokenizer::NAME => 'foo',
+                        Mustache_Tokenizer::OTAG => '{{',
+                        Mustache_Tokenizer::CTAG => '}}',
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::INDEX => 11,
                     ),
                 ),
             ),

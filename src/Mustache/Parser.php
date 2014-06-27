@@ -133,11 +133,20 @@ class Mustache_Parser
                     break;
 
                 case Mustache_Tokenizer::T_BLOCK_VAR:
-                    if ($parent[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_PARENT) {
-                        $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_BLOCK_ARG;
+                    if (isset($this->pragmas[Mustache_Engine::PRAGMA_BLOCKS])) {
+                        // BLOCKS pragma is enabled, let's do this!
+                        if ($parent[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_PARENT) {
+                            $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_BLOCK_ARG;
+                        }
+                        $this->clearStandaloneLines($nodes, $tokens);
+                        $nodes[] = $this->buildTree($tokens, $token);
+                    } else {
+                        // pretend this was just a normal "escaped" token...
+                        $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_ESCAPED;
+                        // TODO: figure out how to figure out if there was a space after this dollar:
+                        $token[Mustache_Tokenizer::NAME] = '$' . $token[Mustache_Tokenizer::NAME];
+                        $nodes[] = $token;
                     }
-                    $this->clearStandaloneLines($nodes, $tokens);
-                    $nodes[] = $this->buildTree($tokens, $token);
                     break;
 
                 case Mustache_Tokenizer::T_PRAGMA:

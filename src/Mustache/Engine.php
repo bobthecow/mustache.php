@@ -27,10 +27,12 @@ class Mustache_Engine
     const SPEC_VERSION   = '1.1.2';
 
     const PRAGMA_FILTERS = 'FILTERS';
+    const PRAGMA_BLOCKS  = 'BLOCKS';
 
     // Known pragmas
     private static $knownPragmas = array(
         self::PRAGMA_FILTERS => true,
+        self::PRAGMA_BLOCKS  => true,
     );
 
     // Template cache

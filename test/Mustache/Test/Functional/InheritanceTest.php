@@ -11,7 +11,9 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
 
     public function setUp()
     {
-        $this->mustache = new Mustache_Engine;
+        $this->mustache = new Mustache_Engine(array(
+            'pragmas' => array(Mustache_Engine::PRAGMA_BLOCKS),
+        ));
     }
 
     public function getIllegalInheritanceExamples()
