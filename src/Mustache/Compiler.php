@@ -334,10 +334,11 @@ class Mustache_Compiler
      * @param string $otag  Current Mustache opening tag
      * @param string $ctag  Current Mustache closing tag
      * @param int    $level
+     * @param bool   $arg   (default: false)
      *
      * @return string Generated section PHP source code
      */
-    private function section($nodes, $id, $start, $end, $otag, $ctag, $level, $arg=false)
+    private function section($nodes, $id, $start, $end, $otag, $ctag, $level, $arg = false)
     {
         $filters = '';
 
@@ -354,7 +355,7 @@ class Mustache_Compiler
             $delims = '';
         }
 
-        $key    = ucfirst(md5($delims."\n".$source));
+        $key = ucfirst(md5($delims."\n".$source));
 
         if (!isset($this->sections[$key])) {
             $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $callable, $source, $delims, $this->walk($nodes, 2));
@@ -363,8 +364,8 @@ class Mustache_Compiler
         if ($arg === true) {
             return $key;
         } else {
-            $method   = $this->getFindMethod($id);
-            $id = var_export($id, true);
+            $method = $this->getFindMethod($id);
+            $id     = var_export($id, true);
 
             return sprintf($this->prepare(self::SECTION_CALL, $level), $id, $method, $id, $filters, $key);
         }

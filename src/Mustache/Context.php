@@ -14,8 +14,8 @@
  */
 class Mustache_Context
 {
-    private $stack = array();
-    private $block_stack = array();
+    private $stack      = array();
+    private $blockStack = array();
 
     /**
      * Mustache rendering Context constructor.
@@ -39,9 +39,14 @@ class Mustache_Context
         array_push($this->stack, $value);
     }
 
+    /**
+     * Push a new Context frame onto the block context stack.
+     *
+     * @param  mixed $value Object or array to use for block context
+     */
     public function pushBlockContext($value)
     {
-        array_push($this->block_stack, $value);
+        array_push($this->blockStack, $value);
     }
 
     /**
@@ -54,9 +59,14 @@ class Mustache_Context
         return array_pop($this->stack);
     }
 
+    /**
+     * Pop the last block Context frame from the stack.
+     *
+     * @return mixed Last block Context frame (object or array)
+     */
     public function popBlockContext()
     {
-        return array_pop($this->block_stack);
+        return array_pop($this->blockStack);
     }
 
     /**
@@ -131,9 +141,16 @@ class Mustache_Context
         return $value;
     }
 
+    /**
+     * Find an argument in the block context stack.
+     *
+     * @param string $id
+     *
+     * @return mixed Variable value, or '' if not found.
+     */
     public function findInBlock($id)
     {
-        foreach ($this->block_stack as $context) {
+        foreach ($this->blockStack as $context) {
             if (array_key_exists($id, $context)) {
                 return $context[$id];
             }
