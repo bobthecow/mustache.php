@@ -133,7 +133,7 @@ class Mustache_Context
 
     public function findInBlock($id)
     {
-        foreach($this->block_stack as $context) {
+        foreach ($this->block_stack as $context) {
             if (array_key_exists($id, $context)) {
                 return $context[$id];
             }

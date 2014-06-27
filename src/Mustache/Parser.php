@@ -235,14 +235,22 @@ class Mustache_Parser
      */
     private function tokenIsWhitespace(array $token)
     {
-        if ($token[Mustache_Tokenizer::TYPE] == Mustache_Tokenizer::T_TEXT) {
+        if ($token[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_TEXT) {
             return preg_match('/^\s*$/', $token[Mustache_Tokenizer::VALUE]);
         }
 
         return false;
     }
 
-    private function checkIfTokenIsAllowedInParent($parent, $token)
+    /**
+     * Check whether a token is allowed inside a parent tag.
+     *
+     * @throws Mustache_Exception_SyntaxException if an invalid token is found inside a parent tag.
+     *
+     * @param array|null $parent
+     * @param array      $token
+     */
+    private function checkIfTokenIsAllowedInParent($parent, array $token)
     {
         if ($parent[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_PARENT) {
             throw new Mustache_Exception_SyntaxException('Illegal content in < parent tag', $token);

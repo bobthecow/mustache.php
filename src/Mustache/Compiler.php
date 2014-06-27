@@ -123,8 +123,8 @@ class Mustache_Compiler
                     $code .= $this->parent(
                         $node[Mustache_Tokenizer::NAME],
                         isset($node[Mustache_Tokenizer::INDENT]) ? $node[Mustache_Tokenizer::INDENT] : '',
-                        $level,
-                        $node[Mustache_Tokenizer::NODES]
+                        $node[Mustache_Tokenizer::NODES],
+                        $level
                     );
                     break;
 
@@ -172,6 +172,7 @@ class Mustache_Compiler
                     throw new Mustache_Exception_SyntaxException(sprintf('Unknown token type: %s', $node[Mustache_Tokenizer::TYPE]), $node);
             }
         }
+
         return $code;
     }
 
@@ -230,13 +231,26 @@ class Mustache_Compiler
 
     const BLOCK_VAR = '
         $value = $this->resolveValue($context->findInBlock(%s), $context, $indent);
-        if($value && !is_array($value) && !is_object($value)) {
+        if ($value && !is_array($value) && !is_object($value)) {
             $buffer .= $value;
         } else {
             %s
         }
     ';
 
+    /**
+     * Generate Mustache Template inheritance block variable PHP source.
+     *
+     * @param array  $nodes Array of child tokens
+     * @param string $id    Section name
+     * @param int    $start Section start offset
+     * @param int    $end   Section end offset
+     * @param string $otag  Current Mustache opening tag
+     * @param string $ctag  Current Mustache closing tag
+     * @param int    $level
+     *
+     * @return string Generated PHP source code
+     */
     private function blockVar($nodes, $id, $start, $end, $otag, $ctag, $level)
     {
         $id_str = var_export($id, true);
@@ -250,6 +264,19 @@ class Mustache_Compiler
         $newContext[%s] = %s$value;
     ';
 
+    /**
+     * Generate Mustache Template inheritance block argument PHP source.
+     *
+     * @param array  $nodes Array of child tokens
+     * @param string $id    Section name
+     * @param int    $start Section start offset
+     * @param int    $end   Section end offset
+     * @param string $otag  Current Mustache opening tag
+     * @param string $ctag  Current Mustache closing tag
+     * @param int    $level
+     *
+     * @return string Generated PHP source code
+     */
     private function blockArg($nodes, $id, $start, $end, $otag, $ctag, $level)
     {
         $key = $this->section($nodes, $id, $start, $end, $otag, $ctag, $level, true);
@@ -338,6 +365,7 @@ class Mustache_Compiler
         } else {
             $method   = $this->getFindMethod($id);
             $id = var_export($id, true);
+
             return sprintf($this->prepare(self::SECTION_CALL, $level), $id, $method, $id, $filters, $key);
         }
     }
@@ -397,6 +425,7 @@ class Mustache_Compiler
     }
 
     const PARENT = '
+        %s
 
         if ($parent = $this->mustache->LoadPartial(%s)) {
             $context->pushBlockContext($newContext);
@@ -405,24 +434,38 @@ class Mustache_Compiler
         }
     ';
 
-    private function parent($id, $indent, $level, $children)
+    /**
+     * Generate Mustache Template inheritance parent call PHP source.
+     *
+     * @param string $id       Parent tag name
+     * @param string $indent   Whitespace indent to apply to parent
+     * @param array  $children Child nodes
+     * @param int    $level
+     *
+     * @return string Generated PHP source code
+     */
+    private function parent($id, $indent, array $children, $level)
     {
-        $block = '';
+        $realChildren = array_filter($children, array(__CLASS__, 'onlyBlockArgs'));
 
-        $real_children = array_filter($children, array(__CLASS__, 'return_only_block_args'));
-
-        $block = $this->walk($real_children, $level);
-
-        return $block. sprintf(
+        return sprintf(
             $this->prepare(self::PARENT, $level),
+            $this->walk($realChildren, $level),
             var_export($id, true),
             var_export($indent, true)
         );
     }
 
-    private static function return_only_block_args($child)
+    /**
+     * Helper method for filtering out non-block-arg tokens.
+     *
+     * @param array $node
+     *
+     * @return boolean True if $node is a block arg token.
+     */
+    private static function onlyBlockArgs(array $node)
     {
-        return $child[Mustache_Tokenizer::TYPE] == Mustache_Tokenizer::T_BLOCK_ARG;
+        return $node[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_BLOCK_ARG;
     }
 
     const VARIABLE = '
@@ -590,6 +633,13 @@ class Mustache_Compiler
     const IS_CALLABLE        = '!is_string(%s) && is_callable(%s)';
     const STRICT_IS_CALLABLE = 'is_object(%s) && is_callable(%s)';
 
+    /**
+     * Helper function to compile strict vs lax "is callable" logic.
+     *
+     * @param string $variable (default: '$value')
+     *
+     * @return string "is callable" logic
+     */
     private function getCallable($variable = '$value')
     {
         $tpl = $this->strictCallables ? self::STRICT_IS_CALLABLE : self::IS_CALLABLE;

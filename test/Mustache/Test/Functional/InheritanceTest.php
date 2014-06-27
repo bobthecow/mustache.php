@@ -411,8 +411,6 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         $this->assertEquals('default content', $tpl->render($data));
     }
 
-    
-
     /**
      * @dataProvider getIllegalInheritanceExamples
      * @expectedException Mustache_Exception_SyntaxException

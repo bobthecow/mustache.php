@@ -34,8 +34,8 @@ class Mustache_Tokenizer
     const T_UNESCAPED_2  = '&';
     const T_TEXT         = '_t';
     const T_PRAGMA       = '%';
-    const T_BLOCK_VAR   = '$';
-    const T_BLOCK_ARG   = '$arg';
+    const T_BLOCK_VAR    = '$';
+    const T_BLOCK_ARG    = '$arg';
 
     // Valid token types
     private static $tagTypes = array(
@@ -50,14 +50,14 @@ class Mustache_Tokenizer
         self::T_UNESCAPED    => true,
         self::T_UNESCAPED_2  => true,
         self::T_PRAGMA       => true,
-        self::T_BLOCK_VAR   => true,
+        self::T_BLOCK_VAR    => true,
     );
 
     // Interpolated tags
     private static $interpolatedTags = array(
-        self::T_ESCAPED      => true,
-        self::T_UNESCAPED    => true,
-        self::T_UNESCAPED_2  => true,
+        self::T_ESCAPED     => true,
+        self::T_UNESCAPED   => true,
+        self::T_UNESCAPED_2 => true,
     );
 
     // Token properties
