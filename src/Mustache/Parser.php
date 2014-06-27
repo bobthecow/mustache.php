@@ -18,6 +18,8 @@ class Mustache_Parser
 {
     private $lineNum;
     private $lineTokens;
+    private $pragmas;
+    private $defaultPragmas = array();
 
     /**
      * Process an array of Mustache tokens and convert them into a parse tree.
@@ -30,8 +32,26 @@ class Mustache_Parser
     {
         $this->lineNum    = -1;
         $this->lineTokens = 0;
+        $this->pragmas    = $this->defaultPragmas;
 
         return $this->buildTree($tokens);
+    }
+
+    /**
+     * Enable pragmas across all templates, regardless of the presence of pragma
+     * tags in the individual templates.
+     *
+     * @internal Users should set global pragmas in Mustache_Engine, not here :)
+     *
+     * @param array $pragmas
+     */
+    public function setPragmas(array $pragmas)
+    {
+        $this->pragmas = array();
+        foreach ($pragmas as $pragma) {
+            $this->pragmas[$pragma] = true;
+        }
+        $this->defaultPragmas = $this->pragmas;
     }
 
     /**
@@ -121,6 +141,9 @@ class Mustache_Parser
                     break;
 
                 case Mustache_Tokenizer::T_PRAGMA:
+                    $this->pragmas[$token[Mustache_Tokenizer::NAME]] = true;
+                    // no break
+
                 case Mustache_Tokenizer::T_COMMENT:
                     $this->clearStandaloneLines($nodes, $tokens);
                     $nodes[] = $token;

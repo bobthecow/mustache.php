@@ -18,6 +18,7 @@ class Mustache_Compiler
 {
 
     private $pragmas;
+    private $defaultPragmas = array();
     private $sections;
     private $source;
     private $indentNextLine;
@@ -41,7 +42,7 @@ class Mustache_Compiler
      */
     public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8', $strictCallables = false, $entityFlags = ENT_COMPAT)
     {
-        $this->pragmas         = array();
+        $this->pragmas         = $this->defaultPragmas;
         $this->sections        = array();
         $this->source          = $source;
         $this->indentNextLine  = true;
@@ -51,6 +52,23 @@ class Mustache_Compiler
         $this->strictCallables = $strictCallables;
 
         return $this->writeCode($tree, $name);
+    }
+
+    /**
+     * Enable pragmas across all templates, regardless of the presence of pragma
+     * tags in the individual templates.
+     *
+     * @internal Users should set global pragmas in Mustache_Engine, not here :)
+     *
+     * @param array $pragmas
+     */
+    public function setPragmas(array $pragmas)
+    {
+        $this->pragmas = array();
+        foreach ($pragmas as $pragma) {
+            $this->pragmas[$pragma] = true;
+        }
+        $this->defaultPragmas = $this->pragmas;
     }
 
     /**
