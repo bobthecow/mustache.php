@@ -92,7 +92,7 @@ class Mustache_Test_Functional_ExamplesTest extends PHPUnit_Framework_TestCase
                 // load other files
                 switch ($info['extension']) {
                     case 'php':
-                        require_once($fullpath);
+                        require_once $fullpath;
                         $context = new $info['filename'];
                         break;
 
