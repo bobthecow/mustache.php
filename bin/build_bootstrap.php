@@ -95,10 +95,10 @@ EOS;
     /**
      * Loads a list of classes and caches them in one big file.
      *
-     * @param array   $classes    An array of classes to load
-     * @param string  $cacheDir   A cache directory
-     * @param string  $name       The cache name prefix
-     * @param string  $extension  File extension of the resulting file
+     * @param array  $classes   An array of classes to load
+     * @param string $cacheDir  A cache directory
+     * @param string $name      The cache name prefix
+     * @param string $extension File extension of the resulting file
      *
      * @throws InvalidArgumentException When class can't be loaded
      */
