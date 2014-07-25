@@ -21,7 +21,7 @@ class MagicObject
 
     public function __get($key)
     {
-        return isset($this->_data[$key]) ? $this->_data[$key] : NULL;
+        return isset($this->_data[$key]) ? $this->_data[$key] : null;
     }
 
     public function __isset($key)
