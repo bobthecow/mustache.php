@@ -107,21 +107,15 @@ abstract class Mustache_Template
      *
      * @param mixed $value
      *
-     * @return boolean True if the value is 'iterable'
+ * @return boolean True if the value is 'iterable'
      */
     protected function isIterable($value)
     {
         if (is_object($value)) {
             return $value instanceof Traversable;
         } elseif (is_array($value)) {
-            $i = 0;
-            foreach ($value as $k => $v) {
-                if ($k !== $i++) {
-                    return false;
-                }
-            }
-
-            return true;
+            //is sequential array - not associative
+            return array_keys($value) === range(0, count($value) - 1);
         } else {
             return false;
         }
