@@ -18,7 +18,7 @@ class Mustache_Compiler
 {
     private $sections;
     private $source;
-    private $indentNextLine;
+    protected $indentNextLine = true;
     private $customEscape;
     private $entityFlags;
     private $charset;
@@ -43,7 +43,6 @@ class Mustache_Compiler
         $this->pragmas         = array();
         $this->sections        = array();
         $this->source          = $source;
-        $this->indentNextLine  = true;
         $this->customEscape    = $customEscape;
         $this->entityFlags     = $entityFlags;
         $this->charset         = $charset;
