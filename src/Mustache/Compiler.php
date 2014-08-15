@@ -24,6 +24,7 @@ class Mustache_Compiler
     private $charset;
     private $strictCallables;
     private $pragmas;
+    protected $templateBaseClass = "Mustache_Template";
 
     /**
      * Compile a Mustache token parse tree into PHP source code.
@@ -127,7 +128,7 @@ class Mustache_Compiler
 
     const KLASS = '<?php
 
-        class %s extends Mustache_Template
+        class %s extends %s
         {
             protected $templateFileName = "%s";
             private $lambdaHelper;%s
@@ -150,7 +151,7 @@ class Mustache_Compiler
 
     const KLASS_NO_LAMBDAS = '<?php
 
-        class %s extends Mustache_Template
+        class %s extends %s
         {
             protected $templateFileName = "%s";
         %s
@@ -186,7 +187,7 @@ class Mustache_Compiler
         $klass    = empty($this->sections) ? self::KLASS_NO_LAMBDAS : self::KLASS;
         $callable = $this->strictCallables ? $this->prepare(self::STRICT_CALLABLE) : '';
 
-        return sprintf($this->prepare($klass, 0, false, true), $name, $templateName, $callable, $code, $sections);
+        return sprintf($this->prepare($klass, 0, false, true), $name, $this->templateBaseClass, $templateName, $callable, $code, $sections);
     }
 
     const SECTION_CALL = '
