@@ -38,7 +38,7 @@ class Mustache_Compiler
      *
      * @return string Generated PHP source code
      */
-    public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8', $strictCallables = false, $entityFlags = ENT_COMPAT)
+    public function compile($templateName, $source, array $tree, $name, $customEscape = false, $charset = 'UTF-8', $strictCallables = false, $entityFlags = ENT_COMPAT)
     {
         $this->pragmas         = array();
         $this->sections        = array();
@@ -49,7 +49,7 @@ class Mustache_Compiler
         $this->charset         = $charset;
         $this->strictCallables = $strictCallables;
 
-        return $this->writeCode($tree, $name);
+        return $this->writeCode($tree, $name, $templateName);
     }
 
     /**
@@ -129,14 +129,20 @@ class Mustache_Compiler
 
         class %s extends Mustache_Template
         {
+            protected $templateFileName = "%s";
             private $lambdaHelper;%s
 
             public function renderInternal(Mustache_Context $context, $indent = \'\')
             {
+                $buffer = $this->beforeRender($context);
+                if ($buffer) {
+                    return $buffer;
+                }
+
                 $this->lambdaHelper = new Mustache_LambdaHelper($this->mustache, $context);
                 $buffer = \'\';
         %s
-
+                $this->afterRender($context, $buffer);
                 return $buffer;
             }
         %s
@@ -145,12 +151,20 @@ class Mustache_Compiler
     const KLASS_NO_LAMBDAS = '<?php
 
         class %s extends Mustache_Template
-        {%s
+        {
+            protected $templateFileName = "%s";
+        %s
             public function renderInternal(Mustache_Context $context, $indent = \'\')
             {
+                $buffer = $this->beforeRender($context);
+                if ($buffer) {
+                    return $buffer;
+                }
+
                 $buffer = \'\';
         %s
 
+                $this->afterRender($context, $buffer);
                 return $buffer;
             }
         }';
@@ -165,14 +179,14 @@ class Mustache_Compiler
      *
      * @return string Generated PHP source code
      */
-    private function writeCode($tree, $name)
+    private function writeCode($tree, $name, $templateName)
     {
         $code     = $this->walk($tree);
         $sections = implode("\n", $this->sections);
         $klass    = empty($this->sections) ? self::KLASS_NO_LAMBDAS : self::KLASS;
         $callable = $this->strictCallables ? $this->prepare(self::STRICT_CALLABLE) : '';
 
-        return sprintf($this->prepare($klass, 0, false, true), $name, $callable, $code, $sections);
+        return sprintf($this->prepare($klass, 0, false, true), $name, $templateName, $callable, $code, $sections);
     }
 
     const SECTION_CALL = '
