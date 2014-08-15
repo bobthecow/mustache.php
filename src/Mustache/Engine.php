@@ -582,7 +582,7 @@ class Mustache_Engine
      */
     public function loadTemplate($name)
     {
-        return $this->loadSource($this->getLoader()->load($name));
+        return $this->loadSource($name, $this->getLoader()->load($name));
     }
 
     /**
@@ -606,7 +606,7 @@ class Mustache_Engine
                 throw new Mustache_Exception_UnknownTemplateException($name);
             }
 
-            return $this->loadSource($loader->load($name));
+            return $this->loadSource($name, $loader->load($name));
         } catch (Mustache_Exception_UnknownTemplateException $e) {
             // If the named partial cannot be found, log then return null.
             $this->log(
@@ -652,7 +652,7 @@ class Mustache_Engine
      *
      * @return Mustache_Template
      */
-    private function loadSource($source, Mustache_Cache $cache = null)
+    private function loadSource($templateName, $source, Mustache_Cache $cache = null)
     {
         $className = $this->getTemplateClassName($source);
 
@@ -663,7 +663,7 @@ class Mustache_Engine
 
             if (!class_exists($className, false)) {
                 if (!$cache->load($className)) {
-                    $compiled = $this->compile($source);
+                    $compiled = $this->compile($templateName, $source);
                     $cache->cache($className, $compiled);
                 }
             }
@@ -717,7 +717,7 @@ class Mustache_Engine
      *
      * @return string generated Mustache template class code
      */
-    private function compile($source)
+    private function compile($templateName, $source)
     {
         $tree = $this->parse($source);
         $name = $this->getTemplateClassName($source);
@@ -728,7 +728,7 @@ class Mustache_Engine
             array('className' => $name)
         );
 
-        return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables, $this->entityFlags);
+        return $this->getCompiler()->compile($templateName, $source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables, $this->entityFlags);
     }
 
     /**

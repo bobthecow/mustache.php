@@ -27,6 +27,11 @@ abstract class Mustache_Template
     protected $strictCallables = false;
 
     /**
+     * @var string
+     */
+    protected $templateFileName;
+
+    /**
      * Mustache Template constructor.
      *
      * @param Mustache_Engine $mustache
@@ -34,6 +39,17 @@ abstract class Mustache_Template
     public function __construct(Mustache_Engine $mustache)
     {
         $this->mustache = $mustache;
+    }
+
+    protected function beforeRender(Mustache_Context $context)
+    {
+        //here you can write logic for caching depend of $this->templateFileName
+        return false;
+    }
+
+    protected function afterRender(Mustache_Context $context, &$buffer)
+    {
+        return false;
     }
 
     /**
