@@ -401,9 +401,10 @@ class Mustache_Compiler
         return sprintf($this->prepare(self::INVERTED_SECTION, $level), $id, $method, $id, $filters, $this->walk($nodes, $level));
     }
 
+    const PARTIAL_INDENT = ', $indent . %s';
     const PARTIAL = '
         if ($partial = $this->mustache->loadPartial(%s)) {
-            $buffer .= $partial->renderInternal($context, $indent . %s);
+            $buffer .= $partial->renderInternal($context%s);
         }
     ';
 
@@ -418,10 +419,16 @@ class Mustache_Compiler
      */
     private function partial($id, $indent, $level)
     {
+        if ($indent !== '') {
+            $indentParam = sprintf(self::PARTIAL_INDENT, var_export($indent, true));
+        } else {
+            $indentParam = '';
+        }
+
         return sprintf(
             $this->prepare(self::PARTIAL, $level),
             var_export($id, true),
-            var_export($indent, true)
+            $indentParam
         );
     }
 
