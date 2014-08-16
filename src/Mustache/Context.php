@@ -42,7 +42,7 @@ class Mustache_Context
     /**
      * Push a new Context frame onto the block context stack.
      *
-     * @param  mixed $value Object or array to use for block context
+     * @param mixed $value Object or array to use for block context
      */
     public function pushBlockContext($value)
     {

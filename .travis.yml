@@ -1,4 +1,12 @@
 language: php
+
+before_script:
+  - curl http://cs.sensiolabs.org/get/php-cs-fixer.phar -o php-cs-fixer.phar
+
+script:
+  - phpunit
+  - php php-cs-fixer.phar --dry-run -v fix .
+
 php:
   - 5.2
   - 5.3
