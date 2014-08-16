@@ -5,7 +5,7 @@ before_script:
 
 script:
   - phpunit
-  - php php-cs-fixer.phar --dry-run -v fix .
+  - if [[ `php -r "echo version_compare(PHP_VERSION, '5.3.6', '>=');"` ]]; then php php-cs-fixer.phar --dry-run -v fix .; fi
 
 php:
   - 5.2
