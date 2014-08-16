@@ -16,7 +16,7 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $one = new Mustache_Context;
+        $one = new Mustache_Context();
         $this->assertSame('', $one->find('foo'));
         $this->assertSame('', $one->find('bar'));
 
@@ -27,7 +27,7 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('FOO', $two->find('foo'));
         $this->assertEquals('<BAR>', $two->find('bar'));
 
-        $obj = new StdClass;
+        $obj = new StdClass();
         $obj->name = 'NAME';
         $three = new Mustache_Context($obj);
         $this->assertSame($obj, $three->last());
@@ -36,16 +36,16 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
 
     public function testPushPopAndLast()
     {
-        $context = new Mustache_Context;
+        $context = new Mustache_Context();
         $this->assertFalse($context->last());
 
-        $dummy = new Mustache_Test_TestDummy;
+        $dummy = new Mustache_Test_TestDummy();
         $context->push($dummy);
         $this->assertSame($dummy, $context->last());
         $this->assertSame($dummy, $context->pop());
         $this->assertFalse($context->last());
 
-        $obj = new StdClass;
+        $obj = new StdClass();
         $context->push($dummy);
         $this->assertSame($dummy, $context->last());
         $context->push($obj);
@@ -57,11 +57,11 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
 
     public function testFind()
     {
-        $context = new Mustache_Context;
+        $context = new Mustache_Context();
 
-        $dummy = new Mustache_Test_TestDummy;
+        $dummy = new Mustache_Test_TestDummy();
 
-        $obj = new StdClass;
+        $obj = new StdClass();
         $obj->name = 'obj';
 
         $arr = array(
@@ -112,7 +112,7 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
 
     public function testAccessorPriority()
     {
-        $context = new Mustache_Context(new Mustache_Test_AllTheThings);
+        $context = new Mustache_Context(new Mustache_Test_AllTheThings());
 
         $this->assertEquals('win', $context->find('foo'), 'method beats property');
         $this->assertEquals('win', $context->find('bar'), 'property beats ArrayAccess');

@@ -46,7 +46,7 @@ class Mustache_Test_Loader_ArrayLoaderTest extends PHPUnit_Framework_TestCase
      */
     public function testMissingTemplatesThrowExceptions()
     {
-        $loader = new Mustache_Loader_ArrayLoader;
+        $loader = new Mustache_Loader_ArrayLoader();
         $loader->load('not_a_real_template');
     }
 }

@@ -140,7 +140,7 @@ abstract class Mustache_Template
      */
     protected function prepareContextStack($context = null)
     {
-        $stack = new Mustache_Context;
+        $stack = new Mustache_Context();
 
         $helpers = $this->mustache->getHelpers();
         if (!$helpers->isEmpty()) {

@@ -20,7 +20,7 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
      */
     public function testParse($tokens, $expected)
     {
-        $parser = new Mustache_Parser;
+        $parser = new Mustache_Parser();
         $this->assertEquals($expected, $parser->parse($tokens));
     }
 
@@ -157,7 +157,7 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
      */
     public function testParseWithInheritance($tokens, $expected)
     {
-        $parser = new Mustache_Parser;
+        $parser = new Mustache_Parser();
         $parser->setPragmas(array(Mustache_Engine::PRAGMA_BLOCKS));
         $this->assertEquals($expected, $parser->parse($tokens));
     }
@@ -286,7 +286,7 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
      */
     public function testParserThrowsExceptions($tokens)
     {
-        $parser = new Mustache_Parser;
+        $parser = new Mustache_Parser();
         $parser->parse($tokens);
     }
 

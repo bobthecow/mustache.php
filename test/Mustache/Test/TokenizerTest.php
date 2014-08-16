@@ -20,7 +20,7 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
      */
     public function testScan($text, $delimiters, $expected)
     {
-        $tokenizer = new Mustache_Tokenizer;
+        $tokenizer = new Mustache_Tokenizer();
         $this->assertSame($expected, $tokenizer->scan($text, $delimiters));
     }
 
@@ -29,7 +29,7 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
      */
     public function testUnevenBracesThrowExceptions()
     {
-        $tokenizer = new Mustache_Tokenizer;
+        $tokenizer = new Mustache_Tokenizer();
 
         $text = "{{{ name }}";
         $tokenizer->scan($text, null);
@@ -40,7 +40,7 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
      */
     public function testUnevenBracesWithCustomDelimiterThrowExceptions()
     {
-        $tokenizer = new Mustache_Tokenizer;
+        $tokenizer = new Mustache_Tokenizer();
 
         $text = "<%{ name %>";
         $tokenizer->scan($text, "<% %>");

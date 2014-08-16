@@ -19,7 +19,7 @@ class Mustache_Test_FiveThree_Functional_ClosureQuirksTest extends PHPUnit_Frame
 
     public function setUp()
     {
-        $this->mustache = new Mustache_Engine;
+        $this->mustache = new Mustache_Engine();
     }
 
     public function testClosuresDontLikeItWhenYouTouchTheirProperties()

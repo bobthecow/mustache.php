@@ -19,13 +19,13 @@ class Mustache_Test_Functional_ObjectSectionTest extends PHPUnit_Framework_TestC
 
     public function setUp()
     {
-        $this->mustache = new Mustache_Engine;
+        $this->mustache = new Mustache_Engine();
     }
 
     public function testBasicObject()
     {
         $tpl = $this->mustache->loadTemplate('{{#foo}}{{name}}{{/foo}}');
-        $this->assertEquals('Foo', $tpl->render(new Mustache_Test_Functional_Alpha));
+        $this->assertEquals('Foo', $tpl->render(new Mustache_Test_Functional_Alpha()));
     }
 
     /**
@@ -34,7 +34,7 @@ class Mustache_Test_Functional_ObjectSectionTest extends PHPUnit_Framework_TestC
     public function testObjectWithGet()
     {
         $tpl = $this->mustache->loadTemplate('{{#foo}}{{name}}{{/foo}}');
-        $this->assertEquals('Foo', $tpl->render(new Mustache_Test_Functional_Beta));
+        $this->assertEquals('Foo', $tpl->render(new Mustache_Test_Functional_Beta()));
     }
 
     /**
@@ -43,14 +43,14 @@ class Mustache_Test_Functional_ObjectSectionTest extends PHPUnit_Framework_TestC
     public function testSectionObjectWithGet()
     {
         $tpl = $this->mustache->loadTemplate('{{#bar}}{{#foo}}{{name}}{{/foo}}{{/bar}}');
-        $this->assertEquals('Foo', $tpl->render(new Mustache_Test_Functional_Gamma));
+        $this->assertEquals('Foo', $tpl->render(new Mustache_Test_Functional_Gamma()));
     }
 
     public function testSectionObjectWithFunction()
     {
         $tpl = $this->mustache->loadTemplate('{{#foo}}{{name}}{{/foo}}');
-        $alpha = new Mustache_Test_Functional_Alpha;
-        $alpha->foo = new Mustache_Test_Functional_Delta;
+        $alpha = new Mustache_Test_Functional_Alpha();
+        $alpha->foo = new Mustache_Test_Functional_Delta();
         $this->assertEquals('Foo', $tpl->render($alpha));
     }
 }
@@ -95,7 +95,7 @@ class Mustache_Test_Functional_Gamma
 
     public function __construct()
     {
-        $this->bar = new Mustache_Test_Functional_Beta;
+        $this->bar = new Mustache_Test_Functional_Beta();
     }
 }
 
