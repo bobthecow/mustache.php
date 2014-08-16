@@ -273,6 +273,35 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                     )
                 )
             ),
+
+            // Ensure that $arg token is not picked up during tokenization
+            array(
+                '{{$arg}}default{{/arg}}',
+                null,
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_BLOCK_VAR,
+                        Mustache_Tokenizer::NAME => 'arg',
+                        Mustache_Tokenizer::OTAG => '{{',
+                        Mustache_Tokenizer::CTAG => '}}',
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::INDEX => 8
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::VALUE => "default",
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_END_SECTION,
+                        Mustache_Tokenizer::NAME  => 'arg',
+                        Mustache_Tokenizer::OTAG  => '{{',
+                        Mustache_Tokenizer::CTAG  => '}}',
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::INDEX => 15,
+                    )
+                )
+            ),
         );
     }
 }

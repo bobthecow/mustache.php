@@ -63,7 +63,9 @@ abstract class Mustache_Template
      */
     public function render($context = array())
     {
-        return $this->renderInternal($this->prepareContextStack($context));
+        return $this->renderInternal(
+            $this->prepareContextStack($context)
+        );
     }
 
     /**

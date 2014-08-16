@@ -36,6 +36,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
             'escape'  => 'strtoupper',
             'entity_flags' => ENT_QUOTES,
             'charset' => 'ISO-8859-1',
+            'pragmas' => array(Mustache_Engine::PRAGMA_FILTERS),
         ));
 
         $this->assertSame($logger, $mustache->getLogger());
@@ -50,6 +51,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
         $this->assertTrue($mustache->hasHelper('bar'));
         $this->assertFalse($mustache->hasHelper('baz'));
         $this->assertInstanceOf('Mustache_Cache_FilesystemCache', $mustache->getCache());
+        $this->assertEquals(array(Mustache_Engine::PRAGMA_FILTERS), $mustache->getPragmas());
     }
 
     public static function getFoo()

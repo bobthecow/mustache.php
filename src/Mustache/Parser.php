@@ -18,6 +18,8 @@ class Mustache_Parser
 {
     private $lineNum;
     private $lineTokens;
+    private $pragmas;
+    private $defaultPragmas = array();
 
     /**
      * Process an array of Mustache tokens and convert them into a parse tree.
@@ -30,8 +32,26 @@ class Mustache_Parser
     {
         $this->lineNum    = -1;
         $this->lineTokens = 0;
+        $this->pragmas    = $this->defaultPragmas;
 
         return $this->buildTree($tokens);
+    }
+
+    /**
+     * Enable pragmas across all templates, regardless of the presence of pragma
+     * tags in the individual templates.
+     *
+     * @internal Users should set global pragmas in Mustache_Engine, not here :)
+     *
+     * @param array $pragmas
+     */
+    public function setPragmas(array $pragmas)
+    {
+        $this->pragmas = array();
+        foreach ($pragmas as $pragma) {
+            $this->pragmas[$pragma] = true;
+        }
+        $this->defaultPragmas = $this->pragmas;
     }
 
     /**
@@ -60,11 +80,13 @@ class Mustache_Parser
 
             switch ($token[Mustache_Tokenizer::TYPE]) {
                 case Mustache_Tokenizer::T_DELIM_CHANGE:
+                    $this->checkIfTokenIsAllowedInParent($parent, $token);
                     $this->clearStandaloneLines($nodes, $tokens);
                     break;
 
                 case Mustache_Tokenizer::T_SECTION:
                 case Mustache_Tokenizer::T_INVERTED:
+                    $this->checkIfTokenIsAllowedInParent($parent, $token);
                     $this->clearStandaloneLines($nodes, $tokens);
                     $nodes[] = $this->buildTree($tokens, $token);
                     break;
@@ -97,15 +119,40 @@ class Mustache_Parser
                     return $parent;
 
                 case Mustache_Tokenizer::T_PARTIAL:
-                case Mustache_Tokenizer::T_PARTIAL_2:
-                    // store the whitespace prefix for laters!
+                    $this->checkIfTokenIsAllowedInParent($parent, $token);
+                    //store the whitespace prefix for laters!
                     if ($indent = $this->clearStandaloneLines($nodes, $tokens)) {
                         $token[Mustache_Tokenizer::INDENT] = $indent[Mustache_Tokenizer::VALUE];
                     }
                     $nodes[] = $token;
                     break;
 
+                case Mustache_Tokenizer::T_PARENT:
+                    $this->checkIfTokenIsAllowedInParent($parent, $token);
+                    $nodes[] = $this->buildTree($tokens, $token);
+                    break;
+
+                case Mustache_Tokenizer::T_BLOCK_VAR:
+                    if (isset($this->pragmas[Mustache_Engine::PRAGMA_BLOCKS])) {
+                        // BLOCKS pragma is enabled, let's do this!
+                        if ($parent[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_PARENT) {
+                            $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_BLOCK_ARG;
+                        }
+                        $this->clearStandaloneLines($nodes, $tokens);
+                        $nodes[] = $this->buildTree($tokens, $token);
+                    } else {
+                        // pretend this was just a normal "escaped" token...
+                        $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_ESCAPED;
+                        // TODO: figure out how to figure out if there was a space after this dollar:
+                        $token[Mustache_Tokenizer::NAME] = '$' . $token[Mustache_Tokenizer::NAME];
+                        $nodes[] = $token;
+                    }
+                    break;
+
                 case Mustache_Tokenizer::T_PRAGMA:
+                    $this->pragmas[$token[Mustache_Tokenizer::NAME]] = true;
+                    // no break
+
                 case Mustache_Tokenizer::T_COMMENT:
                     $this->clearStandaloneLines($nodes, $tokens);
                     $nodes[] = $token;
@@ -197,10 +244,25 @@ class Mustache_Parser
      */
     private function tokenIsWhitespace(array $token)
     {
-        if ($token[Mustache_Tokenizer::TYPE] == Mustache_Tokenizer::T_TEXT) {
+        if ($token[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_TEXT) {
             return preg_match('/^\s*$/', $token[Mustache_Tokenizer::VALUE]);
         }
 
         return false;
+    }
+
+    /**
+     * Check whether a token is allowed inside a parent tag.
+     *
+     * @throws Mustache_Exception_SyntaxException if an invalid token is found inside a parent tag.
+     *
+     * @param array|null $parent
+     * @param array      $token
+     */
+    private function checkIfTokenIsAllowedInParent($parent, array $token)
+    {
+        if ($parent[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_PARENT) {
+            throw new Mustache_Exception_SyntaxException('Illegal content in < parent tag', $token);
+        }
     }
 }
