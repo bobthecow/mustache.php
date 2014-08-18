@@ -609,9 +609,9 @@ class Mustache_Compiler
     {
         if ($this->customEscape) {
             return sprintf(self::CUSTOM_ESCAPE, $value);
-        } else {
-            return sprintf(self::DEFAULT_ESCAPE, $value, var_export($this->entityFlags, true), var_export($this->charset, true));
         }
+
+        return sprintf(self::DEFAULT_ESCAPE, $value, var_export($this->entityFlags, true), var_export($this->charset, true));
     }
 
     /**
