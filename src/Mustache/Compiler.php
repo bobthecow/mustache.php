@@ -631,11 +631,13 @@ class Mustache_Compiler
     {
         if ($id === '.') {
             return 'last';
-        } elseif (strpos($id, '.') === false) {
-            return 'find';
-        } else {
-            return 'findDot';
         }
+
+        if (strpos($id, '.') === false) {
+            return 'find';
+        }
+
+        return 'findDot';
     }
 
     const IS_CALLABLE        = '!is_string(%s) && is_callable(%s)';

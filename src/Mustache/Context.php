@@ -181,9 +181,13 @@ class Mustache_Context
                         // See https://github.com/bobthecow/mustache.php/wiki/Magic-Methods
                         if (method_exists($frame, $id)) {
                             return $frame->$id();
-                        } elseif (isset($frame->$id)) {
+                        }
+
+                        if (isset($frame->$id)) {
                             return $frame->$id;
-                        } elseif ($frame instanceof ArrayAccess && isset($frame[$id])) {
+                        }
+
+                        if ($frame instanceof ArrayAccess && isset($frame[$id])) {
                             return $frame[$id];
                         }
                     }
