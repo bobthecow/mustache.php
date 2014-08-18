@@ -172,19 +172,26 @@ class Mustache_Context
     private function findVariableInStack($id, array $stack)
     {
         for ($i = count($stack) - 1; $i >= 0; $i--) {
-            if (is_object($stack[$i]) && !($stack[$i] instanceof Closure)) {
+            switch (gettype($stack[$i])) {
+                case 'object':
+                    if (!($stack[$i] instanceof Closure)) {
+                        // Note that is_callable() *will not work here*
+                        // See https://github.com/bobthecow/mustache.php/wiki/Magic-Methods
+                        if (method_exists($stack[$i], $id)) {
+                            return $stack[$i]->$id();
+                        } elseif (isset($stack[$i]->$id)) {
+                            return $stack[$i]->$id;
+                        } elseif ($stack[$i] instanceof ArrayAccess && isset($stack[$i][$id])) {
+                            return $stack[$i][$id];
+                        }
+                    }
+                    break;
 
-                // Note that is_callable() *will not work here*
-                // See https://github.com/bobthecow/mustache.php/wiki/Magic-Methods
-                if (method_exists($stack[$i], $id)) {
-                    return $stack[$i]->$id();
-                } elseif (isset($stack[$i]->$id)) {
-                    return $stack[$i]->$id;
-                } elseif ($stack[$i] instanceof ArrayAccess && isset($stack[$i][$id])) {
-                    return $stack[$i][$id];
-                }
-            } elseif (is_array($stack[$i]) && array_key_exists($id, $stack[$i])) {
-                return $stack[$i][$id];
+                case 'array':
+                    if (array_key_exists($id, $stack[$i])) {
+                        return $stack[$i][$id];
+                    }
+                    break;
             }
         }
 
