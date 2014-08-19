@@ -253,9 +253,9 @@ class Mustache_Compiler
      */
     private function blockVar($nodes, $id, $start, $end, $otag, $ctag, $level)
     {
-        $id_str = var_export($id, true);
+        $id = var_export($id, true);
 
-        return sprintf($this->prepare(self::BLOCK_VAR, $level), $id_str, $this->walk($nodes, 2));
+        return sprintf($this->prepare(self::BLOCK_VAR, $level), $id, $this->walk($nodes, 2));
     }
 
     const BLOCK_ARG = '
@@ -280,13 +280,6 @@ class Mustache_Compiler
     private function blockArg($nodes, $id, $start, $end, $otag, $ctag, $level)
     {
         $key = $this->section($nodes, $id, $start, $end, $otag, $ctag, $level, true);
-        $filters = '';
-
-        if (isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS])) {
-            list($id, $filters) = $this->getFilters($id, $level);
-        }
-
-        $method   = $this->getFindMethod($id);
         $id       = var_export($id, true);
 
         return sprintf($this->prepare(self::BLOCK_ARG, $level), $id, $key, $id, $this->flushIndent());
