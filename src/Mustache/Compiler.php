@@ -609,9 +609,9 @@ class Mustache_Compiler
     {
         if ($this->customEscape) {
             return sprintf(self::CUSTOM_ESCAPE, $value);
-        } else {
-            return sprintf(self::DEFAULT_ESCAPE, $value, var_export($this->entityFlags, true), var_export($this->charset, true));
         }
+
+        return sprintf(self::DEFAULT_ESCAPE, $value, var_export($this->entityFlags, true), var_export($this->charset, true));
     }
 
     /**
@@ -631,11 +631,13 @@ class Mustache_Compiler
     {
         if ($id === '.') {
             return 'last';
-        } elseif (strpos($id, '.') === false) {
-            return 'find';
-        } else {
-            return 'findDot';
         }
+
+        if (strpos($id, '.') === false) {
+            return 'find';
+        }
+
+        return 'findDot';
     }
 
     const IS_CALLABLE        = '!is_string(%s) && is_callable(%s)';
