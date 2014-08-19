@@ -600,7 +600,7 @@ class Mustache_Engine
             $this->entityFlags,
             $this->charset,
             $this->strictCallables ? 'true' : 'false',
-            implode(' ', array_keys($this->pragmas)),
+            implode(' ', $this->getPragmas()),
             $source
         ));
     }
