@@ -35,7 +35,7 @@ class Mustache_Test_HelperCollectionTest extends PHPUnit_Framework_TestCase
         $foo = array($this, 'getFoo');
         $bar = 'BAR';
 
-        $helpers = new Mustache_HelperCollection;
+        $helpers = new Mustache_HelperCollection();
         $this->assertTrue($helpers->isEmpty());
         $this->assertFalse($helpers->has('foo'));
         $this->assertFalse($helpers->has('bar'));
@@ -61,7 +61,7 @@ class Mustache_Test_HelperCollectionTest extends PHPUnit_Framework_TestCase
         $foo = array($this, 'getFoo');
         $bar = 'BAR';
 
-        $helpers = new Mustache_HelperCollection;
+        $helpers = new Mustache_HelperCollection();
         $this->assertTrue($helpers->isEmpty());
         $this->assertFalse($helpers->has('foo'));
         $this->assertFalse($helpers->has('bar'));

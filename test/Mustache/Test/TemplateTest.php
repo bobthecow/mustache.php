@@ -16,7 +16,7 @@ class Mustache_Test_TemplateTest extends PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $mustache = new Mustache_Engine;
+        $mustache = new Mustache_Engine();
         $template = new Mustache_Test_TemplateStub($mustache);
         $this->assertSame($mustache, $template->getMustache());
     }
@@ -24,10 +24,10 @@ class Mustache_Test_TemplateTest extends PHPUnit_Framework_TestCase
     public function testRendering()
     {
         $rendered = '<< wheee >>';
-        $mustache = new Mustache_Engine;
+        $mustache = new Mustache_Engine();
         $template = new Mustache_Test_TemplateStub($mustache);
         $template->rendered = $rendered;
-        $context  = new Mustache_Context;
+        $context  = new Mustache_Context();
 
         if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
             $this->assertEquals($rendered, $template());

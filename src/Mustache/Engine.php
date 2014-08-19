@@ -278,7 +278,7 @@ class Mustache_Engine
     public function getLoader()
     {
         if (!isset($this->loader)) {
-            $this->loader = new Mustache_Loader_StringLoader;
+            $this->loader = new Mustache_Loader_StringLoader();
         }
 
         return $this->loader;
@@ -305,7 +305,7 @@ class Mustache_Engine
     public function getPartialsLoader()
     {
         if (!isset($this->partialsLoader)) {
-            $this->partialsLoader = new Mustache_Loader_ArrayLoader;
+            $this->partialsLoader = new Mustache_Loader_ArrayLoader();
         }
 
         return $this->partialsLoader;
@@ -321,7 +321,7 @@ class Mustache_Engine
     public function setPartials(array $partials = array())
     {
         if (!isset($this->partialsLoader)) {
-            $this->partialsLoader = new Mustache_Loader_ArrayLoader;
+            $this->partialsLoader = new Mustache_Loader_ArrayLoader();
         }
 
         if (!$this->partialsLoader instanceof Mustache_Loader_MutableLoader) {
@@ -365,7 +365,7 @@ class Mustache_Engine
     public function getHelpers()
     {
         if (!isset($this->helpers)) {
-            $this->helpers = new Mustache_HelperCollection;
+            $this->helpers = new Mustache_HelperCollection();
         }
 
         return $this->helpers;
@@ -474,7 +474,7 @@ class Mustache_Engine
     public function getTokenizer()
     {
         if (!isset($this->tokenizer)) {
-            $this->tokenizer = new Mustache_Tokenizer;
+            $this->tokenizer = new Mustache_Tokenizer();
         }
 
         return $this->tokenizer;
@@ -500,7 +500,7 @@ class Mustache_Engine
     public function getParser()
     {
         if (!isset($this->parser)) {
-            $this->parser = new Mustache_Parser;
+            $this->parser = new Mustache_Parser();
         }
 
         return $this->parser;
@@ -526,7 +526,7 @@ class Mustache_Engine
     public function getCompiler()
     {
         if (!isset($this->compiler)) {
-            $this->compiler = new Mustache_Compiler;
+            $this->compiler = new Mustache_Compiler();
         }
 
         return $this->compiler;

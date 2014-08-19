@@ -19,7 +19,7 @@ class Mustache_Test_FiveThree_Functional_LambdaHelperTest extends PHPUnit_Framew
 
     public function setUp()
     {
-        $this->mustache = new Mustache_Engine;
+        $this->mustache = new Mustache_Engine();
     }
 
     public function testSectionLambdaHelper()
@@ -27,7 +27,7 @@ class Mustache_Test_FiveThree_Functional_LambdaHelperTest extends PHPUnit_Framew
         $one = $this->mustache->loadTemplate('{{name}}');
         $two = $this->mustache->loadTemplate('{{#lambda}}{{name}}{{/lambda}}');
 
-        $foo = new StdClass;
+        $foo = new StdClass();
         $foo->name = 'Mario';
         $foo->lambda = function ($text, $mustache) {
             return strtoupper($mustache->render($text));
