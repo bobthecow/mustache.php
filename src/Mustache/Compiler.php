@@ -154,24 +154,16 @@ class Mustache_Compiler
                     );
                     break;
 
+                case Mustache_Tokenizer::T_COMMENT:
+                    break;
+
+                case Mustache_Tokenizer::T_ESCAPED:
                 case Mustache_Tokenizer::T_UNESCAPED:
                 case Mustache_Tokenizer::T_UNESCAPED_2:
                     $code .= $this->variable(
                         $node[Mustache_Tokenizer::NAME],
                         isset($node[Mustache_Tokenizer::FILTERS]) ? $node[Mustache_Tokenizer::FILTERS] : array(),
-                        false,
-                        $level
-                    );
-                    break;
-
-                case Mustache_Tokenizer::T_COMMENT:
-                    break;
-
-                case Mustache_Tokenizer::T_ESCAPED:
-                    $code .= $this->variable(
-                        $node[Mustache_Tokenizer::NAME],
-                        isset($node[Mustache_Tokenizer::FILTERS]) ? $node[Mustache_Tokenizer::FILTERS] : array(),
-                        true,
+                        $node[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_ESCAPED,
                         $level
                     );
                     break;
