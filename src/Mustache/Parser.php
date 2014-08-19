@@ -286,9 +286,9 @@ class Mustache_Parser
      * @param string $name
      *
      * @return array {
-     * @type string   Tag name
-     * @type string[] Array of filters
-     *               }
+     *     @type string   Tag name
+     *     @type string[] Array of filters
+     * }
      */
     private function getNameAndFilters($name)
     {
