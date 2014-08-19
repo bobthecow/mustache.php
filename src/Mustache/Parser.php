@@ -21,6 +21,9 @@ class Mustache_Parser
     private $pragmas;
     private $defaultPragmas = array();
 
+    private $pragmaFilters;
+    private $pragmaBlocks;
+
     /**
      * Process an array of Mustache tokens and convert them into a parse tree.
      *
@@ -34,6 +37,9 @@ class Mustache_Parser
         $this->lineTokens = 0;
         $this->pragmas    = $this->defaultPragmas;
 
+        $this->pragmaFilters = isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS]);
+        $this->pragmaBlocks  = isset($this->pragmas[Mustache_Engine::PRAGMA_BLOCKS]);
+
         return $this->buildTree($tokens);
     }
 
@@ -43,13 +49,13 @@ class Mustache_Parser
      *
      * @internal Users should set global pragmas in Mustache_Engine, not here :)
      *
-     * @param array $pragmas
+     * @param string[] $pragmas
      */
     public function setPragmas(array $pragmas)
     {
         $this->pragmas = array();
         foreach ($pragmas as $pragma) {
-            $this->pragmas[$pragma] = true;
+            $this->enablePragma($pragma);
         }
         $this->defaultPragmas = $this->pragmas;
     }
@@ -76,6 +82,14 @@ class Mustache_Parser
             } else {
                 $this->lineNum    = $token[Mustache_Tokenizer::LINE];
                 $this->lineTokens = 0;
+            }
+
+            if ($this->pragmaFilters && isset($token[Mustache_Tokenizer::NAME])) {
+                list($name, $filters) = $this->getNameAndFilters($token[Mustache_Tokenizer::NAME]);
+                if (!empty($filters)) {
+                    $token[Mustache_Tokenizer::NAME]    = $name;
+                    $token[Mustache_Tokenizer::FILTERS] = $filters;
+                }
             }
 
             switch ($token[Mustache_Tokenizer::TYPE]) {
@@ -133,7 +147,7 @@ class Mustache_Parser
                     break;
 
                 case Mustache_Tokenizer::T_BLOCK_VAR:
-                    if (isset($this->pragmas[Mustache_Engine::PRAGMA_BLOCKS])) {
+                    if ($this->pragmaBlocks) {
                         // BLOCKS pragma is enabled, let's do this!
                         if ($parent[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_PARENT) {
                             $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_BLOCK_ARG;
@@ -150,7 +164,7 @@ class Mustache_Parser
                     break;
 
                 case Mustache_Tokenizer::T_PRAGMA:
-                    $this->pragmas[$token[Mustache_Tokenizer::NAME]] = true;
+                    $this->enablePragma($token[Mustache_Tokenizer::NAME]);
                     // no break
 
                 case Mustache_Tokenizer::T_COMMENT:
@@ -184,7 +198,7 @@ class Mustache_Parser
      * @param array $nodes  Parsed nodes.
      * @param array $tokens Tokens to be parsed.
      *
-     * @return array Resulting indent token, if any.
+     * @return array|null Resulting indent token, if any.
      */
     private function clearStandaloneLines(array &$nodes, array &$tokens)
     {
@@ -263,6 +277,44 @@ class Mustache_Parser
     {
         if ($parent[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_PARENT) {
             throw new Mustache_Exception_SyntaxException('Illegal content in < parent tag', $token);
+        }
+    }
+
+    /**
+     * Split a tag name into name and filters.
+     *
+     * @param string $name
+     *
+     * @return array {
+     * @type string   Tag name
+     * @type string[] Array of filters
+     *               }
+     */
+    private function getNameAndFilters($name)
+    {
+        $filters = array_map('trim', explode('|', $name));
+        $name    = array_shift($filters);
+
+        return array($name, $filters);
+    }
+
+    /**
+     * Enable a pragma.
+     *
+     * @param string $name
+     */
+    private function enablePragma($name)
+    {
+        $this->pragmas[$name] = true;
+
+        switch ($name) {
+            case Mustache_Engine::PRAGMA_BLOCKS:
+                $this->pragmaBlocks = true;
+                break;
+
+            case Mustache_Engine::PRAGMA_FILTERS:
+                $this->pragmaFilters = true;
+                break;
         }
     }
 }

@@ -61,16 +61,17 @@ class Mustache_Tokenizer
     );
 
     // Token properties
-    const TYPE   = 'type';
-    const NAME   = 'name';
-    const OTAG   = 'otag';
-    const CTAG   = 'ctag';
-    const LINE   = 'line';
-    const INDEX  = 'index';
-    const END    = 'end';
-    const INDENT = 'indent';
-    const NODES  = 'nodes';
-    const VALUE  = 'value';
+    const TYPE    = 'type';
+    const NAME    = 'name';
+    const OTAG    = 'otag';
+    const CTAG    = 'ctag';
+    const LINE    = 'line';
+    const INDEX   = 'index';
+    const END     = 'end';
+    const INDENT  = 'indent';
+    const NODES   = 'nodes';
+    const VALUE   = 'value';
+    const FILTERS = 'filters';
 
     private $state;
     private $tagType;
