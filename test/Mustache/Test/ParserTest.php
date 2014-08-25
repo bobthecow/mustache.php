@@ -149,6 +149,42 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
                     ),
                 ),
             ),
+
+            array(
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_TEXT,
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::VALUE => "  ",
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_DELIM_CHANGE,
+                        Mustache_Tokenizer::LINE => 0,
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_TEXT,
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::VALUE => "  \n",
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME => 'foo',
+                        Mustache_Tokenizer::OTAG => '[[',
+                        Mustache_Tokenizer::CTAG => ']]',
+                        Mustache_Tokenizer::LINE => 1,
+                    ),
+                ),
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME => 'foo',
+                        Mustache_Tokenizer::OTAG => '[[',
+                        Mustache_Tokenizer::CTAG => ']]',
+                        Mustache_Tokenizer::LINE => 1,
+                    ),
+                ),
+            ),
+
         );
     }
 
