@@ -5,13 +5,15 @@
 
  1. [Fork the repo on GitHub](https://github.com/bobthecow/mustache.php).
 
- 2. Run the test suite. We only take pull requests with passing tests, and it's great to know that you have a clean slate. Make sure you have PHPUnit 3.5+, then run `phpunit` from the project directory.
+ 2. Update submodules: `git submodule update --init`
 
- 3. Add tests for your change. Only refactoring and documentation changes require no new tests. If you are adding functionality or fixing a bug, add a test!
+ 3. Run the test suite. We only take pull requests with passing tests, and it's great to know that you have a clean slate. Make sure you have PHPUnit 3.5+, then run `phpunit` from the project directory.
 
- 4. Make the tests pass.
+ 4. Add tests for your change. Only refactoring and documentation changes require no new tests. If you are adding functionality or fixing a bug, add a test!
 
- 5. Push your fork to GitHub and submit a pull request against the `dev` branch.
+ 5. Make the tests pass.
+
+ 6. Push your fork to GitHub and submit a pull request against the `dev` branch.
 
 
 ### You can do some things to increase the chance that your pull request is accepted the first time:

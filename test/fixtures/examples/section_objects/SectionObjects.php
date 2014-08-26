@@ -6,7 +6,7 @@ class SectionObjects
 
     public function middle()
     {
-        return new SectionObject;
+        return new SectionObject();
     }
 
     public $final = "Then, surprisingly, it worked the final time.";

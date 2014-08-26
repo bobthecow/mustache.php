@@ -63,7 +63,9 @@ abstract class Mustache_Template
      */
     public function render($context = array())
     {
-        return $this->renderInternal($this->prepareContextStack($context));
+        return $this->renderInternal(
+            $this->prepareContextStack($context)
+        );
     }
 
     /**
@@ -111,19 +113,22 @@ abstract class Mustache_Template
      */
     protected function isIterable($value)
     {
-        if (is_object($value)) {
-            return $value instanceof Traversable;
-        } elseif (is_array($value)) {
-            $i = 0;
-            foreach ($value as $k => $v) {
-                if ($k !== $i++) {
-                    return false;
-                }
-            }
+        switch (gettype($value)) {
+            case 'object':
+                return $value instanceof Traversable;
 
-            return true;
-        } else {
-            return false;
+            case 'array':
+                $i = 0;
+                foreach ($value as $k => $v) {
+                    if ($k !== $i++) {
+                        return false;
+                    }
+                }
+
+                return true;
+
+            default:
+                return false;
         }
     }
 
@@ -138,7 +143,7 @@ abstract class Mustache_Template
      */
     protected function prepareContextStack($context = null)
     {
-        $stack = new Mustache_Context;
+        $stack = new Mustache_Context();
 
         $helpers = $this->mustache->getHelpers();
         if (!$helpers->isEmpty()) {

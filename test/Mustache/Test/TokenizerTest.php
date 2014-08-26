@@ -20,7 +20,7 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
      */
     public function testScan($text, $delimiters, $expected)
     {
-        $tokenizer = new Mustache_Tokenizer;
+        $tokenizer = new Mustache_Tokenizer();
         $this->assertSame($expected, $tokenizer->scan($text, $delimiters));
     }
 
@@ -29,7 +29,7 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
      */
     public function testUnevenBracesThrowExceptions()
     {
-        $tokenizer = new Mustache_Tokenizer;
+        $tokenizer = new Mustache_Tokenizer();
 
         $text = "{{{ name }}";
         $tokenizer->scan($text, null);
@@ -40,7 +40,7 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
      */
     public function testUnevenBracesWithCustomDelimiterThrowExceptions()
     {
-        $tokenizer = new Mustache_Tokenizer;
+        $tokenizer = new Mustache_Tokenizer();
 
         $text = "<%{ name %>";
         $tokenizer->scan($text, "<% %>");
@@ -270,6 +270,35 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::CTAG  => '%>',
                         Mustache_Tokenizer::LINE  => 0,
                         Mustache_Tokenizer::INDEX => 9,
+                    )
+                )
+            ),
+
+            // Ensure that $arg token is not picked up during tokenization
+            array(
+                '{{$arg}}default{{/arg}}',
+                null,
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_BLOCK_VAR,
+                        Mustache_Tokenizer::NAME => 'arg',
+                        Mustache_Tokenizer::OTAG => '{{',
+                        Mustache_Tokenizer::CTAG => '}}',
+                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::INDEX => 8
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::VALUE => "default",
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_END_SECTION,
+                        Mustache_Tokenizer::NAME  => 'arg',
+                        Mustache_Tokenizer::OTAG  => '{{',
+                        Mustache_Tokenizer::CTAG  => '}}',
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::INDEX => 15,
                     )
                 )
             ),

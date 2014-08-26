@@ -18,6 +18,11 @@ class Mustache_Parser
 {
     private $lineNum;
     private $lineTokens;
+    private $pragmas;
+    private $defaultPragmas = array();
+
+    private $pragmaFilters;
+    private $pragmaBlocks;
 
     /**
      * Process an array of Mustache tokens and convert them into a parse tree.
@@ -30,8 +35,29 @@ class Mustache_Parser
     {
         $this->lineNum    = -1;
         $this->lineTokens = 0;
+        $this->pragmas    = $this->defaultPragmas;
+
+        $this->pragmaFilters = isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS]);
+        $this->pragmaBlocks  = isset($this->pragmas[Mustache_Engine::PRAGMA_BLOCKS]);
 
         return $this->buildTree($tokens);
+    }
+
+    /**
+     * Enable pragmas across all templates, regardless of the presence of pragma
+     * tags in the individual templates.
+     *
+     * @internal Users should set global pragmas in Mustache_Engine, not here :)
+     *
+     * @param string[] $pragmas
+     */
+    public function setPragmas(array $pragmas)
+    {
+        $this->pragmas = array();
+        foreach ($pragmas as $pragma) {
+            $this->enablePragma($pragma);
+        }
+        $this->defaultPragmas = $this->pragmas;
     }
 
     /**
@@ -58,13 +84,23 @@ class Mustache_Parser
                 $this->lineTokens = 0;
             }
 
+            if ($this->pragmaFilters && isset($token[Mustache_Tokenizer::NAME])) {
+                list($name, $filters) = $this->getNameAndFilters($token[Mustache_Tokenizer::NAME]);
+                if (!empty($filters)) {
+                    $token[Mustache_Tokenizer::NAME]    = $name;
+                    $token[Mustache_Tokenizer::FILTERS] = $filters;
+                }
+            }
+
             switch ($token[Mustache_Tokenizer::TYPE]) {
                 case Mustache_Tokenizer::T_DELIM_CHANGE:
+                    $this->checkIfTokenIsAllowedInParent($parent, $token);
                     $this->clearStandaloneLines($nodes, $tokens);
                     break;
 
                 case Mustache_Tokenizer::T_SECTION:
                 case Mustache_Tokenizer::T_INVERTED:
+                    $this->checkIfTokenIsAllowedInParent($parent, $token);
                     $this->clearStandaloneLines($nodes, $tokens);
                     $nodes[] = $this->buildTree($tokens, $token);
                     break;
@@ -97,15 +133,40 @@ class Mustache_Parser
                     return $parent;
 
                 case Mustache_Tokenizer::T_PARTIAL:
-                case Mustache_Tokenizer::T_PARTIAL_2:
-                    // store the whitespace prefix for laters!
+                    $this->checkIfTokenIsAllowedInParent($parent, $token);
+                    //store the whitespace prefix for laters!
                     if ($indent = $this->clearStandaloneLines($nodes, $tokens)) {
                         $token[Mustache_Tokenizer::INDENT] = $indent[Mustache_Tokenizer::VALUE];
                     }
                     $nodes[] = $token;
                     break;
 
+                case Mustache_Tokenizer::T_PARENT:
+                    $this->checkIfTokenIsAllowedInParent($parent, $token);
+                    $nodes[] = $this->buildTree($tokens, $token);
+                    break;
+
+                case Mustache_Tokenizer::T_BLOCK_VAR:
+                    if ($this->pragmaBlocks) {
+                        // BLOCKS pragma is enabled, let's do this!
+                        if ($parent[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_PARENT) {
+                            $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_BLOCK_ARG;
+                        }
+                        $this->clearStandaloneLines($nodes, $tokens);
+                        $nodes[] = $this->buildTree($tokens, $token);
+                    } else {
+                        // pretend this was just a normal "escaped" token...
+                        $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_ESCAPED;
+                        // TODO: figure out how to figure out if there was a space after this dollar:
+                        $token[Mustache_Tokenizer::NAME] = '$' . $token[Mustache_Tokenizer::NAME];
+                        $nodes[] = $token;
+                    }
+                    break;
+
                 case Mustache_Tokenizer::T_PRAGMA:
+                    $this->enablePragma($token[Mustache_Tokenizer::NAME]);
+                    // no break
+
                 case Mustache_Tokenizer::T_COMMENT:
                     $this->clearStandaloneLines($nodes, $tokens);
                     $nodes[] = $token;
@@ -137,7 +198,7 @@ class Mustache_Parser
      * @param array $nodes  Parsed nodes.
      * @param array $tokens Tokens to be parsed.
      *
-     * @return array Resulting indent token, if any.
+     * @return array|null Resulting indent token, if any.
      */
     private function clearStandaloneLines(array &$nodes, array &$tokens)
     {
@@ -197,10 +258,60 @@ class Mustache_Parser
      */
     private function tokenIsWhitespace(array $token)
     {
-        if ($token[Mustache_Tokenizer::TYPE] == Mustache_Tokenizer::T_TEXT) {
+        if ($token[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_TEXT) {
             return preg_match('/^\s*$/', $token[Mustache_Tokenizer::VALUE]);
         }
 
         return false;
+    }
+
+    /**
+     * Check whether a token is allowed inside a parent tag.
+     *
+     * @throws Mustache_Exception_SyntaxException if an invalid token is found inside a parent tag.
+     *
+     * @param array|null $parent
+     * @param array      $token
+     */
+    private function checkIfTokenIsAllowedInParent($parent, array $token)
+    {
+        if ($parent[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_PARENT) {
+            throw new Mustache_Exception_SyntaxException('Illegal content in < parent tag', $token);
+        }
+    }
+
+    /**
+     * Split a tag name into name and filters.
+     *
+     * @param string $name
+     *
+     * @return array [Tag name, Array of filters]
+     */
+    private function getNameAndFilters($name)
+    {
+        $filters = array_map('trim', explode('|', $name));
+        $name    = array_shift($filters);
+
+        return array($name, $filters);
+    }
+
+    /**
+     * Enable a pragma.
+     *
+     * @param string $name
+     */
+    private function enablePragma($name)
+    {
+        $this->pragmas[$name] = true;
+
+        switch ($name) {
+            case Mustache_Engine::PRAGMA_BLOCKS:
+                $this->pragmaBlocks = true;
+                break;
+
+            case Mustache_Engine::PRAGMA_FILTERS:
+                $this->pragmaFilters = true;
+                break;
+        }
     }
 }

@@ -19,14 +19,14 @@ class Mustache_Test_FiveThree_Functional_HigherOrderSectionsTest extends PHPUnit
 
     public function setUp()
     {
-        $this->mustache = new Mustache_Engine;
+        $this->mustache = new Mustache_Engine();
     }
 
     public function testAnonymousFunctionSectionCallback()
     {
         $tpl = $this->mustache->loadTemplate('{{#wrapper}}{{name}}{{/wrapper}}');
 
-        $foo = new Mustache_Test_FiveThree_Functional_Foo;
+        $foo = new Mustache_Test_FiveThree_Functional_Foo();
         $foo->name = 'Mario';
         $foo->wrapper = function ($text) {
             return sprintf('<div class="anonymous">%s</div>', $text);
@@ -40,7 +40,7 @@ class Mustache_Test_FiveThree_Functional_HigherOrderSectionsTest extends PHPUnit
         $one = $this->mustache->loadTemplate('{{name}}');
         $two = $this->mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
 
-        $foo = new Mustache_Test_FiveThree_Functional_Foo;
+        $foo = new Mustache_Test_FiveThree_Functional_Foo();
         $foo->name = 'Luigi';
 
         $this->assertEquals($foo->name, $one->render($foo));

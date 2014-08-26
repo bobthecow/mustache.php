@@ -16,7 +16,7 @@ class Mustache_Test_Logger_AbstractLoggerTest extends PHPUnit_Framework_TestCase
 {
     public function testEverything()
     {
-        $logger = new Mustache_Test_Logger_TestLogger;
+        $logger = new Mustache_Test_Logger_TestLogger();
 
         $logger->emergency('emergency message');
         $logger->alert('alert message');

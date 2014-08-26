@@ -23,7 +23,7 @@ class Mustache_Test_FiveThree_Functional_StrictCallablesTest extends PHPUnit_Fra
         $mustache = new Mustache_Engine(array('strict_callables' => $strict));
         $tpl      = $mustache->loadTemplate('{{# section }}{{ name }}{{/ section }}');
 
-        $data = new StdClass;
+        $data = new StdClass();
         $data->name    = $name;
         $data->section = $section;
 

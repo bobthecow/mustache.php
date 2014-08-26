@@ -20,7 +20,7 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
      */
     public function testCompile($source, array $tree, $name, $customEscaper, $entityFlags, $charset, $expected)
     {
-        $compiler = new Mustache_Compiler;
+        $compiler = new Mustache_Compiler();
 
         $compiled = $compiler->compile($source, $tree, $name, $customEscaper, $charset, false, $entityFlags);
         foreach ($expected as $contains) {
@@ -138,7 +138,7 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
      */
     public function testCompilerThrowsSyntaxException()
     {
-        $compiler = new Mustache_Compiler;
+        $compiler = new Mustache_Compiler();
         $compiler->compile('', array(array(Mustache_Tokenizer::TYPE => 'invalid')), 'SomeClass');
     }
 

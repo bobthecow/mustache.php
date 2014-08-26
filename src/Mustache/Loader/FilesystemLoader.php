@@ -49,7 +49,7 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
     {
         $this->baseDir = $baseDir;
 
-        if (strpos($this->baseDir, '://') === -1) {
+        if (strpos($this->baseDir, '://') === false) {
             $this->baseDir = realpath($this->baseDir);
         }
 

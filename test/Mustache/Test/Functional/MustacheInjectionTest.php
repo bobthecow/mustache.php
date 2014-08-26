@@ -20,7 +20,7 @@ class Mustache_Test_Functional_MustacheInjectionTest extends PHPUnit_Framework_T
 
     public function setUp()
     {
-        $this->mustache = new Mustache_Engine;
+        $this->mustache = new Mustache_Engine();
     }
 
     /**

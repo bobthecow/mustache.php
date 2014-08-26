@@ -23,10 +23,17 @@
  */
 class Mustache_Engine
 {
-    const VERSION        = '2.6.1';
+    const VERSION        = '2.7.0';
     const SPEC_VERSION   = '1.1.2';
 
     const PRAGMA_FILTERS = 'FILTERS';
+    const PRAGMA_BLOCKS  = 'BLOCKS';
+
+    // Known pragmas
+    private static $knownPragmas = array(
+        self::PRAGMA_FILTERS => true,
+        self::PRAGMA_BLOCKS  => true,
+    );
 
     // Template cache
     private $templates = array();
@@ -44,6 +51,7 @@ class Mustache_Engine
     private $charset = 'UTF-8';
     private $logger;
     private $strictCallables = false;
+    private $pragmas = array();
 
     // Services
     private $tokenizer;
@@ -110,6 +118,10 @@ class Mustache_Engine
      *         // helps protect against arbitrary code execution when user input is passed directly into the template.
      *         // This currently defaults to false, but will default to true in v3.0.
      *         'strict_callables' => true,
+     *
+     *         // Enable pragmas across all templates, regardless of the presence of pragma tags in the individual
+     *         // templates.
+     *         'pragmas' => [Mustache_Engine::PRAGMA_FILTERS],
      *     );
      *
      * @throws Mustache_Exception_InvalidArgumentException If `escape` option is not callable.
@@ -176,6 +188,15 @@ class Mustache_Engine
         if (isset($options['strict_callables'])) {
             $this->strictCallables = $options['strict_callables'];
         }
+
+        if (isset($options['pragmas'])) {
+            foreach ($options['pragmas'] as $pragma) {
+                if (!isset(self::$knownPragmas[$pragma])) {
+                    throw new Mustache_Exception_InvalidArgumentException(sprintf('Unknown pragma: "%s".', $pragma));
+                }
+                $this->pragmas[$pragma] = true;
+            }
+        }
     }
 
     /**
@@ -227,6 +248,16 @@ class Mustache_Engine
     }
 
     /**
+     * Get the current globally enabled pragmas.
+     *
+     * @return array
+     */
+    public function getPragmas()
+    {
+        return array_keys($this->pragmas);
+    }
+
+    /**
      * Set the Mustache template Loader instance.
      *
      * @param Mustache_Loader $loader
@@ -247,7 +278,7 @@ class Mustache_Engine
     public function getLoader()
     {
         if (!isset($this->loader)) {
-            $this->loader = new Mustache_Loader_StringLoader;
+            $this->loader = new Mustache_Loader_StringLoader();
         }
 
         return $this->loader;
@@ -274,7 +305,7 @@ class Mustache_Engine
     public function getPartialsLoader()
     {
         if (!isset($this->partialsLoader)) {
-            $this->partialsLoader = new Mustache_Loader_ArrayLoader;
+            $this->partialsLoader = new Mustache_Loader_ArrayLoader();
         }
 
         return $this->partialsLoader;
@@ -290,7 +321,7 @@ class Mustache_Engine
     public function setPartials(array $partials = array())
     {
         if (!isset($this->partialsLoader)) {
-            $this->partialsLoader = new Mustache_Loader_ArrayLoader;
+            $this->partialsLoader = new Mustache_Loader_ArrayLoader();
         }
 
         if (!$this->partialsLoader instanceof Mustache_Loader_MutableLoader) {
@@ -334,7 +365,7 @@ class Mustache_Engine
     public function getHelpers()
     {
         if (!isset($this->helpers)) {
-            $this->helpers = new Mustache_HelperCollection;
+            $this->helpers = new Mustache_HelperCollection();
         }
 
         return $this->helpers;
@@ -443,7 +474,7 @@ class Mustache_Engine
     public function getTokenizer()
     {
         if (!isset($this->tokenizer)) {
-            $this->tokenizer = new Mustache_Tokenizer;
+            $this->tokenizer = new Mustache_Tokenizer();
         }
 
         return $this->tokenizer;
@@ -469,7 +500,7 @@ class Mustache_Engine
     public function getParser()
     {
         if (!isset($this->parser)) {
-            $this->parser = new Mustache_Parser;
+            $this->parser = new Mustache_Parser();
         }
 
         return $this->parser;
@@ -495,7 +526,7 @@ class Mustache_Engine
     public function getCompiler()
     {
         if (!isset($this->compiler)) {
-            $this->compiler = new Mustache_Compiler;
+            $this->compiler = new Mustache_Compiler();
         }
 
         return $this->compiler;
@@ -563,12 +594,13 @@ class Mustache_Engine
     public function getTemplateClassName($source)
     {
         return $this->templateClassPrefix . md5(sprintf(
-            'version:%s,escape:%s,entity_flags:%i,charset:%s,strict_callables:%s,source:%s',
+            'version:%s,escape:%s,entity_flags:%i,charset:%s,strict_callables:%s,pragmas:%s,source:%s',
             self::VERSION,
             isset($this->escape) ? 'custom' : 'default',
             $this->entityFlags,
             $this->charset,
             $this->strictCallables ? 'true' : 'false',
+            implode(' ', $this->getPragmas()),
             $source
         ));
     }
@@ -705,7 +737,10 @@ class Mustache_Engine
      */
     private function parse($source)
     {
-        return $this->getParser()->parse($this->tokenize($source));
+        $parser = $this->getParser();
+        $parser->setPragmas($this->getPragmas());
+
+        return $parser->parse($this->tokenize($source));
     }
 
     /**
@@ -728,7 +763,10 @@ class Mustache_Engine
             array('className' => $name)
         );
 
-        return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables, $this->entityFlags);
+        $compiler = $this->getCompiler();
+        $compiler->setPragmas($this->getPragmas());
+
+        return $compiler->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables, $this->entityFlags);
     }
 
     /**
