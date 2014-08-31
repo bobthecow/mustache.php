@@ -75,7 +75,6 @@ class Mustache_Tokenizer
 
     private $state;
     private $tagType;
-    private $tag;
     private $buffer;
     private $tokens;
     private $seenTag;
@@ -224,7 +223,6 @@ class Mustache_Tokenizer
     {
         $this->state   = self::IN_TEXT;
         $this->tagType = null;
-        $this->tag     = null;
         $this->buffer  = '';
         $this->tokens  = array();
         $this->seenTag = false;
