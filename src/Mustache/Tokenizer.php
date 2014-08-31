@@ -53,13 +53,6 @@ class Mustache_Tokenizer
         self::T_BLOCK_VAR    => true,
     );
 
-    // Interpolated tags
-    private static $interpolatedTags = array(
-        self::T_ESCAPED     => true,
-        self::T_UNESCAPED   => true,
-        self::T_UNESCAPED_2 => true,
-    );
-
     // Token properties
     const TYPE    = 'type';
     const NAME    = 'name';
