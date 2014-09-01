@@ -174,7 +174,7 @@ class Mustache_Engine
         }
 
         if (isset($options['entity_flags'])) {
-          $this->entityFlags = $options['entity_flags'];
+            $this->entityFlags = $options['entity_flags'];
         }
 
         if (isset($options['charset'])) {
