@@ -15,7 +15,6 @@
  */
 class Mustache_Test_Functional_MustacheInjectionTest extends PHPUnit_Framework_TestCase
 {
-
     private $mustache;
 
     public function setUp()

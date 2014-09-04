@@ -16,7 +16,6 @@
  */
 class Mustache_Compiler
 {
-
     private $pragmas;
     private $defaultPragmas = array();
     private $sections;

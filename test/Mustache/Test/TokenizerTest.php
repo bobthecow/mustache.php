@@ -14,7 +14,6 @@
  */
 class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
 {
-
     /**
      * @dataProvider getTokens
      */

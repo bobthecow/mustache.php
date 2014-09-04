@@ -15,7 +15,6 @@
  */
 class Mustache_Test_Functional_ExamplesTest extends PHPUnit_Framework_TestCase
 {
-
     /**
      * Test everything in the `examples` directory.
      *
