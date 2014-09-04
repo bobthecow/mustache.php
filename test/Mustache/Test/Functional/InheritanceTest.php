@@ -144,7 +144,6 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         );
 
         $this->assertEquals('default three content', $tpl->render($data));
-
     }
 
     public function testMustacheInjectionInDefaultContent()
@@ -251,7 +250,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
 
     public function testOverridePartialWithNewlines()
     {
-         $partials = array(
+        $partials = array(
             'partial' => '{{$ballmer}}peaking{{/ballmer}}'
         );
 

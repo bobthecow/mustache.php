@@ -2,7 +2,6 @@
 
 class I18n
 {
-
     // Variable to be interpolated
     public $name = 'Bob';
 

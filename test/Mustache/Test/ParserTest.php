@@ -14,7 +14,6 @@
  */
 class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
 {
-
     /**
      * @dataProvider getTokenSets
      */
