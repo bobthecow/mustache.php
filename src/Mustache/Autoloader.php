@@ -24,7 +24,7 @@ class Mustache_Autoloader
     public function __construct($baseDir = null)
     {
         if ($baseDir === null) {
-            $baseDir = dirname(__FILE__).'/..';
+            $baseDir = dirname(__FILE__) . '/..';
         }
 
         // realpath doesn't always work, for example, with stream URIs

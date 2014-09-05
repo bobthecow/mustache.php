@@ -252,7 +252,7 @@ class Mustache_Tokenizer
     private function changeDelimiters($text, $index)
     {
         $startIndex = strpos($text, '=', $index) + 1;
-        $close      = '='.$this->ctag;
+        $close      = '=' . $this->ctag;
         $closeIndex = strpos($text, $close, $index);
 
         $this->setDelimiters(trim(substr($text, $startIndex, $closeIndex - $startIndex)));

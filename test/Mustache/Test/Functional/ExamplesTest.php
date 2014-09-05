@@ -46,7 +46,7 @@ class Mustache_Test_Functional_ExamplesTest extends PHPUnit_Framework_TestCase
      */
     public function getExamples()
     {
-        $path     = realpath(dirname(__FILE__).'/../../../fixtures/examples');
+        $path     = realpath(dirname(__FILE__) . '/../../../fixtures/examples');
         $examples = array();
 
         $handle   = opendir($path);
@@ -55,7 +55,7 @@ class Mustache_Test_Functional_ExamplesTest extends PHPUnit_Framework_TestCase
                 continue;
             }
 
-            $fullpath = $path.'/'.$file;
+            $fullpath = $path . '/' . $file;
             if (is_dir($fullpath)) {
                 $examples[$file] = $this->loadExample($fullpath);
             }
@@ -81,7 +81,7 @@ class Mustache_Test_Functional_ExamplesTest extends PHPUnit_Framework_TestCase
 
         $handle = opendir($path);
         while (($file = readdir($handle)) !== false) {
-            $fullpath = $path.'/'.$file;
+            $fullpath = $path . '/' . $file;
             $info = pathinfo($fullpath);
 
             if (is_dir($fullpath) && $info['basename'] == 'partials') {
@@ -128,7 +128,7 @@ class Mustache_Test_Functional_ExamplesTest extends PHPUnit_Framework_TestCase
                 continue;
             }
 
-            $fullpath = $path.'/'.$file;
+            $fullpath = $path . '/' . $file;
             $info = pathinfo($fullpath);
 
             if ($info['extension'] === 'mustache') {
