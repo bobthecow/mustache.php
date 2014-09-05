@@ -29,7 +29,7 @@ abstract class Mustache_Test_FunctionalTestCase extends PHPUnit_Framework_TestCa
         $path = rtrim($path, '/') . '/';
         $handle = opendir($path);
         while (($file = readdir($handle)) !== false) {
-            if ($file == '.' || $file == '..') {
+            if ($file === '.' || $file === '..') {
                 continue;
             }
 

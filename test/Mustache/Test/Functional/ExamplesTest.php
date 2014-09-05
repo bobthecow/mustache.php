@@ -51,7 +51,7 @@ class Mustache_Test_Functional_ExamplesTest extends PHPUnit_Framework_TestCase
 
         $handle   = opendir($path);
         while (($file = readdir($handle)) !== false) {
-            if ($file == '.' || $file == '..') {
+            if ($file === '.' || $file === '..') {
                 continue;
             }
 
@@ -84,7 +84,7 @@ class Mustache_Test_Functional_ExamplesTest extends PHPUnit_Framework_TestCase
             $fullpath = $path . '/' . $file;
             $info = pathinfo($fullpath);
 
-            if (is_dir($fullpath) && $info['basename'] == 'partials') {
+            if (is_dir($fullpath) && $info['basename'] === 'partials') {
                 // load partials
                 $partials = $this->loadPartials($fullpath);
             } elseif (is_file($fullpath)) {
@@ -124,7 +124,7 @@ class Mustache_Test_Functional_ExamplesTest extends PHPUnit_Framework_TestCase
 
         $handle = opendir($path);
         while (($file = readdir($handle)) !== false) {
-            if ($file == '.' || $file == '..') {
+            if ($file === '.' || $file === '..') {
                 continue;
             }
 
