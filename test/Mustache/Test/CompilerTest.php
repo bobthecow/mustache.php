@@ -76,7 +76,7 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
                 array(
                     "\nclass Monkey extends Mustache_Template",
                     '$value = $this->resolveValue($context->find(\'name\'), $context, $indent);',
-                    '$buffer .= $indent . htmlspecialchars($value, '.ENT_COMPAT.', \'ISO-8859-1\');',
+                    '$buffer .= $indent . htmlspecialchars($value, ' . ENT_COMPAT . ', \'ISO-8859-1\');',
                     'return $buffer;',
                 )
             ),
@@ -96,7 +96,7 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
                 array(
                     "\nclass Monkey extends Mustache_Template",
                     '$value = $this->resolveValue($context->find(\'name\'), $context, $indent);',
-                    '$buffer .= $indent . htmlspecialchars($value, '.ENT_QUOTES.', \'ISO-8859-1\');',
+                    '$buffer .= $indent . htmlspecialchars($value, ' . ENT_QUOTES . ', \'ISO-8859-1\');',
                     'return $buffer;',
                 )
             ),
@@ -123,7 +123,7 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
                     "\nclass Monkey extends Mustache_Template",
                     "\$buffer .= \$indent . 'foo\n';",
                     '$value = $this->resolveValue($context->find(\'name\'), $context, $indent);',
-                    '$buffer .= htmlspecialchars($value, '.ENT_COMPAT.', \'UTF-8\');',
+                    '$buffer .= htmlspecialchars($value, ' . ENT_COMPAT . ', \'UTF-8\');',
                     '$value = $this->resolveValue($context->last(), $context, $indent);',
                     '$buffer .= \'\\\'bar\\\'\';',
                     'return $buffer;',

@@ -237,7 +237,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
 
     public static function wrapWithUnderscores($text)
     {
-        return '__'.$text.'__';
+        return '__' . $text . '__';
     }
 
     /**

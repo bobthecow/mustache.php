@@ -341,12 +341,12 @@ class Mustache_Compiler
         $callable = $this->getCallable();
 
         if ($otag !== '{{' || $ctag !== '}}') {
-            $delims = ', '.var_export(sprintf('{{= %s %s =}}', $otag, $ctag), true);
+            $delims = ', ' . var_export(sprintf('{{= %s %s =}}', $otag, $ctag), true);
         } else {
             $delims = '';
         }
 
-        $key = ucfirst(md5($delims."\n".$source));
+        $key = ucfirst(md5($delims . "\n" . $source));
 
         if (!isset($this->sections[$key])) {
             $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $callable, $source, $delims, $this->walk($nodes, 2));
@@ -552,7 +552,7 @@ class Mustache_Compiler
      */
     private function prepare($text, $bonus = 0, $prependNewline = true, $appendNewline = false)
     {
-        $text = ($prependNewline ? "\n" : '').trim($text);
+        $text = ($prependNewline ? "\n" : '') . trim($text);
         if ($prependNewline) {
             $bonus++;
         }
@@ -560,7 +560,7 @@ class Mustache_Compiler
             $text .= "\n";
         }
 
-        return preg_replace("/\n( {8})?/", "\n".str_repeat(" ", $bonus * 4), $text);
+        return preg_replace("/\n( {8})?/", "\n" . str_repeat(" ", $bonus * 4), $text);
     }
 
     const DEFAULT_ESCAPE = 'htmlspecialchars(%s, %s, %s)';
