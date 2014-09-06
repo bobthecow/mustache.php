@@ -24,7 +24,7 @@ $fixers = array_merge(
     $fixers[FixerInterface::PSR1_LEVEL],
     $fixers[FixerInterface::PSR2_LEVEL],
     $fixers[FixerInterface::ALL_LEVEL],
-    array('concat_with_spaces', 'ordered_use', 'strict')
+    array('concat_with_spaces', 'strict')
 );
 
 $config = new Config();
