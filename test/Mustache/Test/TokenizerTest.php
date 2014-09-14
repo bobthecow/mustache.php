@@ -83,8 +83,8 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::CTAG  => '}}',
                         Mustache_Tokenizer::LINE  => 0,
                         Mustache_Tokenizer::INDEX => 10,
-                    )
-                )
+                    ),
+                ),
             ),
 
             array(
@@ -110,8 +110,8 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::CTAG  => '>>>',
                         Mustache_Tokenizer::LINE  => 0,
                         Mustache_Tokenizer::INDEX => 12,
-                    )
-                )
+                    ),
+                ),
             ),
 
             array(
@@ -178,7 +178,7 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::INDEX => 51,
                     ),
 
-                )
+                ),
             ),
 
             // See https://github.com/bobthecow/mustache.php/issues/183
@@ -207,7 +207,7 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::LINE  => 0,
                         Mustache_Tokenizer::INDEX => 9,
                     ),
-                )
+                ),
             ),
 
             // custom delimiters don't swallow the next character, even if it is a }, }}}, or the same delimiter
@@ -254,7 +254,7 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::LINE  => 0,
                         Mustache_Tokenizer::VALUE => "}}}",
                     ),
-                )
+                ),
             ),
 
             // unescaped custom delimiters are properly parsed
@@ -269,8 +269,8 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::CTAG  => '%>',
                         Mustache_Tokenizer::LINE  => 0,
                         Mustache_Tokenizer::INDEX => 9,
-                    )
-                )
+                    ),
+                ),
             ),
 
             // Ensure that $arg token is not picked up during tokenization
@@ -284,7 +284,7 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::OTAG => '{{',
                         Mustache_Tokenizer::CTAG => '}}',
                         Mustache_Tokenizer::LINE => 0,
-                        Mustache_Tokenizer::INDEX => 8
+                        Mustache_Tokenizer::INDEX => 8,
                     ),
                     array(
                         Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
@@ -298,8 +298,8 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::CTAG  => '}}',
                         Mustache_Tokenizer::LINE  => 0,
                         Mustache_Tokenizer::INDEX => 15,
-                    )
-                )
+                    ),
+                ),
             ),
         );
     }

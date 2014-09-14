@@ -22,7 +22,7 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
 
         $two = new Mustache_Context(array(
             'foo' => 'FOO',
-            'bar' => '<BAR>'
+            'bar' => '<BAR>',
         ));
         $this->assertEquals('FOO', $two->find('foo'));
         $this->assertEquals('<BAR>', $two->find('bar'));

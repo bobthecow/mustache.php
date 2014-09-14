@@ -47,14 +47,14 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
                 '{{% FILTERS }}{{ date | longdate }}',
                 $helpers,
                 (object) array('date' => new DateTime('1/1/2000', new DateTimeZone("UTC"))),
-                '2000-01-01 12:01:00'
+                '2000-01-01 12:01:00',
             ),
 
             array(
                 '{{% FILTERS }}{{# word | echo }}{{ . }}!{{/ word | echo }}',
                 $helpers,
                 array('word' => 'bacon'),
-                'bacon!bacon!bacon!'
+                'bacon!bacon!bacon!',
             ),
         );
     }

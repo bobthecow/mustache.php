@@ -21,7 +21,7 @@ class Mustache_Test_Functional_NestedPartialIndentTest extends PHPUnit_Framework
     public function testNestedPartialsAreIndentedProperly($src, array $partials, $expected)
     {
         $m = new Mustache_Engine(array(
-            'partials' => $partials
+            'partials' => $partials,
         ));
         $tpl = $m->loadTemplate($src);
         $this->assertEquals($expected, $tpl->render());

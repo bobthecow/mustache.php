@@ -8,7 +8,7 @@ class DotNotation
         'hometown' => array(
             'city'  => 'Cincinnati',
             'state' => 'OH',
-        )
+        ),
     );
 
     public $normal = 'Normal';

@@ -134,7 +134,7 @@ class Mustache_Test_Logger_StreamLoggerTest extends PHPUnit_Framework_TestCase
                 Mustache_Logger::ERROR,
                 'error message',
                 array('name' => 'foo', 'number' => 42),
-                "ERROR: error message\n"
+                "ERROR: error message\n",
             ),
 
             // with interpolation
@@ -142,7 +142,7 @@ class Mustache_Test_Logger_StreamLoggerTest extends PHPUnit_Framework_TestCase
                 Mustache_Logger::ERROR,
                 'error {name}-{number}',
                 array('name' => 'foo', 'number' => 42),
-                "ERROR: error foo-42\n"
+                "ERROR: error foo-42\n",
             ),
 
             // with iterpolation false positive
@@ -150,7 +150,7 @@ class Mustache_Test_Logger_StreamLoggerTest extends PHPUnit_Framework_TestCase
                 Mustache_Logger::ERROR,
                 'error {nothing}',
                 array('name' => 'foo', 'number' => 42),
-                "ERROR: error {nothing}\n"
+                "ERROR: error {nothing}\n",
             ),
 
             // with interpolation injection
@@ -158,7 +158,7 @@ class Mustache_Test_Logger_StreamLoggerTest extends PHPUnit_Framework_TestCase
                 Mustache_Logger::ERROR,
                 '{foo}',
                 array('foo' => '{bar}', 'bar' => 'FAIL'),
-                "ERROR: {bar}\n"
+                "ERROR: {bar}\n",
             ),
         );
     }

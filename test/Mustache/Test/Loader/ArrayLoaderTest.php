@@ -17,7 +17,7 @@ class Mustache_Test_Loader_ArrayLoaderTest extends PHPUnit_Framework_TestCase
     public function testConstructor()
     {
         $loader = new Mustache_Loader_ArrayLoader(array(
-            'foo' => 'bar'
+            'foo' => 'bar',
         ));
 
         $this->assertEquals('bar', $loader->load('foo'));
@@ -26,7 +26,7 @@ class Mustache_Test_Loader_ArrayLoaderTest extends PHPUnit_Framework_TestCase
     public function testSetAndLoadTemplates()
     {
         $loader = new Mustache_Loader_ArrayLoader(array(
-            'foo' => 'bar'
+            'foo' => 'bar',
         ));
         $this->assertEquals('bar', $loader->load('foo'));
 

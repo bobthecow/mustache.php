@@ -16,7 +16,7 @@ class MagicObject
 {
     protected $_data = array(
         'foo' => 'And it worked the second time.',
-        'bar' => 'As well as the third.'
+        'bar' => 'As well as the third.',
     );
 
     public function __get($key)
