@@ -155,7 +155,7 @@ class Mustache_Tokenizer
                             self::OTAG  => $this->otag,
                             self::CTAG  => $this->ctag,
                             self::LINE  => $this->line,
-                            self::INDEX => ($this->tagType === self::T_END_SECTION) ? $this->seenTag - $this->otagLen : $i + $this->ctagLen
+                            self::INDEX => ($this->tagType === self::T_END_SECTION) ? $this->seenTag - $this->otagLen : $i + $this->ctagLen,
                         );
 
                         if ($this->tagType === self::T_UNESCAPED) {
@@ -235,7 +235,7 @@ class Mustache_Tokenizer
             $this->tokens[] = array(
                 self::TYPE  => self::T_TEXT,
                 self::LINE  => $this->line,
-                self::VALUE => $this->buffer
+                self::VALUE => $this->buffer,
             );
             $this->buffer   = '';
         }

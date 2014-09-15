@@ -151,7 +151,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
     public function testWithoutLambdaCache()
     {
         $mustache = new MustacheStub(array(
-            'cache' => self::$tempDir
+            'cache' => self::$tempDir,
         ));
 
         $this->assertInstanceOf('Mustache_Cache_NoopCache', $mustache->getProtectedLambdaCache());
@@ -193,7 +193,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
             'partials_loader' => new Mustache_Loader_ArrayLoader(array(
                 'foo' => 'FOO',
                 'baz' => 'BAZ',
-            ))
+            )),
         ));
 
         $this->assertEquals('FOOBAZ', $mustache->render('{{>foo}}{{>bar}}{{>baz}}', array()));
@@ -327,7 +327,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
     public function testUnknownPragmaThrowsException()
     {
         new Mustache_Engine(array(
-            'pragmas' => array('UNKNOWN')
+            'pragmas' => array('UNKNOWN'),
         ));
     }
 
@@ -335,7 +335,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
     {
         $name     = tempnam(sys_get_temp_dir(), 'mustache-test');
         $mustache = new Mustache_Engine(array(
-            'logger' => new Mustache_Logger_StreamLogger($name, $level)
+            'logger' => new Mustache_Logger_StreamLogger($name, $level),
         ));
 
         return array($name, $mustache);

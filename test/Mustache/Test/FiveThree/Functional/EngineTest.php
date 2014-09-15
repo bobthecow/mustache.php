@@ -33,7 +33,7 @@ class Mustache_Test_FiveThree_Functional_EngineTest extends PHPUnit_Framework_Te
         $helpers = array(
             'longdate' => function (\DateTime $value) {
                 return $value->format('Y-m-d h:m:s');
-            }
+            },
         );
 
         $data = array(

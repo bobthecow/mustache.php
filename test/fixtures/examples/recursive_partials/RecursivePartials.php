@@ -8,6 +8,6 @@ class RecursivePartials
         'child' => array(
             'name'  => 'Justin',
             'child' => false,
-        )
+        ),
     );
 }

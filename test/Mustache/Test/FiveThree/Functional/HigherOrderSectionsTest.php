@@ -55,7 +55,7 @@ class Mustache_Test_FiveThree_Functional_HigherOrderSectionsTest extends PHPUnit
             'name' => 'Bob',
             'wrap' => function ($text) {
                 return sprintf('[[%s]]', $text);
-            }
+            },
         );
 
         $this->assertEquals(sprintf('[[%s]]', $data['name']), $tpl->render($data));

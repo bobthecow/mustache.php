@@ -13,7 +13,7 @@ class SectionsNested
                     array('name' => 'Super Macho Man'),
                     array('name' => 'Piston Honda'),
                     array('name' => 'Mr. Sandman'),
-                )
+                ),
             ),
             array(
                 'name' => 'Mike Tyson',
@@ -22,13 +22,13 @@ class SectionsNested
                     array('name' => 'King Hippo'),
                     array('name' => 'Great Tiger'),
                     array('name' => 'Glass Joe'),
-                )
+                ),
             ),
             array(
                 'name' => 'Don Flamenco',
                 'enemies' => array(
                     array('name' => 'Bald Bull'),
-                )
+                ),
             ),
         );
     }
