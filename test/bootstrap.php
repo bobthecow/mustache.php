@@ -13,4 +13,4 @@ require dirname(__FILE__) . '/../src/Mustache/Autoloader.php';
 Mustache_Autoloader::register();
 Mustache_Autoloader::register(dirname(__FILE__) . '/../test');
 
-require dirname(__FILE__) . '/../vendor/yaml/lib/sfYamlParser.php';
+require dirname(__FILE__) . '/../vendor/fabpot/yaml/lib/sfYamlParser.php';
