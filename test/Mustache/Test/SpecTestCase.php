@@ -36,7 +36,7 @@ abstract class Mustache_Test_SpecTestCase extends PHPUnit_Framework_TestCase
      */
     protected function loadSpec($name)
     {
-        $filename = dirname(__FILE__) . '/../../../vendor/spec/specs/' . $name . '.yml';
+        $filename = dirname(__FILE__) . '/../../../vendor/mustache/spec/specs/' . $name . '.yml';
         if (!file_exists($filename)) {
             return array();
         }

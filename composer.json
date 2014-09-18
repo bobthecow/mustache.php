@@ -12,8 +12,36 @@
             "homepage": "http://justinhileman.com"
         }
     ],
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "fabpot/yaml",
+                "version": "dev-master",
+                "source": {
+                    "url": "https://github.com/fabpot/yaml.git",
+                    "type": "git",
+                    "reference": "master"
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "mustache/spec",
+                "version": "dev-master",
+                "source": {
+                    "url": "https://github.com/mustache/spec.git",
+                    "type": "git",
+                    "reference": "master"
+                }
+            }
+        }
+    ],
     "require": {
-        "php": ">=5.2.4"
+        "php": ">=5.2.4",
+        "fabpot/yaml": "dev-master",
+        "mustache/spec": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "*"

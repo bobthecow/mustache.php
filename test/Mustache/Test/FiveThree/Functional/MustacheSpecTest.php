@@ -23,7 +23,7 @@ class Mustache_Test_FiveThree_Functional_MustacheSpecTest extends Mustache_Test_
      */
     public function testSpecInitialized()
     {
-        if (!file_exists(dirname(__FILE__) . '/../../../../../vendor/spec/specs/')) {
+        if (!file_exists(dirname(__FILE__) . '/../../../../../vendor/mustache/spec/specs/')) {
             $this->markTestSkipped('Mustache spec submodule not initialized: run "git submodule update --init"');
         }
     }
