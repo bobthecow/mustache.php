@@ -268,8 +268,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
     public function testInheritIndentationWhenOverridingAPartial()
     {
         $partials = array(
-            'partial' =>
-                'stop:
+            'partial' => 'stop:
                     {{$nineties}}collaborate and listen{{/nineties}}',
         );
 
