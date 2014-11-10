@@ -26,9 +26,9 @@
  */
 class Mustache_Loader_FilesystemLoader implements Mustache_Loader
 {
-    private $baseDir;
-    private $extension = '.mustache';
-    private $templates = array();
+    protected $baseDir;
+    protected $extension = '.mustache';
+    protected $templates = array();
 
     /**
      * Mustache filesystem Loader constructor.
