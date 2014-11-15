@@ -5,7 +5,7 @@ install:
 
 script:
   - phpunit
-  - if [[ `php -r "echo version_compare(PHP_VERSION, '5.3.6', '>=');"` ]]; then php php-cs-fixer.phar --diff --dry-run -vv fix; fi
+  - if [[ `php -r "echo version_compare(PHP_VERSION, '5.3.6', '>=') && !defined('HHVM_VERSION');"` ]]; then php php-cs-fixer.phar --diff --dry-run -vv fix; fi
 
 php:
   - 5.2
