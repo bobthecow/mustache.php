@@ -1,34 +1,21 @@
 <?php
 
 use Symfony\CS\Config\Config;
-use Symfony\CS\Fixer;
 use Symfony\CS\FixerInterface;
 
-$fixer = new Fixer();
-$fixer->registerBuiltInFixers();
+$config = Config::create()
+    // use default level and extra fixers:
+    ->fixers(array('-concat_without_spaces', 'concat_with_spaces', 'strict', 'strict_param'))
+    ->setUsingCache(true)
+    ->setUsingLinter(false);
 
-$fixers = array();
+$finder = $config->getFinder()
+    ->in(__DIR__)
+    ->exclude('bin');
 
-foreach ($fixer->getFixers() as $fixer) {
-    $level = $fixer->getLevel();
-
-    if (!isset($fixers[$level])) {
-        $fixers[$level] = array();
-    }
-
-    $fixers[$level][] = $fixer->getName();
+// exclude file due to error on PHP 5.3 that ignore content after __halt_compiler when using token_get_all
+if (version_compare(PHP_VERSION, '5.4', '<')) {
+    $finder->notPath('test/Mustache/Test/Loader/InlineLoaderTest.php');
 }
-
-$fixers = array_merge(
-    $fixers[FixerInterface::PSR0_LEVEL],
-    $fixers[FixerInterface::PSR1_LEVEL],
-    $fixers[FixerInterface::PSR2_LEVEL],
-    $fixers[FixerInterface::ALL_LEVEL],
-    array('concat_with_spaces', 'strict')
-);
-
-$config = new Config();
-$config->fixers($fixers);
-$config->getFinder()->in(__DIR__)->exclude('bin');
 
 return $config;
