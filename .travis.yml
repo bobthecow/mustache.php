@@ -1,7 +1,7 @@
 language: php
 
 install:
-  - curl http://cs.sensiolabs.org/get/php-cs-fixer.phar -o php-cs-fixer.phar
+  - curl http://get.sensiolabs.org/php-cs-fixer.phar -o php-cs-fixer.phar
 
 script:
   - phpunit
