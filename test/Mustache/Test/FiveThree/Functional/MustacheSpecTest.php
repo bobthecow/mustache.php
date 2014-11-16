@@ -54,7 +54,7 @@ class Mustache_Test_FiveThree_Functional_MustacheSpecTest extends Mustache_Test_
                     $this->markTestSkipped(sprintf('PHP lambda test not implemented for this test.'));
                 }
 
-                $func = $val['php'];
+                $func       = $val['php'];
                 $data[$key] = function ($text = null) use ($func) {
                     return eval($func);
                 };

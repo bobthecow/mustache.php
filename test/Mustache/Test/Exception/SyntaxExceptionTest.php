@@ -21,7 +21,7 @@ class Mustache_Test_Exception_SyntaxExceptionTest extends PHPUnit_Framework_Test
     public function testGetToken()
     {
         $token = array(Mustache_Tokenizer::TYPE => 'whatever');
-        $e = new Mustache_Exception_SyntaxException('ignore this', $token);
+        $e     = new Mustache_Exception_SyntaxException('ignore this', $token);
         $this->assertEquals($token, $e->getToken());
     }
 }

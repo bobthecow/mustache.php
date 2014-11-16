@@ -71,7 +71,7 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
             return sprintf('[[%s]]', $value);
         });
 
-        $foo = new \StdClass();
+        $foo       = new \StdClass();
         $foo->date = new DateTime('1/1/2000', new DateTimeZone("UTC"));
 
         $this->assertEquals('[[2000-01-01 12:01:00]]', $tpl->render($foo));

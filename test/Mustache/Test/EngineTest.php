@@ -69,7 +69,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mustache = new MustacheStub();
+        $mustache           = new MustacheStub();
         $mustache->template = $template;
 
         $template->expects($this->once())
@@ -201,8 +201,8 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
 
     public function testHelpers()
     {
-        $foo = array($this, 'getFoo');
-        $bar = 'BAR';
+        $foo      = array($this, 'getFoo');
+        $bar      = 'BAR';
         $mustache = new Mustache_Engine(array('helpers' => array(
             'foo' => $foo,
             'bar' => $bar,

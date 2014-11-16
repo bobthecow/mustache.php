@@ -125,18 +125,18 @@ class Mustache_Tokenizer
                     $i += $this->otagLen - 1;
                     $char = $text[$i + 1];
                     if (isset(self::$tagTypes[$char])) {
-                        $tag = $char;
+                        $tag           = $char;
                         $this->tagType = $tag;
                     } else {
-                        $tag = null;
+                        $tag           = null;
                         $this->tagType = self::T_ESCAPED;
                     }
 
                     if ($this->tagType === self::T_DELIM_CHANGE) {
-                        $i = $this->changeDelimiters($text, $i);
+                        $i           = $this->changeDelimiters($text, $i);
                         $this->state = self::IN_TEXT;
                     } elseif ($this->tagType === self::T_PRAGMA) {
-                        $i = $this->addPragma($text, $i);
+                        $i           = $this->addPragma($text, $i);
                         $this->state = self::IN_TEXT;
                     } else {
                         if ($tag !== null) {
@@ -190,7 +190,7 @@ class Mustache_Tokenizer
 
                         $this->buffer = '';
                         $i += $this->ctagLen - 1;
-                        $this->state = self::IN_TEXT;
+                        $this->state    = self::IN_TEXT;
                         $this->tokens[] = $token;
                     } else {
                         $this->buffer .= $text[$i];
@@ -273,10 +273,10 @@ class Mustache_Tokenizer
     private function setDelimiters($delimiters)
     {
         list($otag, $ctag) = explode(' ', $delimiters);
-        $this->otag = $otag;
-        $this->ctag = $ctag;
-        $this->otagLen = strlen($otag);
-        $this->ctagLen = strlen($ctag);
+        $this->otag        = $otag;
+        $this->ctag        = $ctag;
+        $this->otagLen     = strlen($otag);
+        $this->ctagLen     = strlen($ctag);
     }
 
     /**

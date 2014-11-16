@@ -48,8 +48,8 @@ class Mustache_Test_Functional_ObjectSectionTest extends PHPUnit_Framework_TestC
 
     public function testSectionObjectWithFunction()
     {
-        $tpl = $this->mustache->loadTemplate('{{#foo}}{{name}}{{/foo}}');
-        $alpha = new Mustache_Test_Functional_Alpha();
+        $tpl        = $this->mustache->loadTemplate('{{#foo}}{{name}}{{/foo}}');
+        $alpha      = new Mustache_Test_Functional_Alpha();
         $alpha->foo = new Mustache_Test_Functional_Delta();
         $this->assertEquals('Foo', $tpl->render($alpha));
     }
@@ -61,8 +61,8 @@ class Mustache_Test_Functional_Alpha
 
     public function __construct()
     {
-        $this->foo = new StdClass();
-        $this->foo->name = 'Foo';
+        $this->foo         = new StdClass();
+        $this->foo->name   = 'Foo';
         $this->foo->number = 1;
     }
 }
@@ -73,8 +73,8 @@ class Mustache_Test_Functional_Beta
 
     public function __construct()
     {
-        $this->_data['foo'] = new StdClass();
-        $this->_data['foo']->name = 'Foo';
+        $this->_data['foo']         = new StdClass();
+        $this->_data['foo']->name   = 'Foo';
         $this->_data['foo']->number = 1;
     }
 

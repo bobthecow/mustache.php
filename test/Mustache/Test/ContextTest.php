@@ -27,9 +27,9 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('FOO', $two->find('foo'));
         $this->assertEquals('<BAR>', $two->find('bar'));
 
-        $obj = new StdClass();
+        $obj       = new StdClass();
         $obj->name = 'NAME';
-        $three = new Mustache_Context($obj);
+        $three     = new Mustache_Context($obj);
         $this->assertSame($obj, $three->last());
         $this->assertEquals('NAME', $three->find('name'));
     }
@@ -61,7 +61,7 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
 
         $dummy = new Mustache_Test_TestDummy();
 
-        $obj = new StdClass();
+        $obj       = new StdClass();
         $obj->name = 'obj';
 
         $arr = array(

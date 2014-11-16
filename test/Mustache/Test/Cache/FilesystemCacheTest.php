@@ -16,8 +16,8 @@ class Mustache_Test_Cache_FilesystemCacheTest extends Mustache_Test_FunctionalTe
 {
     public function testCacheGetNone()
     {
-        $key = 'some key';
-        $cache = new Mustache_Cache_FilesystemCache(self::$tempDir);
+        $key    = 'some key';
+        $cache  = new Mustache_Cache_FilesystemCache(self::$tempDir);
         $loaded = $cache->load($key);
 
         $this->assertFalse($loaded);
@@ -25,7 +25,7 @@ class Mustache_Test_Cache_FilesystemCacheTest extends Mustache_Test_FunctionalTe
 
     public function testCachePut()
     {
-        $key = 'some key';
+        $key   = 'some key';
         $value = '<?php /* some value */';
         $cache = new Mustache_Cache_FilesystemCache(self::$tempDir);
         $cache->cache($key, $value);
