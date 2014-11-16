@@ -48,10 +48,10 @@ class Mustache_Engine
     private $helpers;
     private $escape;
     private $entityFlags = ENT_COMPAT;
-    private $charset = 'UTF-8';
+    private $charset     = 'UTF-8';
     private $logger;
     private $strictCallables = false;
-    private $pragmas = array();
+    private $pragmas         = array();
 
     // Services
     private $tokenizer;

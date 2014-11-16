@@ -32,7 +32,7 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
      */
     public function __construct($baseDir, $fileMode = null)
     {
-        $this->baseDir = $baseDir;
+        $this->baseDir  = $baseDir;
         $this->fileMode = $fileMode;
     }
 

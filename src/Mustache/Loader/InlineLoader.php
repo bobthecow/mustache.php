@@ -111,7 +111,7 @@ class Mustache_Loader_InlineLoader implements Mustache_Loader
     {
         if ($this->templates === null) {
             $this->templates = array();
-            $data = file_get_contents($this->fileName, false, null, $this->offset);
+            $data            = file_get_contents($this->fileName, false, null, $this->offset);
             foreach (preg_split("/^@@(?= [\w\d\.]+$)/m", $data, -1) as $chunk) {
                 if (trim($chunk)) {
                     list($name, $content)         = explode("\n", $chunk, 2);

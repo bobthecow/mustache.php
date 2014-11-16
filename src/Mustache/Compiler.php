@@ -390,7 +390,7 @@ class Mustache_Compiler
     }
 
     const PARTIAL_INDENT = ', $indent . %s';
-    const PARTIAL = '
+    const PARTIAL        = '
         if ($partial = $this->mustache->loadPartial(%s)) {
             $buffer .= $partial->renderInternal($context%s);
         }
@@ -533,8 +533,8 @@ class Mustache_Compiler
      */
     private function text($text, $level)
     {
-        $indentNextLine = (substr($text, -1) === "\n");
-        $code = sprintf($this->prepare(self::TEXT, $level), $this->flushIndent(), var_export($text, true));
+        $indentNextLine       = (substr($text, -1) === "\n");
+        $code                 = sprintf($this->prepare(self::TEXT, $level), $this->flushIndent(), var_export($text, true));
         $this->indentNextLine = $indentNextLine;
 
         return $code;

@@ -2,6 +2,6 @@
 
 class InvertedDoubleSection
 {
-    public $t = false;
+    public $t   = false;
     public $two = 'second';
 }

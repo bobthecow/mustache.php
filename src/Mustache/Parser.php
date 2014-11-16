@@ -159,7 +159,7 @@ class Mustache_Parser
                         $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_ESCAPED;
                         // TODO: figure out how to figure out if there was a space after this dollar:
                         $token[Mustache_Tokenizer::NAME] = '$' . $token[Mustache_Tokenizer::NAME];
-                        $nodes[] = $token;
+                        $nodes[]                         = $token;
                     }
                     break;
 

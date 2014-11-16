@@ -32,10 +32,10 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends Mustache_Test_Fun
 
     public function sectionCallbackData()
     {
-        $foo = new Mustache_Test_Functional_Foo();
+        $foo             = new Mustache_Test_Functional_Foo();
         $foo->doublewrap = array($foo, 'wrapWithBoth');
 
-        $bar = new Mustache_Test_Functional_Foo();
+        $bar          = new Mustache_Test_Functional_Foo();
         $bar->trimmer = array(get_class($bar), 'staticTrim');
 
         return array(
@@ -62,12 +62,12 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends Mustache_Test_Fun
     {
         $tpl = $this->mustache->loadTemplate('{{#title}}{{title}} {{/title}}{{name}}');
 
-        $frank = new Mustache_Test_Functional_Monster();
+        $frank        = new Mustache_Test_Functional_Monster();
         $frank->title = 'Dr.';
         $frank->name  = 'Frankenstein';
         $this->assertEquals('Dr. Frankenstein', $tpl->render($frank));
 
-        $dracula = new Mustache_Test_Functional_Monster();
+        $dracula        = new Mustache_Test_Functional_Monster();
         $dracula->title = 'Count';
         $dracula->name  = 'Dracula';
         $this->assertEquals('Count Dracula', $tpl->render($dracula));
@@ -81,7 +81,7 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends Mustache_Test_Fun
 
         $tpl = $mustache->loadTemplate('{{#wrap}}NAME{{/wrap}}');
 
-        $foo = new Mustache_Test_Functional_Foo();
+        $foo       = new Mustache_Test_Functional_Foo();
         $foo->wrap = array($foo, 'wrapWithEm');
 
         $this->assertEquals('<em>NAME</em>', $tpl->render($foo));
@@ -96,7 +96,7 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends Mustache_Test_Fun
 
         $tpl = $mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
 
-        $foo = new Mustache_Test_Functional_Foo();
+        $foo       = new Mustache_Test_Functional_Foo();
         $foo->wrap = array($foo, 'wrapWithEm');
 
         $this->assertEquals('<em>' . $foo->name . '</em>', $tpl->render($foo));
@@ -114,8 +114,8 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends Mustache_Test_Fun
             'cache_lambda_templates' => $enable,
         ));
 
-        $tpl = $mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
-        $foo = new Mustache_Test_Functional_Foo();
+        $tpl       = $mustache->loadTemplate('{{#wrap}}{{name}}{{/wrap}}');
+        $foo       = new Mustache_Test_Functional_Foo();
         $foo->wrap = array($foo, 'wrapWithEm');
         $this->assertEquals('<em>' . $foo->name . '</em>', $tpl->render($foo));
         $this->assertCount($expect, glob($cacheDir . '/*.php'));
@@ -143,7 +143,7 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends Mustache_Test_Fun
 
 class Mustache_Test_Functional_Foo
 {
-    public $name = 'Justin';
+    public $name  = 'Justin';
     public $lorem = 'Lorem ipsum dolor sit amet,';
 
     public function wrapWithEm($text)
