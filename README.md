@@ -24,9 +24,9 @@ And a more in-depth example -- this is the canonical Mustache template:
 
 ```html+jinja
 Hello {{name}}
-You have just won ${{value}}!
+You have just won {{value}} dollar!
 {{#in_ca}}
-Well, ${{taxed_value}}, after taxes.
+Well, {{taxed_value}} dollar, after taxes.
 {{/in_ca}}
 ```
 
