@@ -38,7 +38,7 @@ define('EXAMPLE_PATH', realpath(dirname(__FILE__) . '/../test/fixtures/examples'
  */
 function getLowerCaseName($name)
 {
-    return preg_replace_callback("/([A-Z])/", create_function (
+    return preg_replace_callback("/([A-Z])/", create_function(
         '$match',
         'return "_" . strtolower($match[1]);'
     ), lcfirst($name));
@@ -58,7 +58,7 @@ function getLowerCaseName($name)
  */
 function getUpperCaseName($name)
 {
-    return preg_replace_callback("/_([a-z])/", create_function (
+    return preg_replace_callback("/_([a-z])/", create_function(
         '$match',
         'return strtoupper($match{1});'
     ), ucfirst($name));
@@ -92,8 +92,8 @@ function out($value)
  */
 function buildPath($directory, $filename = null,  $extension = null)
 {
-    return out(EXAMPLE_PATH . '/' . $directory.
-                    ($extension !== null && $filename !== null ? '/' . $filename. "." . $extension : ""));
+    return out(EXAMPLE_PATH . '/' . $directory .
+                    ($extension !== null && $filename !== null ? '/' . $filename . "." . $extension : ""));
 }
 
 /**
@@ -170,7 +170,6 @@ if (count($argv) > 1) {
     $example_name = $argv[1];
 
     main($example_name);
-
 } else {
     echo USAGE;
 }
