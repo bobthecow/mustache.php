@@ -10,9 +10,7 @@ $config = Config::create()
     ->setUsingLinter(false);
 
 $finder = $config->getFinder()
-    ->in('bin')
-    ->in('src')
-    ->in('test');
+    ->in(__DIR__);
 
 // exclude file due to error on PHP 5.3 that ignore content after __halt_compiler when using token_get_all
 if (version_compare(PHP_VERSION, '5.4', '<')) {
