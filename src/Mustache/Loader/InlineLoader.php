@@ -46,7 +46,6 @@
  *
  *     @@ hello
  *     Hello, {{ name }}!
- *
  */
 class Mustache_Loader_InlineLoader implements Mustache_Loader
 {
