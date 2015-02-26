@@ -4,7 +4,6 @@
  * @group inheritance
  * @group functional
  */
-
 class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCase
 {
     private $mustache;
