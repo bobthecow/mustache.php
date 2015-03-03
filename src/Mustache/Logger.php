@@ -10,7 +10,7 @@
  */
 
 /**
- * Describes a Mustache logger instance
+ * Describes a Mustache logger instance.
  *
  * This is identical to the Psr\Log\LoggerInterface.
  *
@@ -29,7 +29,7 @@
 interface Mustache_Logger
 {
     /**
-     * Psr\Log compatible log levels
+     * Psr\Log compatible log levels.
      */
     const EMERGENCY = 'emergency';
     const ALERT     = 'alert';

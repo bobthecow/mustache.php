@@ -2,7 +2,7 @@
 <?php
 
 /**
- * A commandline script to create an example and the needed files:
+ * A commandline script to create an example and the needed files.
  *
  *     $ bin/create_example.php my_new_example
  *
@@ -26,6 +26,7 @@ define('EXAMPLE_PATH', realpath(dirname(__FILE__) . '/../test/fixtures/examples'
 
 /**
  * transform a string to lowercase using underlines.
+ *
  * Examples:
  * String -> string
  * AString -> a_string
@@ -34,6 +35,7 @@ define('EXAMPLE_PATH', realpath(dirname(__FILE__) . '/../test/fixtures/examples'
  *
  * @param string $name
  * @access public
+ *
  * @return string
  */
 function getLowerCaseName($name)
@@ -45,7 +47,8 @@ function getLowerCaseName($name)
 }
 
 /**
- * transform a string to Uppercase (camelcase)
+ * transform a string to Uppercase (camelcase).
+ *
  * Examples
  * string -> String
  * a_string -> AString
@@ -54,6 +57,7 @@ function getLowerCaseName($name)
  *
  * @param string $name
  * @access public
+ *
  * @return string
  */
 function getUpperCaseName($name)
@@ -65,10 +69,11 @@ function getUpperCaseName($name)
 }
 
 /**
- * return the given value and echo it out appending "\n"
+ * return the given value and echo it out appending "\n".
  *
  * @param mixed $value
  * @access public
+ *
  * @return mixed
  */
 function out($value)
@@ -79,15 +84,17 @@ function out($value)
 }
 
 /**
- * create Path for certain files in an example
+ * create Path for certain files in an example.
+ *
  * returns the directory name if only $directory is given.
  * if an extension is given a complete filename is returned.
- * the returned filename will be echoed out
+ * the returned filename will be echoed out.
  *
  * @param string $directory directory without / at the end
  * @param string $filename filename without path and extension
  * @param string $extension extension of the file without "."
  * @access public
+ *
  * @return string
  */
 function buildPath($directory, $filename = null,  $extension = null)
@@ -97,8 +104,9 @@ function buildPath($directory, $filename = null,  $extension = null)
 }
 
 /**
- * creates the directory for the example
- * the script die()'s if mkdir() fails
+ * creates the directory for the example.
+ *
+ * the script die()'s if mkdir() fails.
  *
  * @param string $directory
  * @access public
@@ -111,8 +119,9 @@ function createDirectory($directory)
 }
 
 /**
- * create a file for the example with the given $content
- * the script die()'s if fopen() fails
+ * create a file for the example with the given $content.
+ *
+ * the script die()'s if fopen() fails.
  *
  * @param string $directory directory without / at the end
  * @param string $filename filename without path and extension
@@ -132,7 +141,7 @@ function createFile($directory, $filename, $extension, $content = "")
 }
 
 /**
- * routine to create the example directory and 3 files
+ * routine to create the example directory and 3 files.
  *
  * if the $example_name is "SomeThing" the following files will be created
  * examples/some_thing

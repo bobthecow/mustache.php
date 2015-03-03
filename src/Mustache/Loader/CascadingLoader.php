@@ -18,7 +18,7 @@ class Mustache_Loader_CascadingLoader implements Mustache_Loader
     private $loaders;
 
     /**
-     * Construct a CascadingLoader with an array of loaders:
+     * Construct a CascadingLoader with an array of loaders.
      *
      *     $loader = new Mustache_Loader_CascadingLoader(array(
      *         new Mustache_Loader_InlineLoader(__FILE__, __COMPILER_HALT_OFFSET__),

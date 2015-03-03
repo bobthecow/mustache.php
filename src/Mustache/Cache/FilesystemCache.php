@@ -56,7 +56,7 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
     }
 
     /**
-     * Cache and load the compiled class
+     * Cache and load the compiled class.
      *
      * @param string $key
      * @param string $value
@@ -89,7 +89,7 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
     }
 
     /**
-     * Create cache directory
+     * Create cache directory.
      *
      * @throws Mustache_Exception_RuntimeException If unable to create directory
      *
@@ -117,7 +117,7 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
     }
 
     /**
-     * Write cache file
+     * Write cache file.
      *
      * @throws Mustache_Exception_RuntimeException If unable to write file
      *

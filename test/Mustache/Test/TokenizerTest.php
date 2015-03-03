@@ -279,11 +279,11 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                 null,
                 array(
                     array(
-                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_BLOCK_VAR,
-                        Mustache_Tokenizer::NAME => 'arg',
-                        Mustache_Tokenizer::OTAG => '{{',
-                        Mustache_Tokenizer::CTAG => '}}',
-                        Mustache_Tokenizer::LINE => 0,
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_BLOCK_VAR,
+                        Mustache_Tokenizer::NAME  => 'arg',
+                        Mustache_Tokenizer::OTAG  => '{{',
+                        Mustache_Tokenizer::CTAG  => '}}',
+                        Mustache_Tokenizer::LINE  => 0,
                         Mustache_Tokenizer::INDEX => 8,
                     ),
                     array(

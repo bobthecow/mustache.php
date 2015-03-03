@@ -12,7 +12,7 @@
 
 /**
  * A shell script to create a single-file class cache of the entire Mustache
- * library:
+ * library.
  *
  *     $ bin/build_bootstrap.php
  *
@@ -72,7 +72,6 @@ SymfonyClassCollectionLoader::load(array(
  * the unnecessary bits removed.
  *
  * @license http://www.opensource.org/licenses/MIT
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SymfonyClassCollectionLoader

@@ -37,7 +37,7 @@ abstract class Mustache_Template
     }
 
     /**
-     * Mustache Template instances can be treated as a function and rendered by simply calling them:
+     * Mustache Template instances can be treated as a function and rendered by simply calling them.
      *
      *     $m = new Mustache_Engine;
      *     $tpl = $m->loadTemplate('Hello, {{ name }}!');

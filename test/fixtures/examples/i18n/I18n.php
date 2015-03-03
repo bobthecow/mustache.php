@@ -10,7 +10,7 @@ class I18n
 
     // A *very* small i18n dictionary :)
     private static $dictionary = array(
-        'Hello.' => 'Hola.',
+        'Hello.'                 => 'Hola.',
         'My name is {{ name }}.' => 'Me llamo {{ name }}.',
     );
 

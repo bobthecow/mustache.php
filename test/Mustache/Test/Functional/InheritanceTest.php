@@ -323,7 +323,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
     public function testRecursionInInheritedTemplates()
     {
         $partials = array(
-            'include' => '{{$foo}}default content{{/foo}} {{$bar}}{{<include2}}{{/include2}}{{/bar}}',
+            'include'  => '{{$foo}}default content{{/foo}} {{$bar}}{{<include2}}{{/include2}}{{/bar}}',
             'include2' => '{{$foo}}include2 default content{{/foo}} {{<include}}{{$bar}}don\'t recurse{{/bar}}{{/include}}',
         );
 
@@ -341,8 +341,8 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
     public function testTopLevelSubstitutionsTakePrecedenceInMultilevelInheritance()
     {
         $partials = array(
-            'parent' => '{{<older}}{{$a}}p{{/a}}{{/older}}',
-            'older' => '{{<grandParent}}{{$a}}o{{/a}}{{/grandParent}}',
+            'parent'      => '{{<older}}{{$a}}p{{/a}}{{/older}}',
+            'older'       => '{{<grandParent}}{{$a}}o{{/a}}{{/grandParent}}',
             'grandParent' => '{{$a}}g{{/a}}',
         );
 
@@ -360,8 +360,8 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
     public function testMultiLevelInheritanceNoSubChild()
     {
         $partials = array(
-            'parent' => '{{<older}}{{$a}}p{{/a}}{{/older}}',
-            'older' => '{{<grandParent}}{{$a}}o{{/a}}{{/grandParent}}',
+            'parent'      => '{{<older}}{{$a}}p{{/a}}{{/older}}',
+            'older'       => '{{<grandParent}}{{$a}}o{{/a}}{{/grandParent}}',
             'grandParent' => '{{$a}}g{{/a}}',
         );
 

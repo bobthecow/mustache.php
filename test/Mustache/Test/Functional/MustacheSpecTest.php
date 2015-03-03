@@ -10,7 +10,7 @@
  */
 
 /**
- * A PHPUnit test case wrapping the Mustache Spec
+ * A PHPUnit test case wrapping the Mustache Spec.
  *
  * @group mustache-spec
  * @group functional

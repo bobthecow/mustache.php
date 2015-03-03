@@ -8,7 +8,7 @@ class SectionsNested
     {
         return array(
             array(
-                'name' => 'Von Kaiser',
+                'name'    => 'Von Kaiser',
                 'enemies' => array(
                     array('name' => 'Super Macho Man'),
                     array('name' => 'Piston Honda'),
@@ -16,7 +16,7 @@ class SectionsNested
                 ),
             ),
             array(
-                'name' => 'Mike Tyson',
+                'name'    => 'Mike Tyson',
                 'enemies' => array(
                     array('name' => 'Soda Popinski'),
                     array('name' => 'King Hippo'),
@@ -25,7 +25,7 @@ class SectionsNested
                 ),
             ),
             array(
-                'name' => 'Don Flamenco',
+                'name'    => 'Don Flamenco',
                 'enemies' => array(
                     array('name' => 'Bald Bull'),
                 ),
