@@ -102,7 +102,6 @@ function buildPath($directory, $filename = null,  $extension = null)
  *
  * @param string $directory
  * @access public
- * @return void
  */
 function createDirectory($directory)
 {
@@ -120,7 +119,6 @@ function createDirectory($directory)
  * @param string $extension extension of the file without "."
  * @param string $content the content of the file
  * @access public
- * @return void
  */
 function createFile($directory, $filename, $extension, $content = "")
 {
@@ -144,7 +142,6 @@ function createFile($directory, $filename, $extension, $content = "")
  *
  * @param mixed $example_name
  * @access public
- * @return void
  */
 function main($example_name)
 {

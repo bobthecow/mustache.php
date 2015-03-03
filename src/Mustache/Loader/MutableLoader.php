@@ -18,8 +18,6 @@ interface Mustache_Loader_MutableLoader
      * Set an associative array of Template sources for this loader.
      *
      * @param array $templates
-     *
-     * @return void
      */
     public function setTemplates(array $templates);
 
@@ -28,8 +26,6 @@ interface Mustache_Loader_MutableLoader
      *
      * @param string $name
      * @param string $template Mustache Template source
-     *
-     * @return void
      */
     public function setTemplate($name, $template);
 }

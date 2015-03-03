@@ -60,8 +60,6 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
      *
      * @param string $key
      * @param string $value
-     *
-     * @return void
      */
     public function cache($key, $value)
     {
@@ -125,8 +123,6 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
      *
      * @param string $fileName
      * @param string $value
-     *
-     * @return void
      */
     private function writeFile($fileName, $value)
     {

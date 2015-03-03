@@ -31,8 +31,6 @@ interface Mustache_Cache
      *
      * @param string $key
      * @param string $value
-     *
-     * @return void
      */
     public function cache($key, $value);
 }
