@@ -289,6 +289,29 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         );
     }
 
+    public function testInheritSpacingWhenOverridingAPartial()
+    {
+        $partials = array(
+            'parent' => 'collaborate_and{{$id}}{{/id}}',
+            'child' => '{{<parent}}{{$id}}_listen{{/id}}{{/parent}}'
+        );
+
+        $this->mustache->setPartials($partials);
+
+        $tpl = $this->mustache->loadTemplate(
+            'stop:
+              {{>child}}'
+        );
+
+        $data = array();
+
+        $this->assertEquals(
+            'stop:
+              collaborate_and_listen',
+            $tpl->render($data)
+        );
+    }
+
     public function testOverrideOneSubstitutionButNotTheOther()
     {
         $partials = array(
