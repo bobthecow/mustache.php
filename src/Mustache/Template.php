@@ -22,7 +22,7 @@ abstract class Mustache_Template
     protected $mustache;
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $strictCallables = false;
 
@@ -109,7 +109,7 @@ abstract class Mustache_Template
      *
      * @param mixed $value
      *
-     * @return boolean True if the value is 'iterable'
+     * @return bool True if the value is 'iterable'
      */
     protected function isIterable($value)
     {

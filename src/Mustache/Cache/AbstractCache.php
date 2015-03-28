@@ -47,9 +47,9 @@ abstract class Mustache_Cache_AbstractCache implements Mustache_Cache
     /**
      * Add a log record if logging is enabled.
      *
-     * @param integer $level   The logging level
-     * @param string  $message The log message
-     * @param array   $context The log context
+     * @param int    $level   The logging level
+     * @param string $message The log message
+     * @param array  $context The log context
      */
     protected function log($level, $message, array $context = array())
     {

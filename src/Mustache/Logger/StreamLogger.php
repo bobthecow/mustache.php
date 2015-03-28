@@ -39,7 +39,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      * @throws InvalidArgumentException if the logging level is unknown.
      *
      * @param resource|string $stream Resource instance or URL
-     * @param integer         $level  The minimum logging level at which this handler will be triggered
+     * @param int             $level  The minimum logging level at which this handler will be triggered
      */
     public function __construct($stream, $level = Mustache_Logger::ERROR)
     {
@@ -67,7 +67,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      *
      * @throws Mustache_Exception_InvalidArgumentException if the logging level is unknown.
      *
-     * @param integer $level The minimum logging level which will be written
+     * @param int $level The minimum logging level which will be written
      */
     public function setLevel($level)
     {
@@ -81,7 +81,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
     /**
      * Get the current minimum logging level.
      *
-     * @return integer
+     * @return int
      */
     public function getLevel()
     {
@@ -114,9 +114,9 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      * @throws Mustache_Exception_LogicException   If neither a stream resource nor url is present.
      * @throws Mustache_Exception_RuntimeException If the stream url cannot be opened.
      *
-     * @param integer $level   The logging level
-     * @param string  $message The log message
-     * @param array   $context The log context
+     * @param int    $level   The logging level
+     * @param string $message The log message
+     * @param array  $context The log context
      */
     protected function writeLog($level, $message, array $context = array())
     {
@@ -141,7 +141,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      *
      * @throws InvalidArgumentException if the logging level is unknown.
      *
-     * @param integer $level
+     * @param int $level
      *
      * @return string
      */
@@ -153,9 +153,9 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
     /**
      * Format a log line for output.
      *
-     * @param integer $level   The logging level
-     * @param string  $message The log message
-     * @param array   $context The log context
+     * @param int    $level   The logging level
+     * @param string $message The log message
+     * @param array  $context The log context
      *
      * @return string
      */

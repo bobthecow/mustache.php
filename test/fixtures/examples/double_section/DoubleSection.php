@@ -7,5 +7,5 @@ class DoubleSection
         return true;
     }
 
-    public $two = "second";
+    public $two = 'second';
 }

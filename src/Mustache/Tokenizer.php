@@ -313,7 +313,7 @@ class Mustache_Tokenizer
      * @param string $text   Mustache template source
      * @param int    $index  Current tokenizer index
      *
-     * @return boolean True if this is a closing section tag
+     * @return bool True if this is a closing section tag
      */
     private function tagChange($tag, $tagLen, $text, $index)
     {

@@ -12,9 +12,4 @@ $config = Config::create()
 $finder = $config->getFinder()
     ->in(__DIR__);
 
-// exclude file due to error on PHP 5.3 that ignore content after __halt_compiler when using token_get_all
-if (version_compare(PHP_VERSION, '5.4', '<')) {
-    $finder->notPath('test/Mustache/Test/Loader/InlineLoaderTest.php');
-}
-
 return $config;

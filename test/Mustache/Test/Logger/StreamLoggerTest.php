@@ -55,13 +55,13 @@ class Mustache_Test_Logger_StreamLoggerTest extends PHPUnit_Framework_TestCase
     {
         $stream = tmpfile();
         $logger = new Mustache_Logger_StreamLogger($stream, $logLevel);
-        $logger->log($level, "logged");
+        $logger->log($level, 'logged');
 
         rewind($stream);
         $result = fread($stream, 1024);
 
         if ($shouldLog) {
-            $this->assertContains("logged", $result);
+            $this->assertContains('logged', $result);
         } else {
             $this->assertEmpty($result);
         }
