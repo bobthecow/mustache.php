@@ -2,14 +2,14 @@
 
 class SectionObjects
 {
-    public $start = "It worked the first time.";
+    public $start = 'It worked the first time.';
 
     public function middle()
     {
         return new SectionObject();
     }
 
-    public $final = "Then, surprisingly, it worked the final time.";
+    public $final = 'Then, surprisingly, it worked the final time.';
 }
 
 class SectionObject

@@ -40,7 +40,7 @@ define('EXAMPLE_PATH', realpath(dirname(__FILE__) . '/../test/fixtures/examples'
  */
 function getLowerCaseName($name)
 {
-    return preg_replace_callback("/([A-Z])/", create_function(
+    return preg_replace_callback('/([A-Z])/', create_function(
         '$match',
         'return "_" . strtolower($match[1]);'
     ), lcfirst($name));
@@ -62,7 +62,7 @@ function getLowerCaseName($name)
  */
 function getUpperCaseName($name)
 {
-    return preg_replace_callback("/_([a-z])/", create_function(
+    return preg_replace_callback('/_([a-z])/', create_function(
         '$match',
         'return strtoupper($match{1});'
     ), ucfirst($name));
@@ -100,7 +100,7 @@ function out($value)
 function buildPath($directory, $filename = null,  $extension = null)
 {
     return out(EXAMPLE_PATH . '/' . $directory .
-                    ($extension !== null && $filename !== null ? '/' . $filename . "." . $extension : ""));
+                    ($extension !== null && $filename !== null ? '/' . $filename . '.' . $extension : ''));
 }
 
 /**
@@ -129,9 +129,9 @@ function createDirectory($directory)
  * @param string $content the content of the file
  * @access public
  */
-function createFile($directory, $filename, $extension, $content = "")
+function createFile($directory, $filename, $extension, $content = '')
 {
-    $handle = @fopen(buildPath($directory, $filename, $extension), "w");
+    $handle = @fopen(buildPath($directory, $filename, $extension), 'w');
     if ($handle) {
         fwrite($handle, $content);
         fclose($handle);
@@ -157,9 +157,9 @@ function main($example_name)
     $lowercase = getLowerCaseName($example_name);
     $uppercase = getUpperCaseName($example_name);
     createDirectory($lowercase);
-    createFile($lowercase, $lowercase, "mustache");
-    createFile($lowercase, $lowercase, "txt");
-    createFile($lowercase, $uppercase, "php", <<<CONTENT
+    createFile($lowercase, $lowercase, 'mustache');
+    createFile($lowercase, $lowercase, 'txt');
+    createFile($lowercase, $uppercase, 'php', <<<CONTENT
 <?php
 
 class {$uppercase} {

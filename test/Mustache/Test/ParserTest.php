@@ -154,7 +154,7 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
                     array(
                         Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
                         Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::VALUE => "  ",
+                        Mustache_Tokenizer::VALUE => '  ',
                     ),
                     array(
                         Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_DELIM_CHANGE,

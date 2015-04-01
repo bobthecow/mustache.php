@@ -405,7 +405,7 @@ class Mustache_Engine
      *
      * @param string $name
      *
-     * @return boolean True if the helper is present
+     * @return bool True if the helper is present
      */
     public function hasHelper($name)
     {
@@ -772,9 +772,9 @@ class Mustache_Engine
     /**
      * Add a log record if logging is enabled.
      *
-     * @param integer $level   The logging level
-     * @param string  $message The log message
-     * @param array   $context The log context
+     * @param int    $level   The logging level
+     * @param string $message The log message
+     * @param array  $context The log context
      */
     private function log($level, $message, array $context = array())
     {
