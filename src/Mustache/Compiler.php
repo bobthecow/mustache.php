@@ -16,7 +16,6 @@
  */
 class Mustache_Compiler
 {
-
     private $pragmas;
     private $defaultPragmas = array();
     private $sections;
@@ -264,7 +263,7 @@ class Mustache_Compiler
 
     const BLOCK_ARG = '
         // %s block_arg
-        $value = $this->section%s($context, $indent, true);
+        $value = $this->section%s($context, \'\', true);
         $newContext[%s] = %s$value;
     ';
 
@@ -342,12 +341,12 @@ class Mustache_Compiler
         $callable = $this->getCallable();
 
         if ($otag !== '{{' || $ctag !== '}}') {
-            $delims = ', '.var_export(sprintf('{{= %s %s =}}', $otag, $ctag), true);
+            $delims = ', ' . var_export(sprintf('{{= %s %s =}}', $otag, $ctag), true);
         } else {
             $delims = '';
         }
 
-        $key = ucfirst(md5($delims."\n".$source));
+        $key = ucfirst(md5($delims . "\n" . $source));
 
         if (!isset($this->sections[$key])) {
             $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $callable, $source, $delims, $this->walk($nodes, 2));
@@ -458,7 +457,7 @@ class Mustache_Compiler
      *
      * @param array $node
      *
-     * @return boolean True if $node is a block arg token.
+     * @return bool True if $node is a block arg token.
      */
     private static function onlyBlockArgs(array $node)
     {
@@ -475,7 +474,7 @@ class Mustache_Compiler
      *
      * @param string   $id      Variable name
      * @param string[] $filters Array of filters
-     * @param boolean  $escape  Escape the variable value for output?
+     * @param bool     $escape  Escape the variable value for output?
      * @param int      $level
      *
      * @return string Generated variable interpolation PHP source
@@ -544,16 +543,16 @@ class Mustache_Compiler
     /**
      * Prepare PHP source code snippet for output.
      *
-     * @param string  $text
-     * @param int     $bonus          Additional indent level (default: 0)
-     * @param boolean $prependNewline Prepend a newline to the snippet? (default: true)
-     * @param boolean $appendNewline  Append a newline to the snippet? (default: false)
+     * @param string $text
+     * @param int    $bonus          Additional indent level (default: 0)
+     * @param bool   $prependNewline Prepend a newline to the snippet? (default: true)
+     * @param bool   $appendNewline  Append a newline to the snippet? (default: false)
      *
      * @return string PHP source code snippet
      */
     private function prepare($text, $bonus = 0, $prependNewline = true, $appendNewline = false)
     {
-        $text = ($prependNewline ? "\n" : '').trim($text);
+        $text = ($prependNewline ? "\n" : '') . trim($text);
         if ($prependNewline) {
             $bonus++;
         }
@@ -561,7 +560,7 @@ class Mustache_Compiler
             $text .= "\n";
         }
 
-        return preg_replace("/\n( {8})?/", "\n".str_repeat(" ", $bonus * 4), $text);
+        return preg_replace("/\n( {8})?/", "\n" . str_repeat(' ', $bonus * 4), $text);
     }
 
     const DEFAULT_ESCAPE = 'htmlspecialchars(%s, %s, %s)';

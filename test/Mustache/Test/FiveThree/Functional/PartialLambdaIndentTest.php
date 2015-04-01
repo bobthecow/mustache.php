@@ -15,7 +15,6 @@
  */
 class Mustache_Test_FiveThree_Functional_PartialLambdaIndentTest extends PHPUnit_Framework_TestCase
 {
-
     public function testLambdasInsidePartialsAreIndentedProperly()
     {
         $src = <<<EOS
@@ -37,7 +36,7 @@ EOS;
 EOS;
 
         $m = new Mustache_Engine(array(
-            'partials' => array('input' => $partial)
+            'partials' => array('input' => $partial),
         ));
 
         $tpl = $m->loadTemplate($src);

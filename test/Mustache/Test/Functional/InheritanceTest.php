@@ -4,7 +4,6 @@
  * @group inheritance
  * @group functional
  */
-
 class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCase
 {
     private $mustache;
@@ -24,13 +23,13 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
                     'foo' => '{{$baz}}default content{{/baz}}',
                 ),
                 array(
-                    'bar' => 'set by user'
+                    'bar' => 'set by user',
                 ),
                 '{{< foo }}{{# bar }}{{$ baz }}{{/ baz }}{{/ bar }}{{/ foo }}',
             ),
             array(
                 array(
-                    'foo' => '{{$baz}}default content{{/baz}}'
+                    'foo' => '{{$baz}}default content{{/baz}}',
                 ),
                 array(
                 ),
@@ -39,19 +38,19 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
             array(
                 array(
                     'foo' => '{{$baz}}default content{{/baz}}',
-                    'qux' => 'I am a partial'
+                    'qux' => 'I am a partial',
                 ),
                 array(
                 ),
-                '{{<foo}}{{>qux}}{{$baz}}set by template{{/baz}}{{/foo}}'
+                '{{<foo}}{{>qux}}{{$baz}}set by template{{/baz}}{{/foo}}',
             ),
             array(
                 array(
-                    'foo' => '{{$baz}}default content{{/baz}}'
+                    'foo' => '{{$baz}}default content{{/baz}}',
                 ),
                 array(),
-                '{{<foo}}{{=<% %>=}}<%={{ }}=%>{{/foo}}'
-            )
+                '{{<foo}}{{=<% %>=}}<%={{ }}=%>{{/foo}}',
+            ),
         );
     }
 
@@ -63,28 +62,28 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
                     'foo' => '{{$baz}}default content{{/baz}}',
                 ),
                 array(
-                    'bar' => 'set by user'
+                    'bar' => 'set by user',
                 ),
                 '{{<foo}}{{bar}}{{$baz}}override{{/baz}}{{/foo}}',
-                'override'
+                'override',
             ),
             array(
                 array(
-                    'foo' => '{{$baz}}default content{{/baz}}'
+                    'foo' => '{{$baz}}default content{{/baz}}',
                 ),
                 array(
                 ),
                 '{{<foo}}{{! ignore me }}{{$baz}}set by template{{/baz}}{{/foo}}',
-                'set by template'
+                'set by template',
             ),
             array(
                 array(
-                    'foo' => '{{$baz}}defualt content{{/baz}}'
+                    'foo' => '{{$baz}}defualt content{{/baz}}',
                 ),
                 array(),
                 '{{<foo}}set by template{{$baz}}also set by template{{/baz}}{{/foo}}',
-                'also set by template'
-            )
+                'also set by template',
+            ),
         );
     }
 
@@ -102,7 +101,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         $tpl = $this->mustache->loadTemplate('{{$foo}}default {{bar}} content{{/foo}}');
 
         $data = array(
-            'bar' => 'baz'
+            'bar' => 'baz',
         );
 
         $this->assertEquals('default baz content', $tpl->render($data));
@@ -113,7 +112,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         $tpl = $this->mustache->loadTemplate('{{$foo}}default {{{bar}}} content{{/foo}}');
 
         $data = array(
-            'bar' => '<baz>'
+            'bar' => '<baz>',
         );
 
         $this->assertEquals('default <baz> content', $tpl->render($data));
@@ -126,7 +125,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         );
 
         $data = array(
-            'bar' => array('baz' => 'qux')
+            'bar' => array('baz' => 'qux'),
         );
 
         $this->assertEquals('default qux content', $tpl->render($data));
@@ -140,11 +139,10 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
 
         $data = array(
             'foo' => array('bar' => 'qux'),
-            'baz' => 'three'
+            'baz' => 'three',
         );
 
         $this->assertEquals('default three content', $tpl->render($data));
-
     }
 
     public function testMustacheInjectionInDefaultContent()
@@ -154,7 +152,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         );
 
         $data = array(
-            'bar' => array('baz' => '{{qux}}')
+            'bar' => array('baz' => '{{qux}}'),
         );
 
         $this->assertEquals('default {{qux}} content', $tpl->render($data));
@@ -163,7 +161,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
     public function testDefaultContentRenderedInsideIncludedTemplates()
     {
         $partials = array(
-            'include' => '{{$foo}}default content{{/foo}}'
+            'include' => '{{$foo}}default content{{/foo}}',
         );
 
         $this->mustache->setPartials($partials);
@@ -180,7 +178,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
     public function testOverriddenContent()
     {
         $partials = array(
-            'super' => '...{{$title}}Default title{{/title}}...'
+            'super' => '...{{$title}}Default title{{/title}}...',
         );
 
         $this->mustache->setPartials($partials);
@@ -197,7 +195,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
     public function testOverriddenPartial()
     {
         $partials = array(
-            'partial' => '|{{$stuff}}...{{/stuff}}{{$default}} default{{/default}}|'
+            'partial' => '|{{$stuff}}...{{/stuff}}{{$default}} default{{/default}}|',
         );
 
         $this->mustache->setPartials($partials);
@@ -214,7 +212,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
     public function testDataDoesNotOverrideBlock()
     {
         $partials = array(
-            'include' => '{{$var}}var in include{{/var}}'
+            'include' => '{{$var}}var in include{{/var}}',
         );
 
         $this->mustache->setPartials($partials);
@@ -224,7 +222,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         );
 
         $data = array(
-            'var' => 'var in data'
+            'var' => 'var in data',
         );
 
         $this->assertEquals('var in template', $tpl->render($data));
@@ -233,7 +231,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
     public function testDataDoesNotOverrideDefaultBlockValue()
     {
         $partials = array(
-            'include' => '{{$var}}var in include{{/var}}'
+            'include' => '{{$var}}var in include{{/var}}',
         );
 
         $this->mustache->setPartials($partials);
@@ -243,7 +241,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         );
 
         $data = array(
-            'var' => 'var in data'
+            'var' => 'var in data',
         );
 
         $this->assertEquals('var in include', $tpl->render($data));
@@ -251,8 +249,8 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
 
     public function testOverridePartialWithNewlines()
     {
-         $partials = array(
-            'partial' => '{{$ballmer}}peaking{{/ballmer}}'
+        $partials = array(
+            'partial' => '{{$ballmer}}peaking{{/ballmer}}',
         );
 
         $this->mustache->setPartials($partials);
@@ -269,9 +267,8 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
     public function testInheritIndentationWhenOverridingAPartial()
     {
         $partials = array(
-            'partial' =>
-                'stop:
-                    {{$nineties}}collaborate and listen{{/nineties}}'
+            'partial' => 'stop:
+                    {{$nineties}}collaborate and listen{{/nineties}}',
         );
 
         $this->mustache->setPartials($partials);
@@ -289,10 +286,33 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         );
     }
 
+    public function testInheritSpacingWhenOverridingAPartial()
+    {
+        $partials = array(
+            'parent' => 'collaborate_and{{$id}}{{/id}}',
+            'child'  => '{{<parent}}{{$id}}_listen{{/id}}{{/parent}}',
+        );
+
+        $this->mustache->setPartials($partials);
+
+        $tpl = $this->mustache->loadTemplate(
+            'stop:
+              {{>child}}'
+        );
+
+        $data = array();
+
+        $this->assertEquals(
+            'stop:
+              collaborate_and_listen',
+            $tpl->render($data)
+        );
+    }
+
     public function testOverrideOneSubstitutionButNotTheOther()
     {
         $partials = array(
-            'partial' => '{{$stuff}}default one{{/stuff}}, {{$stuff2}}default two{{/stuff2}}'
+            'partial' => '{{$stuff}}default one{{/stuff}}, {{$stuff2}}default two{{/stuff2}}',
         );
 
         $this->mustache->setPartials($partials);
@@ -309,7 +329,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
     public function testSuperTemplatesWithNoParameters()
     {
         $partials = array(
-            'include' => '{{$foo}}default content{{/foo}}'
+            'include' => '{{$foo}}default content{{/foo}}',
         );
 
         $this->mustache->setPartials($partials);
@@ -326,8 +346,8 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
     public function testRecursionInInheritedTemplates()
     {
         $partials = array(
-            'include' => '{{$foo}}default content{{/foo}} {{$bar}}{{<include2}}{{/include2}}{{/bar}}',
-            'include2' => '{{$foo}}include2 default content{{/foo}} {{<include}}{{$bar}}don\'t recurse{{/bar}}{{/include}}'
+            'include'  => '{{$foo}}default content{{/foo}} {{$bar}}{{<include2}}{{/include2}}{{/bar}}',
+            'include2' => '{{$foo}}include2 default content{{/foo}} {{<include}}{{$bar}}don\'t recurse{{/bar}}{{/include}}',
         );
 
         $this->mustache->setPartials($partials);
@@ -344,9 +364,9 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
     public function testTopLevelSubstitutionsTakePrecedenceInMultilevelInheritance()
     {
         $partials = array(
-            'parent' => '{{<older}}{{$a}}p{{/a}}{{/older}}',
-            'older' => '{{<grandParent}}{{$a}}o{{/a}}{{/grandParent}}',
-            'grandParent' => '{{$a}}g{{/a}}'
+            'parent'      => '{{<older}}{{$a}}p{{/a}}{{/older}}',
+            'older'       => '{{<grandParent}}{{$a}}o{{/a}}{{/grandParent}}',
+            'grandParent' => '{{$a}}g{{/a}}',
         );
 
         $this->mustache->setPartials($partials);
@@ -363,9 +383,9 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
     public function testMultiLevelInheritanceNoSubChild()
     {
         $partials = array(
-            'parent' => '{{<older}}{{$a}}p{{/a}}{{/older}}',
-            'older' => '{{<grandParent}}{{$a}}o{{/a}}{{/grandParent}}',
-            'grandParent' => '{{$a}}g{{/a}}'
+            'parent'      => '{{<older}}{{$a}}p{{/a}}{{/older}}',
+            'older'       => '{{<grandParent}}{{$a}}o{{/a}}{{/grandParent}}',
+            'grandParent' => '{{$a}}g{{/a}}',
         );
 
         $this->mustache->setPartials($partials);
@@ -382,7 +402,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
     public function testIgnoreTextInsideSuperTemplatesButParseArgs()
     {
         $partials = array(
-            'include' => '{{$foo}}default content{{/foo}}'
+            'include' => '{{$foo}}default content{{/foo}}',
          );
 
         $this->mustache->setPartials($partials);
@@ -399,7 +419,7 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
     public function testIgnoreTextInsideSuperTemplates()
     {
         $partials = array(
-            'include' => '{{$foo}}default content{{/foo}}'
+            'include' => '{{$foo}}default content{{/foo}}',
          );
 
         $this->mustache->setPartials($partials);

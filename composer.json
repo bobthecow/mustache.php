@@ -16,7 +16,8 @@
         "php": ">=5.2.4"
     },
     "require-dev": {
-        "phpunit/phpunit": "*"
+        "phpunit/phpunit": "~3.7|~4.0",
+        "fabpot/php-cs-fixer": "~1.6"
     },
     "autoload": {
         "psr-0": { "Mustache": "src/" }

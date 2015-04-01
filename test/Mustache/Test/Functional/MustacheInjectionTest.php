@@ -15,7 +15,6 @@
  */
 class Mustache_Test_Functional_MustacheInjectionTest extends PHPUnit_Framework_TestCase
 {
-
     private $mustache;
 
     public function setUp()
@@ -36,25 +35,25 @@ class Mustache_Test_Functional_MustacheInjectionTest extends PHPUnit_Framework_T
     {
         $interpolationData = array(
             'a' => '{{ b }}',
-            'b' => 'FAIL'
+            'b' => 'FAIL',
         );
 
         $sectionData = array(
             'a' => true,
             'b' => '{{ c }}',
-            'c' => 'FAIL'
+            'c' => 'FAIL',
         );
 
         $lambdaInterpolationData = array(
             'a' => array($this, 'lambdaInterpolationCallback'),
             'b' => '{{ c }}',
-            'c' => 'FAIL'
+            'c' => 'FAIL',
         );
 
         $lambdaSectionData = array(
             'a' => array($this, 'lambdaSectionCallback'),
             'b' => '{{ c }}',
-            'c' => 'FAIL'
+            'c' => 'FAIL',
         );
 
         return array(

@@ -23,7 +23,7 @@
  */
 class Mustache_Engine
 {
-    const VERSION        = '2.7.0';
+    const VERSION        = '2.8.0';
     const SPEC_VERSION   = '1.1.2';
 
     const PRAGMA_FILTERS = 'FILTERS';
@@ -174,7 +174,7 @@ class Mustache_Engine
         }
 
         if (isset($options['entity_flags'])) {
-          $this->entityFlags = $options['entity_flags'];
+            $this->entityFlags = $options['entity_flags'];
         }
 
         if (isset($options['charset'])) {
@@ -405,7 +405,7 @@ class Mustache_Engine
      *
      * @param string $name
      *
-     * @return boolean True if the helper is present
+     * @return bool True if the helper is present
      */
     public function hasHelper($name)
     {
@@ -772,9 +772,9 @@ class Mustache_Engine
     /**
      * Add a log record if logging is enabled.
      *
-     * @param integer $level   The logging level
-     * @param string  $message The log message
-     * @param array   $context The log context
+     * @param int    $level   The logging level
+     * @param string $message The log message
+     * @param array  $context The log context
      */
     private function log($level, $message, array $context = array())
     {

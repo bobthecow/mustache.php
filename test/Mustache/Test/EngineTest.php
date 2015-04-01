@@ -21,22 +21,22 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
         $partialsLoader = new Mustache_Loader_ArrayLoader();
         $mustache       = new Mustache_Engine(array(
             'template_class_prefix' => '__whot__',
-            'cache'  => self::$tempDir,
-            'cache_file_mode' => 777,
-            'logger' => $logger,
-            'loader' => $loader,
-            'partials_loader' => $partialsLoader,
-            'partials' => array(
+            'cache'                 => self::$tempDir,
+            'cache_file_mode'       => 777,
+            'logger'                => $logger,
+            'loader'                => $loader,
+            'partials_loader'       => $partialsLoader,
+            'partials'              => array(
                 'foo' => '{{ foo }}',
             ),
             'helpers' => array(
                 'foo' => array($this, 'getFoo'),
                 'bar' => 'BAR',
             ),
-            'escape'  => 'strtoupper',
+            'escape'       => 'strtoupper',
             'entity_flags' => ENT_QUOTES,
-            'charset' => 'ISO-8859-1',
-            'pragmas' => array(Mustache_Engine::PRAGMA_FILTERS),
+            'charset'      => 'ISO-8859-1',
+            'pragmas'      => array(Mustache_Engine::PRAGMA_FILTERS),
         ));
 
         $this->assertSame($logger, $mustache->getLogger());
@@ -127,7 +127,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
     {
         $mustache = new Mustache_Engine(array(
             'template_class_prefix' => '__whot__',
-            'cache' => self::$tempDir,
+            'cache'                 => self::$tempDir,
         ));
 
         $source    = '{{ foo }}';
@@ -140,7 +140,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
     public function testLambdaCache()
     {
         $mustache = new MustacheStub(array(
-            'cache' => self::$tempDir,
+            'cache'                  => self::$tempDir,
             'cache_lambda_templates' => true,
         ));
 
@@ -151,7 +151,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
     public function testWithoutLambdaCache()
     {
         $mustache = new MustacheStub(array(
-            'cache' => self::$tempDir
+            'cache' => self::$tempDir,
         ));
 
         $this->assertInstanceOf('Mustache_Cache_NoopCache', $mustache->getProtectedLambdaCache());
@@ -193,7 +193,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
             'partials_loader' => new Mustache_Loader_ArrayLoader(array(
                 'foo' => 'FOO',
                 'baz' => 'BAZ',
-            ))
+            )),
         ));
 
         $this->assertEquals('FOOBAZ', $mustache->render('{{>foo}}{{>bar}}{{>baz}}', array()));
@@ -237,7 +237,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
 
     public static function wrapWithUnderscores($text)
     {
-        return '__'.$text.'__';
+        return '__' . $text . '__';
     }
 
     /**
@@ -317,7 +317,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
         list($name, $mustache) = $this->getLoggedMustache(Mustache_Logger::DEBUG);
         $mustache->render('{{ foo }}{{> bar }}', array('foo' => 'FOO'));
         $log = file_get_contents($name);
-        $this->assertContains("DEBUG: Instantiating template: ",     $log);
+        $this->assertContains('DEBUG: Instantiating template: ',     $log);
         $this->assertContains("WARNING: Partial not found: \"bar\"", $log);
     }
 
@@ -327,7 +327,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
     public function testUnknownPragmaThrowsException()
     {
         new Mustache_Engine(array(
-            'pragmas' => array('UNKNOWN')
+            'pragmas' => array('UNKNOWN'),
         ));
     }
 
@@ -335,7 +335,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
     {
         $name     = tempnam(sys_get_temp_dir(), 'mustache-test');
         $mustache = new Mustache_Engine(array(
-            'logger' => new Mustache_Logger_StreamLogger($name, $level)
+            'logger' => new Mustache_Logger_StreamLogger($name, $level),
         ));
 
         return array($name, $mustache);

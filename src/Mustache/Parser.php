@@ -254,7 +254,7 @@ class Mustache_Parser
      *
      * @param array $token
      *
-     * @return boolean True if token is a whitespace token
+     * @return bool True if token is a whitespace token
      */
     private function tokenIsWhitespace(array $token)
     {

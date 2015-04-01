@@ -15,7 +15,6 @@
  */
 class Mustache_Test_Functional_CallTest extends PHPUnit_Framework_TestCase
 {
-
     public function testCallEatsContext()
     {
         $m = new Mustache_Engine();

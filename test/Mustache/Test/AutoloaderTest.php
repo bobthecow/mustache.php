@@ -22,7 +22,7 @@ class Mustache_Test_AutoloaderTest extends PHPUnit_Framework_TestCase
 
     public function testAutoloader()
     {
-        $loader = new Mustache_Autoloader(dirname(__FILE__).'/../../fixtures/autoloader');
+        $loader = new Mustache_Autoloader(dirname(__FILE__) . '/../../fixtures/autoloader');
 
         $this->assertNull($loader->autoload('NonMustacheClass'));
         $this->assertFalse(class_exists('NonMustacheClass'));

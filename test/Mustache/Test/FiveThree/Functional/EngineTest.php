@@ -33,7 +33,7 @@ class Mustache_Test_FiveThree_Functional_EngineTest extends PHPUnit_Framework_Te
         $helpers = array(
             'longdate' => function (\DateTime $value) {
                 return $value->format('Y-m-d h:m:s');
-            }
+            },
         );
 
         $data = array(
@@ -44,7 +44,7 @@ class Mustache_Test_FiveThree_Functional_EngineTest extends PHPUnit_Framework_Te
 
         return array(
             array(array(Mustache_Engine::PRAGMA_FILTERS), $helpers, $data, $tpl, '2000-01-01 12:01:00'),
-            array(array(),                                $helpers, $data, $tpl, ''                   ),
+            array(array(),                                $helpers, $data, $tpl, ''),
         );
     }
 }

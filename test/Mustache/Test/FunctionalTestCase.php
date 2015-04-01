@@ -26,14 +26,14 @@ abstract class Mustache_Test_FunctionalTestCase extends PHPUnit_Framework_TestCa
      */
     protected static function rmdir($path)
     {
-        $path = rtrim($path, '/').'/';
+        $path = rtrim($path, '/') . '/';
         $handle = opendir($path);
         while (($file = readdir($handle)) !== false) {
-            if ($file == '.' || $file == '..') {
+            if ($file === '.' || $file === '..') {
                 continue;
             }
 
-            $fullpath = $path.$file;
+            $fullpath = $path . $file;
             if (is_dir($fullpath)) {
                 self::rmdir($fullpath);
             } else {

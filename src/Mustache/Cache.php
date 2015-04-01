@@ -22,7 +22,7 @@ interface Mustache_Cache
      *
      * @param string $key
      *
-     * @return boolean indicates successfully class load
+     * @return bool indicates successfully class load
      */
     public function load($key);
 
@@ -31,8 +31,6 @@ interface Mustache_Cache
      *
      * @param string $key
      * @param string $value
-     *
-     * @return void
      */
     public function cache($key, $value);
 }

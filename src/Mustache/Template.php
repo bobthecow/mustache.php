@@ -22,7 +22,7 @@ abstract class Mustache_Template
     protected $mustache;
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $strictCallables = false;
 
@@ -37,7 +37,7 @@ abstract class Mustache_Template
     }
 
     /**
-     * Mustache Template instances can be treated as a function and rendered by simply calling them:
+     * Mustache Template instances can be treated as a function and rendered by simply calling them.
      *
      *     $m = new Mustache_Engine;
      *     $tpl = $m->loadTemplate('Hello, {{ name }}!');
@@ -109,7 +109,7 @@ abstract class Mustache_Template
      *
      * @param mixed $value
      *
-     * @return boolean True if the value is 'iterable'
+     * @return bool True if the value is 'iterable'
      */
     protected function isIterable($value)
     {

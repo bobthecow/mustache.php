@@ -22,7 +22,7 @@ class Mustache_Cache_NoopCache extends Mustache_Cache_AbstractCache
      *
      * @param string $key
      *
-     * @return boolean
+     * @return bool
      */
     public function load($key)
     {
@@ -34,8 +34,6 @@ class Mustache_Cache_NoopCache extends Mustache_Cache_AbstractCache
      *
      * @param string $key
      * @param string $value
-     *
-     * @return void
      */
     public function cache($key, $value)
     {
