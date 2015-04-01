@@ -263,7 +263,7 @@ class Mustache_Compiler
 
     const BLOCK_ARG = '
         // %s block_arg
-        $value = $this->section%s($context, $indent, true);
+        $value = $this->section%s($context, \'\', true);
         $newContext[%s] = %s$value;
     ';
 
