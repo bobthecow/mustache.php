@@ -233,9 +233,10 @@ class Mustache_Compiler
     }
 
     const BLOCK_VAR = '
-        $value = $this->resolveValue($context->findInBlock(%s), $context, $indent);
-        if ($value && !is_array($value) && !is_object($value)) {
-            $buffer .= $value;
+        $blockFunction = $context->findInBlock(%s);
+        if (is_callable($blockFunction)) {
+            $boundFunction = $blockFunction->bindTo($this, $this);
+            $boundFunction($context, $buffer);
         } else {
             %s
         }
@@ -258,13 +259,15 @@ class Mustache_Compiler
     {
         $id = var_export($id, true);
 
-        return sprintf($this->prepare(self::BLOCK_VAR, $level), $id, $this->walk($nodes, 2));
+        return sprintf($this->prepare(self::BLOCK_VAR, $level), $id, $this->walk($nodes));
     }
 
     const BLOCK_ARG = '
         // %s block_arg
-        $value = $this->section%s($context, \'\', true);
-        $newContext[%s] = %s$value;
+        $blockFunction = function(& $context, & $buffer, $indent=\'\') {
+            %s
+        };
+        $newContext[%s] = $blockFunction;
     ';
 
     /**
@@ -282,10 +285,10 @@ class Mustache_Compiler
      */
     private function blockArg($nodes, $id, $start, $end, $otag, $ctag, $level)
     {
-        $key = $this->section($nodes, $id, array(), $start, $end, $otag, $ctag, $level, true);
-        $id  = var_export($id, true);
+        $id = var_export($id, true);
+        $code = $this->walk($nodes, 1);
 
-        return sprintf($this->prepare(self::BLOCK_ARG, $level), $id, $key, $id, $this->flushIndent());
+        return sprintf($this->prepare(self::BLOCK_ARG, 1), $id, $code, $id);
     }
 
     const SECTION_CALL = '
