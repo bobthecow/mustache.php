@@ -34,7 +34,6 @@ define('EXAMPLE_PATH', realpath(dirname(__FILE__) . '/../test/fixtures/examples'
  * AStringMore -> a_string_more
  *
  * @param string $name
- * @access public
  *
  * @return string
  */
@@ -56,7 +55,6 @@ function getLowerCaseName($name)
  * a_string_more -> AStringMore -> a_string_more
  *
  * @param string $name
- * @access public
  *
  * @return string
  */
@@ -72,7 +70,6 @@ function getUpperCaseName($name)
  * return the given value and echo it out appending "\n".
  *
  * @param mixed $value
- * @access public
  *
  * @return mixed
  */
@@ -91,9 +88,8 @@ function out($value)
  * the returned filename will be echoed out.
  *
  * @param string $directory directory without / at the end
- * @param string $filename filename without path and extension
+ * @param string $filename  filename without path and extension
  * @param string $extension extension of the file without "."
- * @access public
  *
  * @return string
  */
@@ -109,7 +105,6 @@ function buildPath($directory, $filename = null,  $extension = null)
  * the script die()'s if mkdir() fails.
  *
  * @param string $directory
- * @access public
  */
 function createDirectory($directory)
 {
@@ -124,10 +119,9 @@ function createDirectory($directory)
  * the script die()'s if fopen() fails.
  *
  * @param string $directory directory without / at the end
- * @param string $filename filename without path and extension
+ * @param string $filename  filename without path and extension
  * @param string $extension extension of the file without "."
- * @param string $content the content of the file
- * @access public
+ * @param string $content   the content of the file
  */
 function createFile($directory, $filename, $extension, $content = '')
 {
@@ -150,7 +144,6 @@ function createFile($directory, $filename, $extension, $content = '')
  * examples/some_thing/SomeThing.php
  *
  * @param mixed $example_name
- * @access public
  */
 function main($example_name)
 {

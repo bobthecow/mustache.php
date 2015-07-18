@@ -317,8 +317,8 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
         list($name, $mustache) = $this->getLoggedMustache(Mustache_Logger::DEBUG);
         $mustache->render('{{ foo }}{{> bar }}', array('foo' => 'FOO'));
         $log = file_get_contents($name);
-        $this->assertContains('DEBUG: Instantiating template: ',     $log);
-        $this->assertContains("WARNING: Partial not found: \"bar\"", $log);
+        $this->assertContains('DEBUG: Instantiating template: ',   $log);
+        $this->assertContains('WARNING: Partial not found: "bar"', $log);
     }
 
     /**
