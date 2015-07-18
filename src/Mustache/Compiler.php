@@ -240,8 +240,7 @@ class Mustache_Compiler
         $blockFunction = $context->findInBlock(%s);
         if (is_callable($blockFunction)) {
             $buffer .= call_user_func($blockFunction, $context);
-        } else {
-            %s
+        } else {%s
         }
     ';
 
@@ -265,10 +264,7 @@ class Mustache_Compiler
         return sprintf($this->prepare(self::BLOCK_VAR, $level), $id, $this->walk($nodes, $level));
     }
 
-    const BLOCK_ARG = '
-        // %s block_arg
-        $newContext[%s] = array($this, \'block%s\');
-    ';
+    const BLOCK_ARG = '$newContext[%s] = array($this, \'block%s\');';
 
     /**
      * Generate Mustache Template inheritance block argument PHP source.
@@ -289,33 +285,34 @@ class Mustache_Compiler
         $keystr = var_export($key, true);
         $id = var_export($id, true);
 
-        return sprintf($this->prepare(self::BLOCK_ARG, 1), $keystr, $id, $key);
+        return sprintf($this->prepare(self::BLOCK_ARG, 1), $id, $key);
     }
 
-    const BLOCK_FUNCTION = 'public function block%s($context) {
-            $indent = $buffer = \'\';
-
-            %s
+    const BLOCK_FUNCTION = '
+        public function block%s($context)
+        {
+            $indent = $buffer = \'\';%s
 
             return $buffer;
-        }';
+        }
+    ';
 
     /**
      * Generate Mustache Template inheritance block function PHP source.
      *
-     * @param array  $nodes Array of child tokens
+     * @param array $nodes Array of child tokens
      *
      * @return string key of new block function
      */
     private function block($nodes)
     {
-        $code = $this->walk($nodes, 1);
-
+        $code = $this->walk($nodes, 0);
         $key = ucfirst(md5($code));
 
         if (!isset($this->blocks[$key])) {
-            $this->blocks[$key] = sprintf($this->prepare(self::BLOCK_FUNCTION, 1), $key, $code);
+            $this->blocks[$key] = sprintf($this->prepare(self::BLOCK_FUNCTION, 0), $key, $code);
         }
+
         return $key;
     }
 
@@ -349,7 +346,8 @@ class Mustache_Compiler
             }
 
             return $buffer;
-        }';
+        }
+    ';
 
     /**
      * Generate Mustache Template section PHP source.
@@ -399,7 +397,8 @@ class Mustache_Compiler
         $value = $context->%s(%s);%s
         if (empty($value)) {
             %s
-        }';
+        }
+    ';
 
     /**
      * Generate Mustache Template inverted section PHP source.
