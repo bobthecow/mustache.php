@@ -17,8 +17,3 @@ php:
   - hhvm
 
 sudo: false
-
-matrix:
-  allow_failures:
-    - php: hhvm-nightly
-  fast_finish: true
