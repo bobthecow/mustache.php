@@ -26,13 +26,15 @@ class Mustache_Engine
     const VERSION        = '2.8.0';
     const SPEC_VERSION   = '1.1.2';
 
-    const PRAGMA_FILTERS = 'FILTERS';
-    const PRAGMA_BLOCKS  = 'BLOCKS';
+    const PRAGMA_FILTERS      = 'FILTERS';
+    const PRAGMA_BLOCKS       = 'BLOCKS';
+    const PRAGMA_ANCHORED_DOT = 'ANCHORED-DOT';
 
     // Known pragmas
     private static $knownPragmas = array(
-        self::PRAGMA_FILTERS => true,
-        self::PRAGMA_BLOCKS  => true,
+        self::PRAGMA_FILTERS      => true,
+        self::PRAGMA_BLOCKS       => true,
+        self::PRAGMA_ANCHORED_DOT => true,
     );
 
     // Template cache

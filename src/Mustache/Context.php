@@ -128,12 +128,43 @@ class Mustache_Context
     {
         $chunks = explode('.', $id);
         $first  = array_shift($chunks);
+        $value  = $this->findVariableInStack($first, $this->stack);
 
-        if ($first === '') {
-            $value = $this->last();
-        } else {
-            $value = $this->findVariableInStack($first, $this->stack);
+        foreach ($chunks as $chunk) {
+            if ($value === '') {
+                return $value;
+            }
+
+            $value = $this->findVariableInStack($chunk, array($value));
         }
+
+        return $value;
+    }
+
+    /**
+     * Find an 'anchored dot notation' variable in the Context stack.
+     *
+     * This is the same as findDot(), except it looks in the top of the context
+     * stack for the first value, rather than searching the whole context stack
+     * and starting from there.
+     *
+     * @see Mustache_Context::findDot
+     *
+     * @throws Mustache_Exception_InvalidArgumentException if given an invalid anchored dot $id.
+     *
+     * @param string $id Dotted variable selector
+     *
+     * @return mixed Variable value, or '' if not found
+     */
+    public function findAnchoredDot($id)
+    {
+        $chunks = explode('.', $id);
+        $first  = array_shift($chunks);
+        if ($first !== '') {
+            throw new Mustache_Exception_InvalidArgumentException(sprintf('Unexpected id for findAnchoredDot: %s', $id));
+        }
+
+        $value  = $this->last();
 
         foreach ($chunks as $chunk) {
             if ($value === '') {

@@ -142,25 +142,43 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
 
         $context->push($a);
         $this->assertEquals('a', $context->find('name'));
-        $this->assertEquals('a', $context->findDot('.name'));
+        $this->assertEquals('', $context->findDot('.name'));
+        $this->assertEquals('a', $context->findAnchoredDot('.name'));
         $this->assertEquals(1, $context->find('number'));
-        $this->assertEquals(1, $context->findDot('.number'));
+        $this->assertEquals('', $context->findDot('.number'));
+        $this->assertEquals(1, $context->findAnchoredDot('.number'));
 
         $context->push($b);
         $this->assertEquals('a', $context->find('name'));
         $this->assertEquals(2, $context->find('number'));
         $this->assertEquals('', $context->findDot('.name'));
-        $this->assertEquals(2, $context->findDot('.number'));
+        $this->assertEquals('', $context->findDot('.number'));
+        $this->assertEquals('', $context->findAnchoredDot('.name'));
+        $this->assertEquals(2, $context->findAnchoredDot('.number'));
         $this->assertEquals('baby bee', $context->findDot('child.name'));
-        $this->assertEquals('baby bee', $context->findDot('.child.name'));
+        $this->assertEquals('', $context->findDot('.child.name'));
+        $this->assertEquals('baby bee', $context->findAnchoredDot('.child.name'));
 
         $context->push($c);
         $this->assertEquals('cee', $context->find('name'));
-        $this->assertEquals('cee', $context->findDot('.name'));
+        $this->assertEquals('', $context->findDot('.name'));
+        $this->assertEquals('cee', $context->findAnchoredDot('.name'));
         $this->assertEquals(2, $context->find('number'));
         $this->assertEquals('', $context->findDot('.number'));
+        $this->assertEquals('', $context->findAnchoredDot('.number'));
         $this->assertEquals('baby bee', $context->findDot('child.name'));
         $this->assertEquals('', $context->findDot('.child.name'));
+        $this->assertEquals('', $context->findAnchoredDot('.child.name'));
+    }
+
+    /**
+     * @expectedException Mustache_Exception_InvalidArgumentException
+     */
+    public function testAnchoredDotNotationThrowsExceptions()
+    {
+        $context = new Mustache_Context();
+        $context->push(array('a' => 1));
+        $context->findAnchoredDot('a');
     }
 }
 

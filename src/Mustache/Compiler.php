@@ -631,6 +631,12 @@ class Mustache_Compiler
             return 'last';
         }
 
+        if (isset($this->pragmas[Mustache_Engine::PRAGMA_ANCHORED_DOT]) && $this->pragmas[Mustache_Engine::PRAGMA_ANCHORED_DOT]) {
+            if (substr($id, 0, 1) === '.') {
+                return 'findAnchoredDot';
+            }
+        }
+
         if (strpos($id, '.') === false) {
             return 'find';
         }
