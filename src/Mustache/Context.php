@@ -128,7 +128,12 @@ class Mustache_Context
     {
         $chunks = explode('.', $id);
         $first  = array_shift($chunks);
-        $value  = $this->findVariableInStack($first, $this->stack);
+
+        if ($first === '') {
+            $value = $this->last();
+        } else {
+            $value = $this->findVariableInStack($first, $this->stack);
+        }
 
         foreach ($chunks as $chunk) {
             if ($value === '') {
