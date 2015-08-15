@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2010-2014 Justin Hileman
+ * (c) 2010-2015 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -317,8 +317,8 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
         list($name, $mustache) = $this->getLoggedMustache(Mustache_Logger::DEBUG);
         $mustache->render('{{ foo }}{{> bar }}', array('foo' => 'FOO'));
         $log = file_get_contents($name);
-        $this->assertContains('DEBUG: Instantiating template: ',     $log);
-        $this->assertContains("WARNING: Partial not found: \"bar\"", $log);
+        $this->assertContains('DEBUG: Instantiating template: ',   $log);
+        $this->assertContains('WARNING: Partial not found: "bar"', $log);
     }
 
     /**

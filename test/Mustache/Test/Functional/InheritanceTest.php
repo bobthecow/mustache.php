@@ -433,6 +433,57 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         $this->assertEquals('default content', $tpl->render($data));
     }
 
+    public function testInheritanceWithLazyEvaluation()
+    {
+        $partials = array(
+            'parent' => '{{#items}}{{$value}}ignored{{/value}}{{/items}}',
+        );
+
+        $this->mustache->setPartials($partials);
+
+        $tpl = $this->mustache->loadTemplate(
+            '{{<parent}}{{$value}}<{{ . }}>{{/value}}{{/parent}}'
+        );
+
+        $data = array('items' => array(1, 2, 3));
+
+        $this->assertEquals('<1><2><3>', $tpl->render($data));
+    }
+
+    public function testInheritanceWithLazyEvaluationWhitespaceIgnored()
+    {
+        $partials = array(
+            'parent' => '{{#items}}{{$value}}\n\nignored\n\n{{/value}}{{/items}}',
+        );
+
+        $this->mustache->setPartials($partials);
+
+        $tpl = $this->mustache->loadTemplate(
+            '{{<parent}}\n\n\n{{$value}}<{{ . }}>{{/value}}\n\n{{/parent}}'
+        );
+
+        $data = array('items' => array(1, 2, 3));
+
+        $this->assertEquals('<1><2><3>', $tpl->render($data));
+    }
+
+    public function testInheritanceWithLazyEvaluationAndSections()
+    {
+        $partials = array(
+            'parent' => '{{#items}}{{$value}}\n\nignored {{.}} {{#more}} there is more {{/more}}\n\n{{/value}}{{/items}}',
+        );
+
+        $this->mustache->setPartials($partials);
+
+        $tpl = $this->mustache->loadTemplate(
+            '{{<parent}}\n\n\n{{$value}}<{{ . }}>{{#more}} there is less {{/more}}{{/value}}\n\n{{/parent}}'
+        );
+
+        $data = array('items' => array(1, 2, 3), 'more' => 'stuff');
+
+        $this->assertEquals('<1> there is less <2> there is less <3> there is less ', $tpl->render($data));
+    }
+
     /**
      * @dataProvider getIllegalInheritanceExamples
      * @expectedException Mustache_Exception_SyntaxException
