@@ -74,6 +74,9 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
      *
      * @throws Mustache_Exception_RuntimeException
      *
+     * @param string $dir
+     *
+     * @return string
      */
     protected function sanitizeDir($dir)
     {
@@ -84,6 +87,7 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
         if (!is_dir($dir)) {
             throw new Mustache_Exception_RuntimeException(sprintf('FilesystemLoader baseDir must be a directory: %s', $dir));
         }
+        
         return $dir;
     }
 
