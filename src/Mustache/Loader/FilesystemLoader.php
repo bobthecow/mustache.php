@@ -48,7 +48,7 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
     public function __construct($baseDir, array $options = array())
     {
         if (is_array($baseDir)) {
-            $this->baseDir = [];
+            $this->baseDir = array();
             foreach ($baseDir as $dir) {
                 $this->baseDir[] = $this->sanitizeDir($dir);
             }
@@ -87,7 +87,7 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
         if (!is_dir($dir)) {
             throw new Mustache_Exception_RuntimeException(sprintf('FilesystemLoader baseDir must be a directory: %s', $dir));
         }
-        
+    
         return $dir;
     }
 
