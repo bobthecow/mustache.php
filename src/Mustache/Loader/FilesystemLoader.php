@@ -52,17 +52,14 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
             foreach ($baseDir as $dir) {
                 $this->baseDir[] = $this->sanitizeDir($dir);
             }
-        }
-        else {
+        } else {
             $this->baseDir = array($this->sanitizeDir($baseDir));
         }
-
 
         if (empty($this->baseDir)) {
             throw new Mustache_Exception_RuntimeException('FilesystemLoader baseDir must have at least one directory.');
         }
 
-        
         if (array_key_exists('extension', $options)) {
             if (empty($options['extension'])) {
                 $this->extension = '';
@@ -73,7 +70,7 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
     }
 
     /**
-     * Sanitize a directory name
+     * Sanitize a directory name.
      *
      * @throws Mustache_Exception_RuntimeException
      *
@@ -81,7 +78,7 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
     protected function sanitizeDir($dir)
     {
         if (strpos($dir, '://') === false) {
-            $dir= realpath($dir);
+            $dir = realpath($dir);
         }
 
         if (!is_dir($dir)) {
@@ -140,7 +137,7 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
      *
      * @return string Template file name
      */
-    protected function getFileName($name, $dir=null)
+    protected function getFileName($name, $dir = null)
     {
         $fileName = $dir . '/' . $name;
         if (substr($fileName, 0 - strlen($this->extension)) !== $this->extension) {
