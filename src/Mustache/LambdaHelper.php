@@ -20,17 +20,20 @@ class Mustache_LambdaHelper
 {
     private $mustache;
     private $context;
+    private $delims;
 
     /**
      * Mustache Lambda Helper constructor.
      *
      * @param Mustache_Engine  $mustache Mustache engine instance.
      * @param Mustache_Context $context  Rendering context.
+     * @param string           $delims   Optional custom delimiters, in the format `{{= <% %> =}}`. (default: null)
      */
-    public function __construct(Mustache_Engine $mustache, Mustache_Context $context)
+    public function __construct(Mustache_Engine $mustache, Mustache_Context $context, $delims = null)
     {
         $this->mustache = $mustache;
         $this->context  = $context;
+        $this->delims   = $delims;
     }
 
     /**
@@ -43,7 +46,19 @@ class Mustache_LambdaHelper
     public function render($string)
     {
         return $this->mustache
-            ->loadLambda((string) $string)
+            ->loadLambda((string) $string, $this->delims)
             ->renderInternal($this->context);
+    }
+
+    /**
+     * Get a Lambda Helper with custom delimiters.
+     *
+     * @param string $delims Custom delimiters, in the format `{{= <% %> =}}`.
+     *
+     * @return Mustache_LambdaHelper
+     */
+    public function withDelimiters($delims)
+    {
+        return new self($this->mustache, $this->context, $delims);
     }
 }
