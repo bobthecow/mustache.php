@@ -58,13 +58,14 @@ abstract class Mustache_Template
      * Render this template given the rendering context.
      *
      * @param mixed $context Array or object rendering context (default: array())
+     * @param mixed $globalContext Array or object rendering context (default: array())
      *
      * @return string Rendered template
      */
-    public function render($context = array())
+    public function render($context = array(), $globalContext = array())
     {
         return $this->renderInternal(
-            $this->prepareContextStack($context)
+            $this->prepareContextStack($context, $globalContext)
         );
     }
 
@@ -138,12 +139,13 @@ abstract class Mustache_Template
      * Adds the Mustache HelperCollection to the stack's top context frame if helpers are present.
      *
      * @param mixed $context Optional first context frame (default: null)
+     * @param mixed $globalContext Optional second context frame (default: null)
      *
      * @return Mustache_Context
      */
-    protected function prepareContextStack($context = null)
+    protected function prepareContextStack($context = null, $globalContext = null)
     {
-        $stack = new Mustache_Context();
+        $stack = new Mustache_Context($globalContext);
 
         $helpers = $this->mustache->getHelpers();
         if (!$helpers->isEmpty()) {

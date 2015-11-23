@@ -16,6 +16,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
 {
     public function testConstructor()
     {
+        $global_variables = array('globalKey' => 'globalValue');
         $logger         = new Mustache_Logger_StreamLogger(tmpfile());
         $loader         = new Mustache_Loader_StringLoader();
         $partialsLoader = new Mustache_Loader_ArrayLoader();
@@ -37,6 +38,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
             'entity_flags' => ENT_QUOTES,
             'charset'      => 'ISO-8859-1',
             'pragmas'      => array(Mustache_Engine::PRAGMA_FILTERS),
+            'global_variables' => $global_variables
         ));
 
         $this->assertSame($logger, $mustache->getLogger());
@@ -52,6 +54,7 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
         $this->assertFalse($mustache->hasHelper('baz'));
         $this->assertInstanceOf('Mustache_Cache_FilesystemCache', $mustache->getCache());
         $this->assertEquals(array(Mustache_Engine::PRAGMA_FILTERS), $mustache->getPragmas());
+        $this->assertEquals($global_variables, $mustache->getGlobalVariables());
     }
 
     public static function getFoo()
@@ -79,6 +82,29 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
 
         $this->assertEquals($output, $mustache->render($source, $data));
         $this->assertEquals($source, $mustache->source);
+    }
+    
+    public function testRenderWithGlobalVariablesArray()
+    {
+        $source = '{{ foo }} {{ bar }}';
+        $data   = array('bar' => 'baz');
+        $output = 'fo baz';
+
+        $mustache = new Mustache_Engine(/*$options =*/array('global_variables' => array('foo' => 'fo')));
+
+        $this->assertEquals($output, $mustache->render($source, $data));
+    }
+    
+    public function testRenderWithGlobalVariablesObject()
+    {
+        
+        $source = '{{ bar }} {{ taxed_value }}';
+        $data   = array('bar' => 'baz');
+        $output = 'baz 6000';
+
+        $mustache = new Mustache_Engine(/*$options =*/array('global_variables' => new globalVariablesObject));
+
+        $this->assertEquals($output, $mustache->render($source, $data));
     }
 
     public function testSettingServices()
@@ -358,4 +384,15 @@ class MustacheStub extends Mustache_Engine
     {
         return $this->getLambdaCache();
     }
+}
+
+class globalVariablesObject {
+    public $name  = "Chris";
+    public $value = 10000;
+
+    public function taxed_value() {
+        return $this->value - ($this->value * 0.4);
+    }
+
+    public $in_ca = true;
 }
