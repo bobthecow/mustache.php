@@ -51,6 +51,18 @@ class Mustache_LambdaHelper
     }
 
     /**
+     * Render a string as a Mustache template with the current rendering context.
+     *
+     * @param string $string
+     *
+     * @return string Rendered template
+     */
+    public function __invoke($string)
+    {
+        return $this->render($string);
+    }
+
+    /**
      * Get a Lambda Helper with custom delimiters.
      *
      * @param string $delims Custom delimiters, in the format `{{= <% %> =}}`.

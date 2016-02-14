@@ -49,4 +49,19 @@ class Mustache_Test_FiveThree_Functional_LambdaHelperTest extends PHPUnit_Framew
 
         $this->assertEquals('hello world!', $tpl->render($data));
     }
+
+    public function testLambdaHelperIsInvokable()
+    {
+        $one = $this->mustache->loadTemplate('{{name}}');
+        $two = $this->mustache->loadTemplate('{{#lambda}}{{name}}{{/lambda}}');
+
+        $foo = new StdClass();
+        $foo->name = 'Mario';
+        $foo->lambda = function ($text, $render) {
+            return strtoupper($render($text));
+        };
+
+        $this->assertEquals('Mario', $one->render($foo));
+        $this->assertEquals('MARIO', $two->render($foo));
+    }
 }
