@@ -498,7 +498,7 @@ class Mustache_Compiler
     }
 
     const VARIABLE = '
-        $value = $this->resolveValue($context->%s(%s), $context, $indent);%s
+        $value = $this->resolveValue($context->%s(%s), $context);%s
         $buffer .= %s%s;
     ';
 
