@@ -87,7 +87,7 @@ class Mustache_Test_FiveThree_Functional_ClassWithLambda
 
     public function placeholder()
     {
-        return function() {
+        return function () {
             return 'Enter your name';
         };
     }
