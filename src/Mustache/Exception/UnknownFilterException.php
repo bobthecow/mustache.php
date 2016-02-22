@@ -17,12 +17,18 @@ class Mustache_Exception_UnknownFilterException extends UnexpectedValueException
     protected $filterName;
 
     /**
-     * @param string $filterName
+     * @param string    $filterName
+     * @param Exception $previous
      */
-    public function __construct($filterName)
+    public function __construct($filterName, Exception $previous = null)
     {
         $this->filterName = $filterName;
-        parent::__construct(sprintf('Unknown filter: %s', $filterName));
+        $message = sprintf('Unknown filter: %s', $filterName);
+        if (method_exists(__CLASS__, 'getPrevious')) {
+            parent::__construct($message, 0, $previous);
+        } else {
+            parent::__construct($message);
+        }
     }
 
     public function getFilterName()

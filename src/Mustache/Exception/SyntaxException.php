@@ -17,13 +17,18 @@ class Mustache_Exception_SyntaxException extends LogicException implements Musta
     protected $token;
 
     /**
-     * @param string $msg
-     * @param array  $token
+     * @param string    $msg
+     * @param array     $token
+     * @param Exception $previous
      */
-    public function __construct($msg, array $token)
+    public function __construct($msg, array $token, Exception $previous = null)
     {
         $this->token = $token;
-        parent::__construct($msg);
+        if (method_exists(__CLASS__, 'getPrevious')) {
+            parent::__construct($msg, 0, $previous);
+        } else {
+            parent::__construct($msg);
+        }
     }
 
     /**
