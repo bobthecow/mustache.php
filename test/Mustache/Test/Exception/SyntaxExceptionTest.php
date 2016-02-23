@@ -24,4 +24,16 @@ class Mustache_Test_Exception_SyntaxExceptionTest extends PHPUnit_Framework_Test
         $e = new Mustache_Exception_SyntaxException('ignore this', $token);
         $this->assertEquals($token, $e->getToken());
     }
+
+    public function testPrevious()
+    {
+        if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+            $this->markTestSkipped('Exception chaining requires at least PHP 5.3');
+        }
+
+        $previous = new Exception();
+        $e = new Mustache_Exception_SyntaxException('foo', array(), $previous);
+
+        $this->assertSame($previous, $e->getPrevious());
+    }
 }
