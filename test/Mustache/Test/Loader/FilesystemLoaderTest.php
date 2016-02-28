@@ -33,7 +33,7 @@ class Mustache_Test_Loader_FilesystemLoaderTest extends PHPUnit_Framework_TestCa
     {
         $baseDir = realpath(dirname(__FILE__) . '/../../../fixtures/templates');
 
-        $loader = new Mustache_Loader_FilesystemLoader('file://' . $baseDir, array('extension' => '.ms'));
+        $loader = new Mustache_Loader_FilesystemLoader('test://' . $baseDir, array('extension' => '.ms'));
         $this->assertEquals('alpha contents', $loader->load('alpha'));
         $this->assertEquals('beta contents', $loader->load('beta.ms'));
     }
