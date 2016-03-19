@@ -17,12 +17,18 @@ class Mustache_Exception_UnknownTemplateException extends InvalidArgumentExcepti
     protected $templateName;
 
     /**
-     * @param string $templateName
+     * @param string    $templateName
+     * @param Exception $previous
      */
-    public function __construct($templateName)
+    public function __construct($templateName, Exception $previous = null)
     {
         $this->templateName = $templateName;
-        parent::__construct(sprintf('Unknown template: %s', $templateName));
+        $message = sprintf('Unknown template: %s', $templateName);
+        if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
+            parent::__construct($message, 0, $previous);
+        } else {
+            parent::__construct($message);
+        }
     }
 
     public function getTemplateName()
