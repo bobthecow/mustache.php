@@ -605,12 +605,18 @@ class Mustache_Engine
      * This method must be updated any time options are added which make it so
      * the same template could be parsed and compiled multiple different ways.
      *
-     * @param string $source
+     * @param string|Mustache_Source $source
      *
      * @return string Mustache Template class name
      */
     public function getTemplateClassName($source)
     {
+        if ($source instanceof Mustache_Source) {
+            $key = $source->getKey();
+        } else {
+            $key = sprintf('source:%s', $source);
+        }
+
         // For the most part, adding a new option here should do the trick.
         //
         // Pick a value here which is unique for each possible way the template
@@ -629,7 +635,7 @@ class Mustache_Engine
             'version'         => self::VERSION,
         );
 
-        return $this->templateClassPrefix . md5(json_encode($options) . "\n" . $source);
+        return $this->templateClassPrefix . md5(json_encode($options) . "\n" . $key);
     }
 
     /**
@@ -706,8 +712,8 @@ class Mustache_Engine
      * @see Mustache_Engine::loadPartial
      * @see Mustache_Engine::loadLambda
      *
-     * @param string         $source
-     * @param Mustache_Cache $cache  (default: null)
+     * @param string|Mustache_Source $source
+     * @param Mustache_Cache         $cache  (default: null)
      *
      * @return Mustache_Template
      */
@@ -775,13 +781,12 @@ class Mustache_Engine
      *
      * @see Mustache_Compiler::compile
      *
-     * @param string $source
+     * @param string|Mustache_Source $source
      *
      * @return string generated Mustache template class code
      */
     private function compile($source)
     {
-        $tree = $this->parse($source);
         $name = $this->getTemplateClassName($source);
 
         $this->log(
@@ -789,6 +794,11 @@ class Mustache_Engine
             'Compiling template to "{className}" class',
             array('className' => $name)
         );
+
+        if ($source instanceof Mustache_Source) {
+            $source = $source->getSource();
+        }
+        $tree = $this->parse($source);
 
         $compiler = $this->getCompiler();
         $compiler->setPragmas($this->getPragmas());
