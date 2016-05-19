@@ -456,7 +456,7 @@ class Mustache_Compiler
     const PARENT = '
         %s
 
-        if ($parent = $this->mustache->LoadPartial(%s)) {
+        if ($parent = $this->mustache->loadPartial(%s)) {
             $context->pushBlockContext($newContext);
             $buffer .= $parent->renderInternal($context, $indent);
             $context->popBlockContext();
