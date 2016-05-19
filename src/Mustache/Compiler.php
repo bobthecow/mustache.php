@@ -191,7 +191,7 @@ class Mustache_Compiler
             {
                 $this->lambdaHelper = new Mustache_LambdaHelper($this->mustache, $context);
                 $buffer = \'\';
-                $newContext = array();
+                $blocksContext = array();
         %s
 
                 return $buffer;
@@ -207,7 +207,7 @@ class Mustache_Compiler
             public function renderInternal(Mustache_Context $context, $indent = \'\')
             {
                 $buffer = \'\';
-                $newContext = array();
+                $blocksContext = array();
         %s
 
                 return $buffer;
@@ -264,7 +264,7 @@ class Mustache_Compiler
         return sprintf($this->prepare(self::BLOCK_VAR, $level), $id, $this->walk($nodes, $level));
     }
 
-    const BLOCK_ARG = '$newContext[%s] = array($this, \'block%s\');';
+    const BLOCK_ARG = '$blocksContext[%s] = array($this, \'block%s\');';
 
     /**
      * Generate Mustache Template inheritance block argument PHP source.
@@ -291,7 +291,8 @@ class Mustache_Compiler
     const BLOCK_FUNCTION = '
         public function block%s($context)
         {
-            $indent = $buffer = \'\';%s
+            $indent = $buffer = \'\';
+            $blocksContext = array();%s
 
             return $buffer;
         }
@@ -326,6 +327,8 @@ class Mustache_Compiler
         private function section%s(Mustache_Context $context, $indent, $value)
         {
             $buffer = \'\';
+            $blocksContext = array();
+
             if (%s) {
                 $source = %s;
                 $result = call_user_func($value, $source, %s);
@@ -457,7 +460,7 @@ class Mustache_Compiler
         %s
 
         if ($parent = $this->mustache->loadPartial(%s)) {
-            $context->pushBlockContext($newContext);
+            $context->pushBlockContext($blocksContext);
             $buffer .= $parent->renderInternal($context, $indent);
             $context->popBlockContext();
         }
