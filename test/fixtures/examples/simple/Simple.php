@@ -11,4 +11,4 @@ class Simple
     }
 
     public $in_ca = true;
-};
+}

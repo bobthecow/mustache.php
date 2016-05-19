@@ -32,6 +32,7 @@ class Mustache_Test_Functional_CallTest extends PHPUnit_Framework_TestCase
 class Mustache_Test_Functional_ClassWithCall
 {
     public $name;
+
     public function __call($method, $args)
     {
         return 'unknown value';

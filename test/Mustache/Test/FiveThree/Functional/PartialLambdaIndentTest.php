@@ -17,18 +17,18 @@ class Mustache_Test_FiveThree_Functional_PartialLambdaIndentTest extends PHPUnit
 {
     public function testLambdasInsidePartialsAreIndentedProperly()
     {
-        $src = <<<EOS
+        $src = <<<'EOS'
 <fieldset>
   {{> input }}
 </fieldset>
 
 EOS;
-        $partial = <<<EOS
+        $partial = <<<'EOS'
 <input placeholder="{{# _t }}Enter your name{{/ _t }}">
 
 EOS;
 
-        $expected = <<<EOS
+        $expected = <<<'EOS'
 <fieldset>
   <input placeholder="ENTER YOUR NAME">
 </fieldset>
@@ -47,18 +47,18 @@ EOS;
 
     public function testLambdaInterpolationsInsidePartialsAreIndentedProperly()
     {
-        $src = <<<EOS
+        $src = <<<'EOS'
 <fieldset>
   {{> input }}
 </fieldset>
 
 EOS;
-        $partial = <<<EOS
+        $partial = <<<'EOS'
 <input placeholder="{{ placeholder }}">
 
 EOS;
 
-        $expected = <<<EOS
+        $expected = <<<'EOS'
 <fieldset>
   <input placeholder="Enter your name">
 </fieldset>

@@ -77,7 +77,7 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
         $this->assertEquals('[[2000-01-01 12:01:00]]', $tpl->render($foo));
     }
 
-    const CHAINED_SECTION_FILTERS_TPL = <<<EOS
+    const CHAINED_SECTION_FILTERS_TPL = <<<'EOS'
 {{% FILTERS }}
 {{# word | echo | with_index }}
 {{ key }}: {{ value }}
