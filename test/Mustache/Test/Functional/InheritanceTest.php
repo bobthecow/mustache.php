@@ -84,6 +84,15 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
                 '{{<foo}}set by template{{$baz}}also set by template{{/baz}}{{/foo}}',
                 'also set by template',
             ),
+            array(
+                array(
+                    'foo' => '{{$a}}FAIL!{{/a}}',
+                    'bar' => 'WIN!!',
+                ),
+                array(),
+                '{{<foo}}{{$a}}{{<bar}}FAIL{{/bar}}{{/a}}{{/foo}}',
+                'WIN!!',
+            ),
         );
     }
 
