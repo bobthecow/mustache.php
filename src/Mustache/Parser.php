@@ -37,8 +37,9 @@ class Mustache_Parser
         $this->lineTokens = 0;
         $this->pragmas    = $this->defaultPragmas;
 
-        $this->pragmaFilters = isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS]);
-        $this->pragmaBlocks  = isset($this->pragmas[Mustache_Engine::PRAGMA_BLOCKS]);
+        $this->pragmaFilters      = isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS]);
+        $this->pragmaBlocks       = isset($this->pragmas[Mustache_Engine::PRAGMA_BLOCKS]);
+        $this->pragmaSelfClosing  = isset($this->pragmas[Mustache_Engine::PRAGMA_SELF_CLOSING]);
 
         return $this->buildTree($tokens);
     }
@@ -102,6 +103,16 @@ class Mustache_Parser
                 case Mustache_Tokenizer::T_INVERTED:
                     $this->checkIfTokenIsAllowedInParent($parent, $token);
                     $this->clearStandaloneLines($nodes, $tokens);
+
+                    if ($this->pragmaSelfClosing === true) {
+                        if (isset($token[Mustache_Tokenizer::SELFCLOSING])) {
+                            $token[Mustache_Tokenizer::NODES] = [];
+                            $token[Mustache_Tokenizer::END] = $token[Mustache_Tokenizer::INDEX];
+                            $nodes[] = $token;
+                            break;
+                        }
+                    }
+
                     $nodes[] = $this->buildTree($tokens, $token);
                     break;
 
@@ -153,6 +164,16 @@ class Mustache_Parser
                             $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_BLOCK_ARG;
                         }
                         $this->clearStandaloneLines($nodes, $tokens);
+
+                        if ($this->pragmaSelfClosing === true) {
+                            if (isset($token[Mustache_Tokenizer::SELFCLOSING])) {
+                                $token[Mustache_Tokenizer::NODES] = [];
+                                $token[Mustache_Tokenizer::END] = $token[Mustache_Tokenizer::INDEX];
+                                $nodes[] = $token;
+                                break;
+                            }
+                        }
+                        
                         $nodes[] = $this->buildTree($tokens, $token);
                     } else {
                         // pretend this was just a normal "escaped" token...

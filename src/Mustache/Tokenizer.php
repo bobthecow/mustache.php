@@ -65,6 +65,7 @@ class Mustache_Tokenizer
     const NODES   = 'nodes';
     const VALUE   = 'value';
     const FILTERS = 'filters';
+    const SELFCLOSING = 'selfclosing';
 
     private $state;
     private $tagType;
@@ -157,6 +158,13 @@ class Mustache_Tokenizer
                             self::LINE  => $this->line,
                             self::INDEX => ($this->tagType === self::T_END_SECTION) ? $this->seenTag - $this->otagLen : $i + $this->ctagLen,
                         );
+
+                        $name = $token[self::NAME];
+                        if ($this->endsWith($name, self::T_END_SECTION)) {
+                            // Handle self-closing tags.
+                            $token[self::NAME] = trim(str_replace(self::T_END_SECTION, '', $name));
+                            $token[self::SELFCLOSING] = true;
+                        }
 
                         if ($this->tagType === self::T_UNESCAPED) {
                             // Clean up `{{{ tripleStache }}}` style tokens.
@@ -319,4 +327,10 @@ class Mustache_Tokenizer
     {
         return substr($text, $index, $tagLen) === $tag;
     }
+
+    private function endsWith($haystack, $needle) {
+        // search forward starting from end minus needle length characters
+        return $needle === "" || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== false);
+    }
+
 }
