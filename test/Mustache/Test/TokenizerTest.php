@@ -301,6 +301,23 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                     ),
                 ),
             ),
+
+            // Handle self-closing blocks
+            array(
+                '{{# foo /}}',
+                null,
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_SECTION,
+                        Mustache_Tokenizer::NAME  => 'foo',
+                        Mustache_Tokenizer::OTAG  => '{{',
+                        Mustache_Tokenizer::CTAG  => '}}',
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::INDEX => 11,
+                        Mustache_Tokenizer::SELFCLOSING  => true,
+                    )
+                )
+            )
         );
     }
 }
