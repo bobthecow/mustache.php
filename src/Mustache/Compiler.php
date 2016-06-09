@@ -97,6 +97,7 @@ class Mustache_Compiler
                         $node[Mustache_Tokenizer::NODES],
                         $node[Mustache_Tokenizer::NAME],
                         isset($node[Mustache_Tokenizer::FILTERS]) ? $node[Mustache_Tokenizer::FILTERS] : array(),
+                        isset($node[Mustache_Tokenizer::ATTRS]) ? $node[Mustache_Tokenizer::ATTRS] : array(),
                         $node[Mustache_Tokenizer::INDEX],
                         $node[Mustache_Tokenizer::END],
                         $node[Mustache_Tokenizer::OTAG],
@@ -110,6 +111,7 @@ class Mustache_Compiler
                         $node[Mustache_Tokenizer::NODES],
                         $node[Mustache_Tokenizer::NAME],
                         isset($node[Mustache_Tokenizer::FILTERS]) ? $node[Mustache_Tokenizer::FILTERS] : array(),
+                        isset($node[Mustache_Tokenizer::ATTRS]) ? $node[Mustache_Tokenizer::ATTRS] : array(),
                         $level
                     );
                     break;
@@ -118,6 +120,7 @@ class Mustache_Compiler
                     $code .= $this->partial(
                         $node[Mustache_Tokenizer::NAME],
                         isset($node[Mustache_Tokenizer::INDENT]) ? $node[Mustache_Tokenizer::INDENT] : '',
+                        isset($node[Mustache_Tokenizer::ATTRS]) ? $node[Mustache_Tokenizer::ATTRS] : array(),
                         $level
                     );
                     break;
@@ -127,6 +130,7 @@ class Mustache_Compiler
                         $node[Mustache_Tokenizer::NAME],
                         isset($node[Mustache_Tokenizer::INDENT]) ? $node[Mustache_Tokenizer::INDENT] : '',
                         $node[Mustache_Tokenizer::NODES],
+                        isset($node[Mustache_Tokenizer::ATTRS]) ? $node[Mustache_Tokenizer::ATTRS] : array(),
                         $level
                     );
                     break;
@@ -134,6 +138,7 @@ class Mustache_Compiler
                 case Mustache_Tokenizer::T_BLOCK_ARG:
                     $code .= $this->blockArg(
                         $node[Mustache_Tokenizer::NODES],
+                        isset($node[Mustache_Tokenizer::ATTRS]) ? $node[Mustache_Tokenizer::ATTRS] : array(),
                         $node[Mustache_Tokenizer::NAME],
                         $node[Mustache_Tokenizer::INDEX],
                         $node[Mustache_Tokenizer::END],
@@ -164,6 +169,7 @@ class Mustache_Compiler
                     $code .= $this->variable(
                         $node[Mustache_Tokenizer::NAME],
                         isset($node[Mustache_Tokenizer::FILTERS]) ? $node[Mustache_Tokenizer::FILTERS] : array(),
+                        isset($node[Mustache_Tokenizer::ATTRS]) ? $node[Mustache_Tokenizer::ATTRS] : array(),
                         $node[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_ESCAPED,
                         $level
                     );
@@ -270,6 +276,7 @@ class Mustache_Compiler
      * Generate Mustache Template inheritance block argument PHP source.
      *
      * @param array  $nodes Array of child tokens
+     * @param array $attrs Array of attributes
      * @param string $id    Section name
      * @param int    $start Section start offset
      * @param int    $end   Section end offset
@@ -279,9 +286,9 @@ class Mustache_Compiler
      *
      * @return string Generated PHP source code
      */
-    private function blockArg($nodes, $id, $start, $end, $otag, $ctag, $level)
+    private function blockArg($nodes, array $attrs, $id, $start, $end, $otag, $ctag, $level)
     {
-        $key = $this->block($nodes);
+        $key = $this->block($nodes, $attrs);
         $keystr = var_export($key, true);
         $id = var_export($id, true);
 
@@ -301,13 +308,18 @@ class Mustache_Compiler
      * Generate Mustache Template inheritance block function PHP source.
      *
      * @param array $nodes Array of child tokens
+     * @param array $attrs Array of attributes
      *
      * @return string key of new block function
      */
-    private function block($nodes)
+    private function block($nodes, array $attrs)
     {
         $code = $this->walk($nodes, 0);
         $key = ucfirst(md5($code));
+
+        if (count($attrs)) {
+            $code = $this->wrapAttrContext($attrs, $code, 1);
+        }
 
         if (!isset($this->blocks[$key])) {
             $this->blocks[$key] = sprintf($this->prepare(self::BLOCK_FUNCTION, 0), $key, $code);
@@ -355,6 +367,7 @@ class Mustache_Compiler
      * @param array    $nodes   Array of child tokens
      * @param string   $id      Section name
      * @param string[] $filters Array of filters
+     * @param array[]  $attrs   Array of attributes
      * @param int      $start   Section start offset
      * @param int      $end     Section end offset
      * @param string   $otag    Current Mustache opening tag
@@ -364,7 +377,7 @@ class Mustache_Compiler
      *
      * @return string Generated section PHP source code
      */
-    private function section($nodes, $id, $filters, $start, $end, $otag, $ctag, $level, $arg = false)
+    private function section($nodes, $id, $filters, array $attrs, $start, $end, $otag, $ctag, $level, $arg = false)
     {
         $source   = var_export(substr($this->source, $start, $end - $start), true);
         $callable = $this->getCallable();
@@ -372,16 +385,26 @@ class Mustache_Compiler
         if ($otag !== '{{' || $ctag !== '}}') {
             $delimTag = var_export(sprintf('{{= %s %s =}}', $otag, $ctag), true);
             $helper = sprintf('$this->lambdaHelper->withDelimiters(%s)', $delimTag);
+            if (count($attrs)) {
+                $helper = $helper.', '.$this->passAttrs($attrs, 3);
+            }
             $delims = ', ' . $delimTag;
         } else {
             $helper = '$this->lambdaHelper';
+            if (count($attrs)) {
+                $helper .= ', '.$this->passAttrs($attrs, 3);
+            }
             $delims = '';
         }
 
         $key = ucfirst(md5($delims . "\n" . $source));
 
         if (!isset($this->sections[$key])) {
-            $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $callable, $source, $helper, $delims, $this->walk($nodes, 2));
+            $body = $this->walk($nodes, 2);
+            if (count($attrs) > 0) {
+                $body = $this->wrapAttrContext($attrs, $body, 3);
+            }
+            $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $callable, $source, $helper, $delims, $body);
         }
 
         if ($arg === true) {
@@ -409,17 +432,23 @@ class Mustache_Compiler
      * @param array    $nodes   Array of child tokens
      * @param string   $id      Section name
      * @param string[] $filters Array of filters
+     * @param array[]  $attrs   Array of attributes
      * @param int      $level
      *
      * @return string Generated inverted section PHP source code
      */
-    private function invertedSection($nodes, $id, $filters, $level)
+    private function invertedSection($nodes, $id, $filters, $attrs, $level)
     {
         $method  = $this->getFindMethod($id);
         $id      = var_export($id, true);
         $filters = $this->getFilters($filters, $level);
 
-        return sprintf($this->prepare(self::INVERTED_SECTION, $level), $id, $method, $id, $filters, $this->walk($nodes, $level));
+        $body = $this->walk($nodes, $level);
+        if (count($attrs) > 0) {
+            $body = $this->wrapAttrContext($attrs, $body, $level);
+        }
+
+        return sprintf($this->prepare(self::INVERTED_SECTION, $level), $id, $method, $id, $filters, $body);
     }
 
     const PARTIAL_INDENT = ', $indent . %s';
@@ -434,11 +463,12 @@ class Mustache_Compiler
      *
      * @param string $id     Partial name
      * @param string $indent Whitespace indent to apply to partial
+     * @param array  $attrs  Array of attributes
      * @param int    $level
      *
      * @return string Generated partial call PHP source code
      */
-    private function partial($id, $indent, $level)
+    private function partial($id, $indent, array $attrs, $level)
     {
         if ($indent !== '') {
             $indentParam = sprintf(self::PARTIAL_INDENT, var_export($indent, true));
@@ -446,11 +476,17 @@ class Mustache_Compiler
             $indentParam = '';
         }
 
-        return sprintf(
+        $body = sprintf(
             $this->prepare(self::PARTIAL, $level),
             var_export($id, true),
             $indentParam
         );
+
+        if (count($attrs) > 0) {
+            $body = $this->wrapAttrContext($attrs, $body, $level);
+        }
+
+        return $body;
     }
 
     const PARENT = '
@@ -469,20 +505,27 @@ class Mustache_Compiler
      * @param string $id       Parent tag name
      * @param string $indent   Whitespace indent to apply to parent
      * @param array  $children Child nodes
+     * @param array  $attrs    Array of attributes
      * @param int    $level
      *
      * @return string Generated PHP source code
      */
-    private function parent($id, $indent, array $children, $level)
+    private function parent($id, $indent, array $children, array $attrs, $level)
     {
         $realChildren = array_filter($children, array(__CLASS__, 'onlyBlockArgs'));
 
-        return sprintf(
+        $body =  sprintf(
             $this->prepare(self::PARENT, $level),
             $this->walk($realChildren, $level),
             var_export($id, true),
             var_export($indent, true)
         );
+
+        if (count($attrs) > 0) {
+            $body = $this->wrapAttrContext($attrs, $body, $level);
+        }
+
+        return $body;
     }
 
     /**
@@ -498,28 +541,33 @@ class Mustache_Compiler
     }
 
     const VARIABLE = '
-        $value = $this->resolveValue($context->%s(%s), $context);%s
+        $value = $this->resolveValue($context->%s(%s), $context%s);%s
         $buffer .= %s%s;
     ';
 
     /**
      * Generate Mustache Template variable interpolation PHP source.
      *
+     * @todo handle attributes
+     *
      * @param string   $id      Variable name
      * @param string[] $filters Array of filters
+     * @param array    $attrs   Array of attributes
      * @param bool     $escape  Escape the variable value for output?
      * @param int      $level
      *
      * @return string Generated variable interpolation PHP source
      */
-    private function variable($id, $filters, $escape, $level)
+    private function variable($id, $filters, array $attrs, $escape, $level)
     {
         $method  = $this->getFindMethod($id);
         $id      = ($method !== 'last') ? var_export($id, true) : '';
-        $filters = $this->getFilters($filters, $level);
         $value   = $escape ? $this->getEscape() : '$value';
+        $filters = $this->getFilters($filters, $level);
 
-        return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $filters, $this->flushIndent(), $value);
+        $args = count($attrs) ? ', '.$this->passAttrs($attrs, $level+1) : '';
+
+        return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $args, $filters, $this->flushIndent(), $value);
     }
 
     const FILTER = '
@@ -681,4 +729,78 @@ class Mustache_Compiler
 
         return self::LINE_INDENT;
     }
+
+    const ATTR_SCOPE = '
+        $context->pushAttrContext([%s
+        ]);%s
+        $context->popAttrContext();
+    ';
+    const ATTR_BINDING = '"%s" => %s,';
+
+    /**
+     * Scope a block tag (or a partial) with attributes.
+     *
+     * @param array  $attrs The attributes to resolve.
+     * @param string $body The code to wrap.
+     * @param int    $level
+     *
+     * @return string
+     */
+    private function wrapAttrContext($attrs, $body, $level)
+    {
+        $text = '';
+        foreach ($attrs as $attr) {
+            $text .= sprintf(
+                $this->prepare(self::ATTR_BINDING, $level+1),
+                $attr[Mustache_Tokenizer::NAME],
+                $this->resolveAttrValue($attr[Mustache_Tokenizer::TYPE], $attr[Mustache_Tokenizer::VALUE])
+            );
+        }
+        return sprintf($this->prepare(self::ATTR_SCOPE, $level), $text, $body);
+    }
+
+    /**
+     * Prepare attributes to send to a callable.
+     *
+     * @param array $attrs 
+     * @param int   $level
+     *
+     * @return string
+     */
+    private function passAttrs($attrs, $level)
+    {
+        $text = '';
+        foreach ($attrs as $attr) {
+            $text .= sprintf(
+                $this->prepare(self::ATTR_BINDING, $level+1),
+                $attr[Mustache_Tokenizer::NAME],
+                $this->resolveAttrValue($attr[Mustache_Tokenizer::TYPE], $attr[Mustache_Tokenizer::VALUE])
+            );
+        }
+        return sprintf('[%s]', $text);
+    }
+
+    const ATTR_VALUE = '$this->resolveValue($context->%s("%s"), $context)';
+
+    /**
+     * Resolve the value of an attribute. It'll either be a variable (like `foo.bar`)
+     * or a string/number.
+     *
+     * @param string $type
+     * @param string $value
+     *
+     * @return string
+     */
+    private function resolveAttrValue($type, $value)
+    {
+        switch ($type)
+        {
+            case Mustache_Tokenizer::T_ESCAPED:
+                return sprintf(self::ATTR_VALUE, $this->getFindMethod($value), $value);
+            case Mustache_Tokenizer::T_TEXT:
+            default:
+                return sprintf('"%s"', $value);
+        }
+    }
+
 }
