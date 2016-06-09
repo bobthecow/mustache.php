@@ -1,7 +1,8 @@
 {{% ATTRIBUTES }}
+{{ foo bar="passed" }}
 {{# bar prefix="hey" }}
-{{ prefix }}_{{ label }}
+  {{ prefix }}_{{ label }}
 {{/ bar }}
 {{# bin prefix="*" }}
-{{ prefix }}_{{ . }}
+  {{ prefix }}_{{ . }}
 {{/ bin }}
