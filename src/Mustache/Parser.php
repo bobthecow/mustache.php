@@ -354,7 +354,6 @@ class Mustache_Parser
                     }
                     $token[Mustache_Tokenizer::VALUE] = trim($buffer);
                     if (is_numeric($token[Mustache_Tokenizer::VALUE])) {
-                        print_r('number');
                         // allow numbers to be passed as values.
                         $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_TEXT;
                     }

@@ -11,13 +11,13 @@ class Attributes
     //     };
     // }
 
-    public $bar = [
-        ['label' => 'thing'],
-        ['label' => 'other_thing'],
-    ];
+    public $bar = array(
+        array('label' => 'thing'),
+        array('label' => 'other_thing'),
+    );
 
-    public $bin = [
+    public $bin = array(
         'one',
         'two',
-    ];
+    );
 }
