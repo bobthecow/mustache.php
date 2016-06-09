@@ -29,12 +29,14 @@ class Mustache_Engine
     const PRAGMA_FILTERS      = 'FILTERS';
     const PRAGMA_BLOCKS       = 'BLOCKS';
     const PRAGMA_ANCHORED_DOT = 'ANCHORED-DOT';
+    const PRAGMA_ATTRIBUTES   = 'ATTRIBUTES';
 
     // Known pragmas
     private static $knownPragmas = array(
         self::PRAGMA_FILTERS      => true,
         self::PRAGMA_BLOCKS       => true,
         self::PRAGMA_ANCHORED_DOT => true,
+        self::PRAGMA_ATTRIBUTES   => true,
     );
 
     // Template cache

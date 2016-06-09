@@ -1,0 +1,12 @@
+{{% ATTRIBUTES }}
+{{% BLOCKS }}
+{{< layout 
+  title = "Page Title"
+  subtitle = page.subtitle
+}}
+{{$ content }}
+<div>
+{{ page.content }}
+</div>
+{{/ content }}
+{{/ layout }}
