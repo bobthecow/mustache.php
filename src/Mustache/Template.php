@@ -164,11 +164,11 @@ abstract class Mustache_Template
      *
      * @param mixed            $value
      * @param Mustache_Context $context
-     * @param array            $args Attrs will be passed here if the tag has them.
+     * @param array            $args    Attrs will be passed here if the tag has them.
      *
      * @return string
      */
-    protected function resolveValue($value, Mustache_Context $context, $args=[])
+    protected function resolveValue($value, Mustache_Context $context, $args = array())
     {
         if (($this->strictCallables ? is_object($value) : !is_string($value)) && is_callable($value)) {
             return $this->mustache

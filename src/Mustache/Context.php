@@ -117,11 +117,14 @@ class Mustache_Context
      */
     public function find($id)
     {
-        if ($id != '.' && count($this->attrStack)) {
+        if ($id !== '.' && count($this->attrStack)) {
             // Ensures that we don't override blocks that are looping over an array.
             $val = $this->findVariableInStack($id, $this->attrStack);
-            if ($val) return $val;
+            if ($val) {
+                return $val;
+            }
         }
+
         return $this->findVariableInStack($id, $this->stack);
     }
 

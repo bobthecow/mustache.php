@@ -13,12 +13,11 @@ class Attributes
 
     public $bar = [
         ['label' => 'thing'],
-        ['label' => 'other_thing']
+        ['label' => 'other_thing'],
     ];
 
     public $bin = [
         'one',
-        'two'
+        'two',
     ];
-
 }
