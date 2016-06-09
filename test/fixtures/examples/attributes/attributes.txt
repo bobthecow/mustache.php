@@ -1,5 +1,4 @@
-passed
-  hey_thing
-  hey_other_thing
-  *_one
-  *_two
+hey_thing
+hey_other_thing
+*_one
+*_two
