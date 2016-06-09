@@ -308,15 +308,15 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                 null,
                 array(
                     array(
-                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
-                        Mustache_Tokenizer::NAME => 'a',
-                        Mustache_Tokenizer::OTAG  => '{{',
-                        Mustache_Tokenizer::CTAG  => '}}',
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::INDEX => 11,
+                        Mustache_Tokenizer::TYPE    => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME    => 'a',
+                        Mustache_Tokenizer::OTAG    => '{{',
+                        Mustache_Tokenizer::CTAG    => '}}',
+                        Mustache_Tokenizer::LINE    => 0,
+                        Mustache_Tokenizer::INDEX   => 11,
                         Mustache_Tokenizer::FILTERS => 'b',
-                    )
-                )
+                    ),
+                ),
             ),
 
             // Ensure that attribute strings are picked up.
@@ -346,7 +346,7 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::LINE  => 0,
                         Mustache_Tokenizer::INDEX => 21,
                     ),
-                )
+                ),
             ),
 
             // Ensure that attribute strings and filters can coexist.
@@ -355,14 +355,14 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                 null,
                 array(
                     array(
-                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_SECTION,
-                        Mustache_Tokenizer::NAME  => 'a',
-                        Mustache_Tokenizer::OTAG  => '{{',
-                        Mustache_Tokenizer::CTAG  => '}}',
-                        Mustache_Tokenizer::LINE  => 0,
-                        Mustache_Tokenizer::INDEX => 24,
+                        Mustache_Tokenizer::TYPE    => Mustache_Tokenizer::T_SECTION,
+                        Mustache_Tokenizer::NAME    => 'a',
+                        Mustache_Tokenizer::OTAG    => '{{',
+                        Mustache_Tokenizer::CTAG    => '}}',
+                        Mustache_Tokenizer::LINE    => 0,
+                        Mustache_Tokenizer::INDEX   => 24,
                         Mustache_Tokenizer::FILTERS => 'g',
-                        Mustache_Tokenizer::ATTRS => 'b="c" d=e.f',
+                        Mustache_Tokenizer::ATTRS   => 'b="c" d=e.f',
                     ),
                     array(
                         Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
@@ -377,7 +377,7 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                         Mustache_Tokenizer::LINE  => 0,
                         Mustache_Tokenizer::INDEX => 25,
                     ),
-                )
+                ),
             ),
 
         );

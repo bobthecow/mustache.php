@@ -89,9 +89,9 @@ class Mustache_Parser
             if ($this->pragmaFilters && isset($token[Mustache_Tokenizer::FILTERS])) {
                 $token[Mustache_Tokenizer::FILTERS] = $this->getFilters($token[Mustache_Tokenizer::FILTERS]);
             } elseif (isset($token[Mustache_Tokenizer::FILTERS])) {
-                $token[Mustache_Tokenizer::NAME] = 
-                    $token[Mustache_Tokenizer::NAME].
-                    ' '.Mustache_Tokenizer::T_FILTER_DELIMITER.' '.
+                $token[Mustache_Tokenizer::NAME] =
+                    $token[Mustache_Tokenizer::NAME] .
+                    ' ' . Mustache_Tokenizer::T_FILTER_DELIMITER . ' ' .
                     $token[Mustache_Tokenizer::FILTERS];
                 unset($token[Mustache_Tokenizer::FILTERS]);
             }
@@ -101,7 +101,7 @@ class Mustache_Parser
             } elseif (isset($token[Mustache_Tokenizer::ATTRS])) {
                 // Treat the attrs string like it's part of the name.
                 // This will probably cause things to fail, but that's the correct behavior.
-                $token[Mustache_Tokenizer::NAME] = $token[Mustache_Tokenizer::NAME].' '.$token[Mustache_Tokenizer::ATTRS];
+                $token[Mustache_Tokenizer::NAME] = $token[Mustache_Tokenizer::NAME] . ' ' . $token[Mustache_Tokenizer::ATTRS];
                 unset($token[Mustache_Tokenizer::ATTRS]);
             }
 
@@ -315,25 +315,25 @@ class Mustache_Parser
     private function getAttributes($attrsText)
     {
         $attrsText = preg_replace('/[\s]+/', ' ', $attrsText);
-        $attrs = [];
+        $attrs = array();
         $len = strlen($attrsText);
         $buffer = '';
         $token = null;
         $open = false;
 
-        for ($i=0; $i < $len; $i++) { 
+        for ($i = 0; $i < $len; $i++) {
             $val = $attrsText[$i];
             switch ($val) {
                 case Mustache_Tokenizer::T_ATTR_ASSIGN:
                     $token = [
                         Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
-                        Mustache_Tokenizer::NAME => trim($buffer)
+                        Mustache_Tokenizer::NAME => trim($buffer),
                     ];
                     $buffer = '';
                     break;
                 case '"':
                     if ($open) {
-                        if ($attrsText[$i-1] === '\\') {
+                        if ($attrsText[$i - 1] === '\\') {
                             // escaped
                             $buffer .= $val;
                             continue;
@@ -354,7 +354,7 @@ class Mustache_Parser
                     }
                     $token[Mustache_Tokenizer::VALUE] = trim($buffer);
                     if (is_numeric($token[Mustache_Tokenizer::VALUE])) {
-                        print_r("number");
+                        print_r('number');
                         // allow numbers to be passed as values.
                         $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_TEXT;
                     }

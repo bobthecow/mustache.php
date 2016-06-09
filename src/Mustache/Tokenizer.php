@@ -152,22 +152,21 @@ class Mustache_Tokenizer
 
                 default:
                     if ($this->tagChange($this->ctag, $this->ctagLen, $text, $i)) {
-
                         $filters = null;
                         $attrs = null;
-                        
-                        if ($this->tagType != self::T_DELIM_CHANGE) {
+
+                        if ($this->tagType !== self::T_DELIM_CHANGE) {
                             // check for filters
                             $newBuffer = explode(self::T_FILTER_DELIMITER, trim($this->buffer), 2);
-                            if (count($newBuffer) == 2) {
+                            if (count($newBuffer) === 2) {
                                 $filters = trim($newBuffer[1]);
                             }
                             $this->buffer = $newBuffer[0];
 
-                            if ($this->tagType != self::T_UNESCAPED) {
+                            if ($this->tagType !== self::T_UNESCAPED) {
                                 // check for attributes
                                 $newBuffer = preg_split('/[\s]/', trim($this->buffer), 2);
-                                if (count($newBuffer) == 2) {
+                                if (count($newBuffer) === 2) {
                                     $attrs = $newBuffer[1];
                                 }
                                 $this->buffer = $newBuffer[0];

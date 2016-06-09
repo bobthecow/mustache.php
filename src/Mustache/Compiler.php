@@ -276,7 +276,7 @@ class Mustache_Compiler
      * Generate Mustache Template inheritance block argument PHP source.
      *
      * @param array  $nodes Array of child tokens
-     * @param array $attrs Array of attributes
+     * @param array  $attrs Array of attributes
      * @param string $id    Section name
      * @param int    $start Section start offset
      * @param int    $end   Section end offset
@@ -389,13 +389,13 @@ class Mustache_Compiler
             $delimTag = var_export(sprintf('{{= %s %s =}}', $otag, $ctag), true);
             $helper = sprintf('$this->lambdaHelper->withDelimiters(%s)', $delimTag);
             if (count($attrs)) {
-                $helper = $helper.', '.$this->passAttrs($attrs, 3);
+                $helper = $helper . ', ' . $this->passAttrs($attrs, 3);
             }
             $delims = ', ' . $delimTag;
         } else {
             $helper = '$this->lambdaHelper';
             if (count($attrs)) {
-                $helper .= ', '.$this->passAttrs($attrs, 3);
+                $helper .= ', ' . $this->passAttrs($attrs, 3);
             }
             $delims = '';
         }
@@ -568,7 +568,7 @@ class Mustache_Compiler
         $value   = $escape ? $this->getEscape() : '$value';
         $filters = $this->getFilters($filters, $level);
 
-        $args = count($attrs) ? ', '.$this->passAttrs($attrs, $level+1) : '';
+        $args = count($attrs) ? ', ' . $this->passAttrs($attrs, $level + 1) : '';
 
         return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $args, $filters, $this->flushIndent(), $value);
     }
@@ -744,7 +744,7 @@ class Mustache_Compiler
      * Scope a block tag (or a partial) with attributes.
      *
      * @param array  $attrs The attributes to resolve.
-     * @param string $body The code to wrap.
+     * @param string $body  The code to wrap.
      * @param int    $level
      *
      * @return string
@@ -754,18 +754,19 @@ class Mustache_Compiler
         $text = '';
         foreach ($attrs as $attr) {
             $text .= sprintf(
-                $this->prepare(self::ATTR_BINDING, $level+1),
+                $this->prepare(self::ATTR_BINDING, $level + 1),
                 $attr[Mustache_Tokenizer::NAME],
                 $this->resolveAttrValue($attr[Mustache_Tokenizer::TYPE], $attr[Mustache_Tokenizer::VALUE])
             );
         }
+
         return sprintf($this->prepare(self::ATTR_SCOPE, $level), $text, $body);
     }
 
     /**
      * Prepare attributes to send to a callable.
      *
-     * @param array $attrs 
+     * @param array $attrs
      * @param int   $level
      *
      * @return string
@@ -775,11 +776,12 @@ class Mustache_Compiler
         $text = '';
         foreach ($attrs as $attr) {
             $text .= sprintf(
-                $this->prepare(self::ATTR_BINDING, $level+1),
+                $this->prepare(self::ATTR_BINDING, $level + 1),
                 $attr[Mustache_Tokenizer::NAME],
                 $this->resolveAttrValue($attr[Mustache_Tokenizer::TYPE], $attr[Mustache_Tokenizer::VALUE])
             );
         }
+
         return sprintf('[%s]', $text);
     }
 
@@ -796,8 +798,7 @@ class Mustache_Compiler
      */
     private function resolveAttrValue($type, $value)
     {
-        switch ($type)
-        {
+        switch ($type) {
             case Mustache_Tokenizer::T_ESCAPED:
                 return sprintf(self::ATTR_VALUE, $this->getFindMethod($value), $value);
             case Mustache_Tokenizer::T_TEXT:
@@ -805,5 +806,4 @@ class Mustache_Compiler
                 return sprintf('"%s"', $value);
         }
     }
-
 }

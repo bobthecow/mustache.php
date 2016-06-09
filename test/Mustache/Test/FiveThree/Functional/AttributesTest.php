@@ -4,7 +4,7 @@
  * @group inheritance
  * @group functional
  */
-class Mustache_Test_Functional_AttributesTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_FiveThree_Functional_AttributesTest extends PHPUnit_Framework_TestCase
 {
     private $mustache;
 
@@ -32,45 +32,45 @@ class Mustache_Test_Functional_AttributesTest extends PHPUnit_Framework_TestCase
             array(
                 '{{# foo bar="bin" }}{{ bar }}{{/ foo }}',
                 array(
-                    'foo' => true
+                    'foo' => true,
                 ),
-                'bin'
+                'bin',
             ),
             array(
                 '{{# foo bar="bin" }}{{ bar }}{{ thing }}{{/ foo }}',
                 array(
                     'foo' => array(
-                        'thing' => 'bif'
-                    )
+                        'thing' => 'bif',
+                    ),
                 ),
-                'binbif'
+                'binbif',
             ),
             array(
                 '{{# foo bar="bin" }}{{ bar }}{{ . }}{{/ foo }}',
                 array(
                     'foo' => array(
                         'bif',
-                        'bax'
-                    )
+                        'bax',
+                    ),
                 ),
-                'binbifbinbax'
+                'binbifbinbax',
             ),
             array(
                 '{{# foo bar="bin" }}{{ bar }}{{ . }}{{/ foo }}',
                 array(
-                    'foo' => 'bif'
+                    'foo' => 'bif',
                 ),
-                'binbif'
+                'binbif',
             ),
             array(
                 '{{# foo bar="bin" }}{{ bar }}{{/ foo }}',
                 array(
                     'foo' => function ($text, $helper, $attrs) {
-                        return "<p>".$attrs['bar']."</p>";
-                    }
+                        return '<p>' . $attrs['bar'] . '</p>';
+                    },
                 ),
-                '<p>bin</p>'
-            )
+                '<p>bin</p>',
+            ),
         );
     }
 
@@ -90,25 +90,25 @@ class Mustache_Test_Functional_AttributesTest extends PHPUnit_Framework_TestCase
                 '{{> foo bar="bin" }}',
                 array(),
                 array(
-                    'foo' => '{{ bar }}'
+                    'foo' => '{{ bar }}',
                 ),
-                'bin'
+                'bin',
             ),
             array(
                 '{{< foo bar="bin" }}{{/ foo }}',
                 array(),
                 array(
-                    'foo' => '{{$ bar }}{{ bar }}{{/ bar }}'
+                    'foo' => '{{$ bar }}{{ bar }}{{/ bar }}',
                 ),
-                'bin'
+                'bin',
             ),
             array(
                 '{{< foo }}{{$ bar bar="bin" }}ok {{ bar }}{{/ bar }}{{/ foo }}',
                 array(),
                 array(
-                    'foo' => '{{$ bar }}{{ bar }}{{/ bar }}'
+                    'foo' => '{{$ bar }}{{ bar }}{{/ bar }}',
                 ),
-                'ok bin'
+                'ok bin',
             ),
         );
     }
@@ -129,31 +129,31 @@ class Mustache_Test_Functional_AttributesTest extends PHPUnit_Framework_TestCase
                 array(
                     'foo' => function ($attrs) {
                         return $attrs['bar'];
-                    }
+                    },
                 ),
-                'foo'
+                'foo',
             ),
             array(
                 '{{ foo bar="1" }}',
                 array(
                     'foo' => function ($attrs) {
                         return $attrs['bar'];
-                    }
+                    },
                 ),
-                '1'
+                '1',
             ),
             array(
                 '{{ foo bar="1" }}',
                 array(
-                    'foo' => 'thing'
+                    'foo' => 'thing',
                 ),
-                'thing'
+                'thing',
             ),
             array(
                 '{{ foo bar="1" }}',
                 array(),
-                ''
-            )
+                '',
+            ),
         );
     }
 
@@ -174,16 +174,15 @@ class Mustache_Test_Functional_AttributesTest extends PHPUnit_Framework_TestCase
                 array(
                     'ucase' => function ($value) {
                         return ucfirst($value);
-                    }
+                    },
                 ),
                 array(
                     'foo' => function ($attrs) {
                         return $attrs['bar'];
-                    }
+                    },
                 ),
-                'Foo'
-            )
+                'Foo',
+            ),
         );
     }
-
 }
