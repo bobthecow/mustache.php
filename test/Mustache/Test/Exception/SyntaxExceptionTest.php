@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-
 class Mustache_Test_Exception_SyntaxExceptionTest extends PHPUnit_Framework_TestCase
 {
     public function testInstance()

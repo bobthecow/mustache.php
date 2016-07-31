@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-
 /**
  * A Mustache Template loader for inline templates.
  *

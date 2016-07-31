@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-
 /**
  * A collection of helpers for a Mustache instance.
  */

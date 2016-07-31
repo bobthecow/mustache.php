@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-
 abstract class Mustache_Test_SpecTestCase extends PHPUnit_Framework_TestCase
 {
     protected static $mustache;

@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-
 /**
  * This is a simple Logger implementation that other Loggers can inherit from.
  *

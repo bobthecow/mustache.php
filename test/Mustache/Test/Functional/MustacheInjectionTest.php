@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-
 /**
  * @group mustache_injection
  * @group functional
