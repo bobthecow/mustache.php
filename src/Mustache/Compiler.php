@@ -3,11 +3,12 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2010-2015 Justin Hileman
+ * (c) 2010-2016 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 
 /**
  * Mustache Compiler class.
@@ -75,7 +76,7 @@ class Mustache_Compiler
     /**
      * Helper function for walking the Mustache token parse tree.
      *
-     * @throws Mustache_Exception_SyntaxException upon encountering unknown token types.
+     * @throws Mustache_Exception_SyntaxException upon encountering unknown token types
      *
      * @param array $tree  Parse tree of Mustache tokens
      * @param int   $level (default: 0)
@@ -493,7 +494,7 @@ class Mustache_Compiler
      *
      * @param array $node
      *
-     * @return bool True if $node is a block arg token.
+     * @return bool True if $node is a block arg token
      */
     private static function onlyBlockArgs(array $node)
     {

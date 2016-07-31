@@ -3,11 +3,12 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2010-2015 Justin Hileman
+ * (c) 2010-2016 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 
 /**
  * A Mustache implementation in PHP.
@@ -126,7 +127,7 @@ class Mustache_Engine
      *         'pragmas' => [Mustache_Engine::PRAGMA_FILTERS],
      *     );
      *
-     * @throws Mustache_Exception_InvalidArgumentException If `escape` option is not callable.
+     * @throws Mustache_Exception_InvalidArgumentException If `escape` option is not callable
      *
      * @param array $options (default: array())
      */
@@ -429,7 +430,7 @@ class Mustache_Engine
     /**
      * Set the Mustache Logger instance.
      *
-     * @throws Mustache_Exception_InvalidArgumentException If logger is not an instance of Mustache_Logger or Psr\Log\LoggerInterface.
+     * @throws Mustache_Exception_InvalidArgumentException If logger is not an instance of Mustache_Logger or Psr\Log\LoggerInterface
      *
      * @param Mustache_Logger|Psr\Log\LoggerInterface $logger
      */

@@ -3,11 +3,12 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2010-2015 Justin Hileman
+ * (c) 2010-2016 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 
 /**
  * Mustache Template filesystem Loader implementation.
@@ -40,9 +41,9 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
      *         'extension' => '.ms',
      *     );
      *
-     * @throws Mustache_Exception_RuntimeException if $baseDir does not exist.
+     * @throws Mustache_Exception_RuntimeException if $baseDir does not exist
      *
-     * @param string $baseDir Base directory containing Mustache template files.
+     * @param string $baseDir Base directory containing Mustache template files
      * @param array  $options Array of Loader options (default: array())
      */
     public function __construct($baseDir, array $options = array())
@@ -88,7 +89,7 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
     /**
      * Helper function for loading a Mustache file by name.
      *
-     * @throws Mustache_Exception_UnknownTemplateException If a template file is not found.
+     * @throws Mustache_Exception_UnknownTemplateException If a template file is not found
      *
      * @param string $name
      *
