@@ -1,12 +1,5 @@
 language: php
 
-install:
-  - curl http://get.sensiolabs.org/php-cs-fixer.phar -o php-cs-fixer.phar
-
-script:
-  - phpunit
-  - if [[ `php -r "echo version_compare(PHP_VERSION, '5.3.6', '>=') && !defined('HHVM_VERSION');"` ]]; then php php-cs-fixer.phar --diff --dry-run -vv fix; fi
-
 php:
   - 5.2
   - 5.3
@@ -15,5 +8,8 @@ php:
   - 5.6
   - 7.0
   - hhvm
+
+script:
+  - phpunit
 
 sudo: false
