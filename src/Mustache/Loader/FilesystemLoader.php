@@ -51,10 +51,10 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
 
         if (strpos($this->baseDir, '://') === false) {
             $this->baseDir = realpath($this->baseDir);
+        }
 
-            if (!is_dir($this->baseDir)) {
-                throw new Mustache_Exception_RuntimeException(sprintf('FilesystemLoader baseDir must be a directory: %s', $baseDir));
-            }
+        if ($this->shouldCheckPath() && !is_dir($this->baseDir)) {
+            throw new Mustache_Exception_RuntimeException(sprintf('FilesystemLoader baseDir must be a directory: %s', $baseDir));
         }
 
         if (array_key_exists('extension', $options)) {
@@ -98,7 +98,7 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
     {
         $fileName = $this->getFileName($name);
 
-        if (strpos($this->baseDir, '://') === false && !file_exists($fileName)) {
+        if ($this->shouldCheckPath() && !file_exists($fileName)) {
             throw new Mustache_Exception_UnknownTemplateException($name);
         }
 
@@ -120,5 +120,16 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
         }
 
         return $fileName;
+    }
+
+    /**
+     * Only check if baseDir is a directory and requested templates are files if
+     * baseDir is using the filesystem stream wrapper.
+     *
+     * @return bool Whether to check `is_dir` and `file_exists`
+     */
+    protected function shouldCheckPath()
+    {
+        return strpos($this->baseDir, '://') === false || strpos($this->baseDir, 'file://') === 0;
     }
 }
