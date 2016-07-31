@@ -56,7 +56,7 @@ class TestStream
      */
     public function stream_stat()
     {
-        return [];
+        return array();
     }
 
     /**
@@ -86,5 +86,6 @@ class TestStream
     }
 }
 
-stream_wrapper_register('test', TestStream::class)
-    || die('Failed to register protocol');
+if (!stream_wrapper_register('test', 'TestStream')) {
+    die('Failed to register protocol');
+}
