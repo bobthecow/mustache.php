@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-
 require dirname(__FILE__) . '/../src/Mustache/Autoloader.php';
 Mustache_Autoloader::register();
 Mustache_Autoloader::register(dirname(__FILE__) . '/../test');
@@ -17,17 +16,18 @@ Mustache_Autoloader::register(dirname(__FILE__) . '/../test');
 require dirname(__FILE__) . '/../vendor/yaml/lib/sfYamlParser.php';
 
 /**
- * Minimal stream wrapper to test protocol-based access to templates
+ * Minimal stream wrapper to test protocol-based access to templates.
  */
 class TestStream
 {
     private $filehandle;
 
     /**
-     * Always returns false
+     * Always returns false.
      *
      * @param string $path
-     * @param int $flags
+     * @param int    $flags
+     *
      * @return array
      */
     public function url_stat($path, $flags)
@@ -36,16 +36,18 @@ class TestStream
     }
 
     /**
-     * Open the file
+     * Open the file.
      *
      * @param string $path
      * @param string $mode
+     *
      * @return bool
      */
     public function stream_open($path, $mode)
     {
         $path = preg_replace('-^test://-', '', $path);
         $this->filehandle = fopen($path, $mode);
+
         return $this->filehandle !== false;
     }
 
@@ -59,6 +61,7 @@ class TestStream
 
     /**
      * @param int $count
+     *
      * @return string
      */
     public function stream_read($count)
