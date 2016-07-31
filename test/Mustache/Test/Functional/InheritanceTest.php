@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of Mustache.php.
+ *
+ * (c) 2010-2016 Justin Hileman
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 /**
  * @group inheritance
  * @group functional
@@ -83,6 +92,15 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
                 array(),
                 '{{<foo}}set by template{{$baz}}also set by template{{/baz}}{{/foo}}',
                 'also set by template',
+            ),
+            array(
+                array(
+                    'foo' => '{{$a}}FAIL!{{/a}}',
+                    'bar' => 'WIN!!',
+                ),
+                array(),
+                '{{<foo}}{{$a}}{{<bar}}FAIL{{/bar}}{{/a}}{{/foo}}',
+                'WIN!!',
             ),
         );
     }

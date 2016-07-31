@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2010-2015 Justin Hileman
+ * (c) 2010-2016 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -35,11 +35,11 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
     {
         $helpers = array(
             'longdate' => function (\DateTime $value) {
-                    return $value->format('Y-m-d h:m:s');
-                },
+                return $value->format('Y-m-d h:m:s');
+            },
             'echo' => function ($value) {
-                    return array($value, $value, $value);
-                },
+                return array($value, $value, $value);
+            },
         );
 
         return array(
@@ -77,7 +77,7 @@ class Mustache_Test_FiveThree_Functional_FiltersTest extends PHPUnit_Framework_T
         $this->assertEquals('[[2000-01-01 12:01:00]]', $tpl->render($foo));
     }
 
-    const CHAINED_SECTION_FILTERS_TPL = <<<EOS
+    const CHAINED_SECTION_FILTERS_TPL = <<<'EOS'
 {{% FILTERS }}
 {{# word | echo | with_index }}
 {{ key }}: {{ value }}
@@ -143,21 +143,45 @@ EOS;
             array('{{% FILTERS }}{{ foo | bar }}',       array('foo' => 'FOO')),
             array('{{% FILTERS }}{{ foo | bar }}',       array('foo' => 'FOO', 'bar' => 'BAR')),
             array('{{% FILTERS }}{{ foo | bar }}',       array('foo' => 'FOO', 'bar' => array(1, 2))),
-            array('{{% FILTERS }}{{ foo | bar | baz }}', array('foo' => 'FOO', 'bar' => function () { return 'BAR'; })),
-            array('{{% FILTERS }}{{ foo | bar | baz }}', array('foo' => 'FOO', 'baz' => function () { return 'BAZ'; })),
-            array('{{% FILTERS }}{{ foo | bar | baz }}', array('bar' => function () { return 'BAR'; })),
-            array('{{% FILTERS }}{{ foo | bar | baz }}', array('baz' => function () { return 'BAZ'; })),
-            array('{{% FILTERS }}{{ foo | bar.baz }}',   array('foo' => 'FOO', 'bar' => function () { return 'BAR'; }, 'baz' => function () { return 'BAZ'; })),
+            array('{{% FILTERS }}{{ foo | bar | baz }}', array('foo' => 'FOO', 'bar' => function () {
+                return 'BAR';
+            })),
+            array('{{% FILTERS }}{{ foo | bar | baz }}', array('foo' => 'FOO', 'baz' => function () {
+                return 'BAZ';
+            })),
+            array('{{% FILTERS }}{{ foo | bar | baz }}', array('bar' => function () {
+                return 'BAR';
+            })),
+            array('{{% FILTERS }}{{ foo | bar | baz }}', array('baz' => function () {
+                return 'BAZ';
+            })),
+            array('{{% FILTERS }}{{ foo | bar.baz }}',   array('foo' => 'FOO', 'bar' => function () {
+                return 'BAR';
+            }, 'baz' => function () {
+                return 'BAZ';
+            })),
 
             array('{{% FILTERS }}{{# foo | bar }}{{ . }}{{/ foo | bar }}',             array()),
             array('{{% FILTERS }}{{# foo | bar }}{{ . }}{{/ foo | bar }}',             array('foo' => 'FOO')),
             array('{{% FILTERS }}{{# foo | bar }}{{ . }}{{/ foo | bar }}',             array('foo' => 'FOO', 'bar' => 'BAR')),
             array('{{% FILTERS }}{{# foo | bar }}{{ . }}{{/ foo | bar }}',             array('foo' => 'FOO', 'bar' => array(1, 2))),
-            array('{{% FILTERS }}{{# foo | bar | baz }}{{ . }}{{/ foo | bar | baz }}', array('foo' => 'FOO', 'bar' => function () { return 'BAR'; })),
-            array('{{% FILTERS }}{{# foo | bar | baz }}{{ . }}{{/ foo | bar | baz }}', array('foo' => 'FOO', 'baz' => function () { return 'BAZ'; })),
-            array('{{% FILTERS }}{{# foo | bar | baz }}{{ . }}{{/ foo | bar | baz }}', array('bar' => function () { return 'BAR'; })),
-            array('{{% FILTERS }}{{# foo | bar | baz }}{{ . }}{{/ foo | bar | baz }}', array('baz' => function () { return 'BAZ'; })),
-            array('{{% FILTERS }}{{# foo | bar.baz }}{{ . }}{{/ foo | bar.baz }}',     array('foo' => 'FOO', 'bar' => function () { return 'BAR'; }, 'baz' => function () { return 'BAZ'; })),
+            array('{{% FILTERS }}{{# foo | bar | baz }}{{ . }}{{/ foo | bar | baz }}', array('foo' => 'FOO', 'bar' => function () {
+                return 'BAR';
+            })),
+            array('{{% FILTERS }}{{# foo | bar | baz }}{{ . }}{{/ foo | bar | baz }}', array('foo' => 'FOO', 'baz' => function () {
+                return 'BAZ';
+            })),
+            array('{{% FILTERS }}{{# foo | bar | baz }}{{ . }}{{/ foo | bar | baz }}', array('bar' => function () {
+                return 'BAR';
+            })),
+            array('{{% FILTERS }}{{# foo | bar | baz }}{{ . }}{{/ foo | bar | baz }}', array('baz' => function () {
+                return 'BAZ';
+            })),
+            array('{{% FILTERS }}{{# foo | bar.baz }}{{ . }}{{/ foo | bar.baz }}',     array('foo' => 'FOO', 'bar' => function () {
+                return 'BAR';
+            }, 'baz' => function () {
+                return 'BAZ';
+            })),
         );
     }
 }

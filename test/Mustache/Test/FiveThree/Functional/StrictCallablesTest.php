@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2010-2015 Justin Hileman
+ * (c) 2010-2016 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -52,7 +52,9 @@ class Mustache_Test_FiveThree_Functional_StrictCallablesTest extends PHPUnit_Fra
             ),
             array(
                 false,
-                function () { return 'Yoshi'; },
+                function () {
+                    return 'Yoshi';
+                },
                 $lambda,
                 'YOSHI',
             ),
@@ -80,7 +82,9 @@ class Mustache_Test_FiveThree_Functional_StrictCallablesTest extends PHPUnit_Fra
             // Strict interpolation lambdas
             array(
                 true,
-                function () { return 'Yoshi'; },
+                function () {
+                    return 'Yoshi';
+                },
                 $lambda,
                 'YOSHI',
             ),
