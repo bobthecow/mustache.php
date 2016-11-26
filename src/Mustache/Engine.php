@@ -54,6 +54,7 @@ class Mustache_Engine
     private $logger;
     private $strictCallables = false;
     private $pragmas = array();
+    private $global_variables = array();
 
     // Services
     private $tokenizer;
@@ -124,6 +125,9 @@ class Mustache_Engine
      *         // Enable pragmas across all templates, regardless of the presence of pragma tags in the individual
      *         // templates.
      *         'pragmas' => [Mustache_Engine::PRAGMA_FILTERS],
+     * 
+     *         // Add global variables across all templates
+     *         'global_variables' => ['globalKey' => 'globalValue'],
      *     );
      *
      * @throws Mustache_Exception_InvalidArgumentException If `escape` option is not callable
@@ -199,6 +203,10 @@ class Mustache_Engine
                 $this->pragmas[$pragma] = true;
             }
         }
+        
+        if (isset($options['global_variables'])) {
+            $this->global_variables = $options['global_variables'];
+        }
     }
 
     /**
@@ -216,7 +224,7 @@ class Mustache_Engine
      */
     public function render($template, $context = array())
     {
-        return $this->loadTemplate($template)->render($context);
+        return $this->loadTemplate($template)->render($context, $this->global_variables);
     }
 
     /**
@@ -257,6 +265,16 @@ class Mustache_Engine
     public function getPragmas()
     {
         return array_keys($this->pragmas);
+    }
+
+    /**
+     * Get the current globally enabled variables.
+     *
+     * @return mixed array|object
+     */
+    public function getGlobalVariables()
+    {
+        return $this->global_variables;
     }
 
     /**

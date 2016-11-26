@@ -29,6 +29,7 @@ You have just won {{value}} dollars!
 {{#in_ca}}
 Well, {{taxed_value}} dollars, after taxes.
 {{/in_ca}}
+contact us at {{system}}
 ```
 
 
@@ -53,7 +54,7 @@ And render it:
 
 ```php
 <?php
-$m = new Mustache_Engine;
+$m = new Mustache_Engine(array('global_variables' => array('system' => 'contact@example.com')));
 $chris = new Chris;
 echo $m->render($template, $chris);
 ```
