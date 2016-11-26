@@ -23,6 +23,7 @@ class Mustache_Parser
 
     private $pragmaFilters;
     private $pragmaBlocks;
+    private $pragmaAttrs;
 
     /**
      * Process an array of Mustache tokens and convert them into a parse tree.
@@ -39,6 +40,7 @@ class Mustache_Parser
 
         $this->pragmaFilters = isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS]);
         $this->pragmaBlocks  = isset($this->pragmas[Mustache_Engine::PRAGMA_BLOCKS]);
+        $this->pragmaAttrs   = isset($this->pragmas[Mustache_Engine::PRAGMA_ATTRIBUTES]);
 
         return $this->buildTree($tokens);
     }
@@ -84,12 +86,23 @@ class Mustache_Parser
                 $this->lineTokens = 0;
             }
 
-            if ($this->pragmaFilters && isset($token[Mustache_Tokenizer::NAME])) {
-                list($name, $filters) = $this->getNameAndFilters($token[Mustache_Tokenizer::NAME]);
-                if (!empty($filters)) {
-                    $token[Mustache_Tokenizer::NAME]    = $name;
-                    $token[Mustache_Tokenizer::FILTERS] = $filters;
-                }
+            if ($this->pragmaFilters && isset($token[Mustache_Tokenizer::FILTERS])) {
+                $token[Mustache_Tokenizer::FILTERS] = $this->getFilters($token[Mustache_Tokenizer::FILTERS]);
+            } elseif (isset($token[Mustache_Tokenizer::FILTERS])) {
+                $token[Mustache_Tokenizer::NAME] =
+                    $token[Mustache_Tokenizer::NAME] .
+                    ' ' . Mustache_Tokenizer::T_FILTER_DELIMITER . ' ' .
+                    $token[Mustache_Tokenizer::FILTERS];
+                unset($token[Mustache_Tokenizer::FILTERS]);
+            }
+
+            if ($this->pragmaAttrs && isset($token[Mustache_Tokenizer::ATTRS])) {
+                $token[Mustache_Tokenizer::ATTRS] = $this->getAttributes($token[Mustache_Tokenizer::ATTRS]);
+            } elseif (isset($token[Mustache_Tokenizer::ATTRS])) {
+                // Treat the attrs string like it's part of the name.
+                // This will probably cause things to fail, but that's the correct behavior.
+                $token[Mustache_Tokenizer::NAME] = $token[Mustache_Tokenizer::NAME] . ' ' . $token[Mustache_Tokenizer::ATTRS];
+                unset($token[Mustache_Tokenizer::ATTRS]);
             }
 
             switch ($token[Mustache_Tokenizer::TYPE]) {
@@ -281,18 +294,85 @@ class Mustache_Parser
     }
 
     /**
-     * Split a tag name into name and filters.
+     * Parse filters.
      *
-     * @param string $name
+     * @param string $filters
      *
-     * @return array [Tag name, Array of filters]
+     * @return array Array of filters
      */
-    private function getNameAndFilters($name)
+    private function getFilters($filters)
     {
-        $filters = array_map('trim', explode('|', $name));
-        $name    = array_shift($filters);
+        return array_map('trim', explode(Mustache_Tokenizer::T_FILTER_DELIMITER, $filters));
+    }
 
-        return array($name, $filters);
+    /**
+     * Parse an attributes list into tokens.
+     *
+     * @param string $attrsText
+     *
+     * @return array
+     */
+    private function getAttributes($attrsText)
+    {
+        $attrsText = preg_replace('/[\s]+/', ' ', $attrsText);
+        $attrs = array();
+        $len = strlen($attrsText);
+        $buffer = '';
+        $token = null;
+        $open = false;
+
+        for ($i = 0; $i < $len; $i++) {
+            $val = $attrsText[$i];
+            switch ($val) {
+                case Mustache_Tokenizer::T_ATTR_ASSIGN:
+                    $token = [
+                        Mustache_Tokenizer::TYPE => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME => trim($buffer),
+                    ];
+                    $buffer = '';
+                    break;
+                case '"':
+                    if ($open) {
+                        if ($attrsText[$i - 1] === '\\') {
+                            // escaped
+                            $buffer .= $val;
+                            continue;
+                        }
+                        $open = false;
+                        break;
+                    }
+                    $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_TEXT;
+                    $open = true;
+                    break;
+                case ' ':
+                    if ($open) {
+                        $buffer .= $val;
+                        break;
+                    }
+                    if (!$token || !$buffer) {
+                        break;
+                    }
+                    $token[Mustache_Tokenizer::VALUE] = trim($buffer);
+                    if (is_numeric($token[Mustache_Tokenizer::VALUE])) {
+                        // allow numbers to be passed as values.
+                        $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_TEXT;
+                    }
+                    $attrs[] = $token;
+                    $token = null;
+                    $buffer = '';
+                    break;
+                default:
+                    $buffer .= $val;
+            }
+        }
+
+        if ($token) {
+            $token[Mustache_Tokenizer::VALUE] = trim($buffer);
+            $attrs[] = $token;
+            $token = null;
+        }
+
+        return $attrs;
     }
 
     /**
@@ -311,6 +391,10 @@ class Mustache_Parser
 
             case Mustache_Engine::PRAGMA_FILTERS:
                 $this->pragmaFilters = true;
+                break;
+
+            case Mustache_Engine::PRAGMA_ATTRIBUTES:
+                $this->pragmaAttrs = true;
                 break;
         }
     }

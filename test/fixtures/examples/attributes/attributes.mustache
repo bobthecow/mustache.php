@@ -1,0 +1,7 @@
+{{% ATTRIBUTES }}
+{{# bar prefix="hey" }}
+{{ prefix }}_{{ label }}
+{{/ bar }}
+{{# bin prefix="*" }}
+{{ prefix }}_{{ . }}
+{{/ bin }}

@@ -36,6 +36,8 @@ class Mustache_Tokenizer
     const T_PRAGMA       = '%';
     const T_BLOCK_VAR    = '$';
     const T_BLOCK_ARG    = '$arg';
+    const T_FILTER_DELIMITER = '|';
+    const T_ATTR_ASSIGN = '=';
 
     // Valid token types
     private static $tagTypes = array(
@@ -65,6 +67,7 @@ class Mustache_Tokenizer
     const NODES   = 'nodes';
     const VALUE   = 'value';
     const FILTERS = 'filters';
+    const ATTRS   = 'attrs';
 
     private $state;
     private $tagType;
@@ -149,6 +152,27 @@ class Mustache_Tokenizer
 
                 default:
                     if ($this->tagChange($this->ctag, $this->ctagLen, $text, $i)) {
+                        $filters = null;
+                        $attrs = null;
+
+                        if ($this->tagType !== self::T_DELIM_CHANGE) {
+                            // check for filters
+                            $newBuffer = explode(self::T_FILTER_DELIMITER, trim($this->buffer), 2);
+                            if (count($newBuffer) === 2) {
+                                $filters = trim($newBuffer[1]);
+                            }
+                            $this->buffer = $newBuffer[0];
+
+                            if ($this->tagType !== self::T_UNESCAPED) {
+                                // check for attributes
+                                $newBuffer = preg_split('/[\s]/', trim($this->buffer), 2);
+                                if (count($newBuffer) === 2) {
+                                    $attrs = $newBuffer[1];
+                                }
+                                $this->buffer = $newBuffer[0];
+                            }
+                        }
+
                         $token = array(
                             self::TYPE  => $this->tagType,
                             self::NAME  => trim($this->buffer),
@@ -157,6 +181,14 @@ class Mustache_Tokenizer
                             self::LINE  => $this->line,
                             self::INDEX => ($this->tagType === self::T_END_SECTION) ? $this->seenTag - $this->otagLen : $i + $this->ctagLen,
                         );
+
+                        if (isset($filters)) {
+                            $token[self::FILTERS] = $filters;
+                        }
+
+                        if (isset($attrs)) {
+                            $token[self::ATTRS] = $attrs;
+                        }
 
                         if ($this->tagType === self::T_UNESCAPED) {
                             // Clean up `{{{ tripleStache }}}` style tokens.

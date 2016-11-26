@@ -301,6 +301,85 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                     ),
                 ),
             ),
+
+            // Ensure that filters are parsed
+            array(
+                '{{ a | b }}',
+                null,
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE    => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME    => 'a',
+                        Mustache_Tokenizer::OTAG    => '{{',
+                        Mustache_Tokenizer::CTAG    => '}}',
+                        Mustache_Tokenizer::LINE    => 0,
+                        Mustache_Tokenizer::INDEX   => 11,
+                        Mustache_Tokenizer::FILTERS => 'b',
+                    ),
+                ),
+            ),
+
+            // Ensure that attribute strings are picked up.
+            array(
+                '{{# a b="c" d=e.f }}0{{/ a }}',
+                null,
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_SECTION,
+                        Mustache_Tokenizer::NAME  => 'a',
+                        Mustache_Tokenizer::OTAG  => '{{',
+                        Mustache_Tokenizer::CTAG  => '}}',
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::INDEX => 20,
+                        Mustache_Tokenizer::ATTRS => 'b="c" d=e.f',
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::VALUE => '0',
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_END_SECTION,
+                        Mustache_Tokenizer::NAME  => 'a',
+                        Mustache_Tokenizer::OTAG  => '{{',
+                        Mustache_Tokenizer::CTAG  => '}}',
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::INDEX => 21,
+                    ),
+                ),
+            ),
+
+            // Ensure that attribute strings and filters can coexist.
+            array(
+                '{{# a b="c" d=e.f | g }}0{{/ a }}',
+                null,
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE    => Mustache_Tokenizer::T_SECTION,
+                        Mustache_Tokenizer::NAME    => 'a',
+                        Mustache_Tokenizer::OTAG    => '{{',
+                        Mustache_Tokenizer::CTAG    => '}}',
+                        Mustache_Tokenizer::LINE    => 0,
+                        Mustache_Tokenizer::INDEX   => 24,
+                        Mustache_Tokenizer::FILTERS => 'g',
+                        Mustache_Tokenizer::ATTRS   => 'b="c" d=e.f',
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_TEXT,
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::VALUE => '0',
+                    ),
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_END_SECTION,
+                        Mustache_Tokenizer::NAME  => 'a',
+                        Mustache_Tokenizer::OTAG  => '{{',
+                        Mustache_Tokenizer::CTAG  => '}}',
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::INDEX => 25,
+                    ),
+                ),
+            ),
+
         );
     }
 }
