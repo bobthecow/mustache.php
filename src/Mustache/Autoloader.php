@@ -17,6 +17,14 @@ class Mustache_Autoloader
     private $baseDir;
 
     /**
+     * An array where the key is the baseDir and the key is an instance of this
+     * class.
+     *
+     * @var array
+     */
+    static private $instances;
+
+    /**
      * Autoloader constructor.
      *
      * @param string $baseDir Mustache library base directory (default: dirname(__FILE__).'/..')
@@ -45,7 +53,13 @@ class Mustache_Autoloader
      */
     public static function register($baseDir = null)
     {
-        $loader = new self($baseDir);
+        $key = $baseDir ? $baseDir : 0;
+
+        if (!isset(self::$instances[$key])) {
+            self::$instances[$key] = new self($baseDir);
+        }
+
+        $loader = self::$instances[$key];
         spl_autoload_register(array($loader, 'autoload'));
 
         return $loader;
