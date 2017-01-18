@@ -220,6 +220,22 @@ class Mustache_Engine
     }
 
     /**
+     * Render a source directly (without loader).
+     *
+     * @see Mustache_Engine::loadSource
+     * @see Mustache_Template::render
+     *
+     * @param string $source
+     * @param mixed $context  (default: array())
+     *
+     * @return string Rendered template
+     */
+    public function renderSource($source, $context = array())
+    {
+        return $this->loadSource($source)->render($context);;
+    }
+
+    /**
      * Get the current Mustache escape callback.
      *
      * @return callable|null
