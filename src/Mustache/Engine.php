@@ -54,6 +54,7 @@ class Mustache_Engine
     private $logger;
     private $strictCallables = false;
     private $pragmas = array();
+    private $delimiters = '{{ }}';
 
     // Services
     private $tokenizer;
@@ -189,6 +190,10 @@ class Mustache_Engine
 
         if (isset($options['strict_callables'])) {
             $this->strictCallables = $options['strict_callables'];
+        }
+
+        if (isset($options['delimiters'])) {
+            $this->delimiters = $options['delimiters'];
         }
 
         if (isset($options['pragmas'])) {
@@ -725,7 +730,7 @@ class Mustache_Engine
      */
     private function tokenize($source)
     {
-        return $this->getTokenizer()->scan($source);
+        return $this->getTokenizer()->scan($source, $this->delimiters);
     }
 
     /**
