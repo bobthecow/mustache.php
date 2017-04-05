@@ -54,7 +54,7 @@ class Mustache_Engine
     private $logger;
     private $strictCallables = false;
     private $pragmas = array();
-    private $delimites = '{{ }}';
+    private $delimiters = '{{ }}';
 
     // Services
     private $tokenizer;
