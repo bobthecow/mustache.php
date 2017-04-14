@@ -11,6 +11,6 @@ php:
   - hhvm
 
 script:
-  - phpunit
+  - ./vendor/bin/phpunit
 
 sudo: false
