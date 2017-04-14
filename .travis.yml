@@ -1,3 +1,4 @@
+sudo: false
 language: php
 
 php:
@@ -13,4 +14,8 @@ php:
 script:
   - ./vendor/bin/phpunit
 
-sudo: false
+before_install:
+  - travis_retry composer self-update
+
+install:
+  - composer install
