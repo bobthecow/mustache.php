@@ -240,9 +240,10 @@ class Mustache_Compiler
         $blockFunction = $context->findInBlock(%s);
         if (is_callable($blockFunction)) {
             $buffer .= call_user_func($blockFunction, $context);
-        } else {%s
-        }
+        %s}
     ';
+
+    const BLOCK_VAR_ELSE = '} else {%s';
 
     /**
      * Generate Mustache Template inheritance block variable PHP source.
@@ -261,7 +262,12 @@ class Mustache_Compiler
     {
         $id = var_export($id, true);
 
-        return sprintf($this->prepare(self::BLOCK_VAR, $level), $id, $this->walk($nodes, $level));
+        $else = $this->walk($nodes, $level);
+        if ($else !== '') {
+            $else = sprintf($this->prepare(self::BLOCK_VAR_ELSE, $level + 1, false, true), $else);
+        }
+
+        return sprintf($this->prepare(self::BLOCK_VAR, $level), $id, $else);
     }
 
     const BLOCK_ARG = '$blocksContext[%s] = array($this, \'block%s\');';
