@@ -191,7 +191,6 @@ class Mustache_Compiler
             {
                 $this->lambdaHelper = new Mustache_LambdaHelper($this->mustache, $context);
                 $buffer = \'\';
-                $blocksContext = array();
         %s
 
                 return $buffer;
@@ -207,7 +206,6 @@ class Mustache_Compiler
             public function renderInternal(Mustache_Context $context, $indent = \'\')
             {
                 $buffer = \'\';
-                $blocksContext = array();
         %s
 
                 return $buffer;
@@ -270,7 +268,7 @@ class Mustache_Compiler
         return sprintf($this->prepare(self::BLOCK_VAR, $level), $id, $else);
     }
 
-    const BLOCK_ARG = '$blocksContext[%s] = array($this, \'block%s\');';
+    const BLOCK_ARG = '%s => array($this, \'block%s\'),';
 
     /**
      * Generate Mustache Template inheritance block argument PHP source.
@@ -291,14 +289,13 @@ class Mustache_Compiler
         $keystr = var_export($key, true);
         $id = var_export($id, true);
 
-        return sprintf($this->prepare(self::BLOCK_ARG, 1), $id, $key);
+        return sprintf($this->prepare(self::BLOCK_ARG, $level), $id, $key);
     }
 
     const BLOCK_FUNCTION = '
         public function block%s($context)
         {
-            $indent = $buffer = \'\';
-            $blocksContext = array();%s
+            $indent = $buffer = \'\';%s
 
             return $buffer;
         }
@@ -333,7 +330,6 @@ class Mustache_Compiler
         private function section%s(Mustache_Context $context, $indent, $value)
         {
             $buffer = \'\';
-            $blocksContext = array();
 
             if (%s) {
                 $source = %s;
@@ -463,12 +459,17 @@ class Mustache_Compiler
     }
 
     const PARENT = '
-        %s
-
         if ($parent = $this->mustache->loadPartial(%s)) {
-            $context->pushBlockContext($blocksContext);
+            $context->pushBlockContext(array(%s
+            ));
             $buffer .= $parent->renderInternal($context, $indent);
             $context->popBlockContext();
+        }
+    ';
+
+    const PARENT_NO_CONTEXT = '
+        if ($parent = $this->mustache->loadPartial(%s)) {
+            $buffer .= $parent->renderInternal($context, $indent);
         }
     ';
 
@@ -486,11 +487,14 @@ class Mustache_Compiler
     {
         $realChildren = array_filter($children, array(__CLASS__, 'onlyBlockArgs'));
 
+        if (empty($realChildren)) {
+            return sprintf($this->prepare(self::PARENT_NO_CONTEXT, $level), var_export($id, true));
+        }
+
         return sprintf(
             $this->prepare(self::PARENT, $level),
-            $this->walk($realChildren, $level),
             var_export($id, true),
-            var_export($indent, true)
+            $this->walk($realChildren, $level + 1)
         );
     }
 
