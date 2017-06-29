@@ -227,6 +227,23 @@ class Mustache_Test_Functional_InheritanceTest extends PHPUnit_Framework_TestCas
         $this->assertEquals('test |override1 default| |override2 default|', $tpl->render($data));
     }
 
+    public function testBlocksDoNotLeakBetweenPartials()
+    {
+        $partials = array(
+            'partial' => '|{{$a}}A{{/a}} {{$b}}B{{/b}}|',
+        );
+
+        $this->mustache->setPartials($partials);
+
+        $tpl = $this->mustache->loadTemplate(
+            'test {{<partial}}{{$a}}C{{/a}}{{/partial}} {{<partial}}{{$b}}D{{/b}}{{/partial}}'
+        );
+
+        $data = array();
+
+        $this->assertEquals('test |C B| |A D|', $tpl->render($data));
+    }
+
     public function testDataDoesNotOverrideBlock()
     {
         $partials = array(
