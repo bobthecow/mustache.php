@@ -14,4 +14,8 @@ matrix:
     - php: hhvm
       dist: trusty
 
-script: vendor/bin/phpunit --verbose
+script:
+ - '[[ "$TRAVIS_PHP_VERSION" = 5.2* ]] && phpunit || vendor/bin/phpunit --verbose'
+
+install:
+ - '[[ "$TRAVIS_PHP_VERSION" = 5.2* ]] || composer install'
