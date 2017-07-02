@@ -22,7 +22,7 @@ class Mustache_Autoloader
      *
      * @var array
      */
-    static private $instances;
+    private static $instances;
 
     /**
      * Autoloader constructor.
