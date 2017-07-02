@@ -594,22 +594,34 @@ class Mustache_Engine
     /**
      * Helper method to generate a Mustache template class.
      *
+     * This method must be updated any time options are added which make it so
+     * the same template could be parsed and compiled multiple different ways.
+     *
      * @param string $source
      *
      * @return string Mustache Template class name
      */
     public function getTemplateClassName($source)
     {
-        return $this->templateClassPrefix . md5(sprintf(
-            'version:%s,escape:%s,entity_flags:%i,charset:%s,strict_callables:%s,pragmas:%s,source:%s',
-            self::VERSION,
-            isset($this->escape) ? 'custom' : 'default',
-            $this->entityFlags,
-            $this->charset,
-            $this->strictCallables ? 'true' : 'false',
-            implode(' ', $this->getPragmas()),
-            $source
-        ));
+        // For the most part, adding a new option here should do the trick.
+        //
+        // Pick a value here which is unique for each possible way the template
+        // could be compiled... but not necessarily unique per option value. See
+        // escape below, which only needs to differentiate between 'custom' and
+        // 'default' escapes.
+        //
+        // Keep this list in alphabetical order :)
+        $options = array(
+            'charset'         => $this->charset,
+            'delimiters'      => $this->delimiters,
+            'entityFlags'     => $this->entityFlags,
+            'escape'          => isset($this->escape) ? 'custom' : 'default',
+            'pragmas'         => $this->getPragmas(),
+            'strictCallables' => $this->strictCallables,
+            'version'         => self::VERSION,
+        );
+
+        return $this->templateClassPrefix . md5(json_encode($options) . "\n" . $source);
     }
 
     /**
