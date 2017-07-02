@@ -82,6 +82,14 @@ class Mustache_Engine
      *         // sections are often too dynamic to benefit from caching.
      *         'cache_lambda_templates' => true,
      *
+     *         // Customize the tag delimiters used by this engine instance. Note that overriding here changes the
+     *         // delimiters used to parse all templates and partials loaded by this instance. To override just for a
+     *         // single template, use an inline "change delimiters" tag at the start of the template file:
+     *         //
+     *         //     {{=<% %>=}}
+     *         //
+     *         'delimiters' => '<% %>',
+     *
      *         // A Mustache template loader instance. Uses a StringLoader if not specified.
      *         'loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/views'),
      *
