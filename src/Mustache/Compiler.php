@@ -365,11 +365,10 @@ class Mustache_Compiler
      * @param string   $otag    Current Mustache opening tag
      * @param string   $ctag    Current Mustache closing tag
      * @param int      $level
-     * @param bool     $arg     (default: false)
      *
      * @return string Generated section PHP source code
      */
-    private function section($nodes, $id, $filters, $start, $end, $otag, $ctag, $level, $arg = false)
+    private function section($nodes, $id, $filters, $start, $end, $otag, $ctag, $level)
     {
         $source   = var_export(substr($this->source, $start, $end - $start), true);
         $callable = $this->getCallable();
@@ -389,15 +388,11 @@ class Mustache_Compiler
             $this->sections[$key] = sprintf($this->prepare(self::SECTION), $key, $callable, $source, $helper, $delims, $this->walk($nodes, 2));
         }
 
-        if ($arg === true) {
-            return $key;
-        } else {
-            $method  = $this->getFindMethod($id);
-            $id      = var_export($id, true);
-            $filters = $this->getFilters($filters, $level);
+        $method  = $this->getFindMethod($id);
+        $id      = var_export($id, true);
+        $filters = $this->getFilters($filters, $level);
 
-            return sprintf($this->prepare(self::SECTION_CALL, $level), $id, $method, $id, $filters, $key);
-        }
+        return sprintf($this->prepare(self::SECTION_CALL, $level), $id, $method, $id, $filters, $key);
     }
 
     const INVERTED_SECTION = '
