@@ -13,20 +13,20 @@ class AnchoredDotNotation
 {
     public $genres = array(
         array(
-            'name' => 'Punk',
+            'name'      => 'Punk',
             'subgenres' => array(
                 array(
-                    'name' => 'Hardcore',
+                    'name'      => 'Hardcore',
                     'subgenres' => array(
                         array(
-                            'name' => 'First wave of black metal',
+                            'name'      => 'First wave of black metal',
                             'subgenres' => array(
                                 array('name' => 'Norwegian black metal'),
                                 array(
-                                    'name' => 'Death metal',
+                                    'name'      => 'Death metal',
                                     'subgenres' => array(
                                         array(
-                                            'name' => 'Swedish death metal',
+                                            'name'      => 'Swedish death metal',
                                             'subgenres' => array(
                                                 array('name' => 'New wave of American metal'),
                                             ),
@@ -36,11 +36,11 @@ class AnchoredDotNotation
                             ),
                         ),
                         array(
-                            'name' => 'Thrash metal',
+                            'name'      => 'Thrash metal',
                             'subgenres' => array(
                                 array('name' => 'Grindcore'),
                                 array(
-                                    'name' => 'Metalcore',
+                                    'name'      => 'Metalcore',
                                     'subgenres' => array(
                                         array('name' => 'Nu metal'),
                                     ),
