@@ -349,6 +349,23 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
 
         return array($name, $mustache);
     }
+
+    public function testCustomDelimiters()
+    {
+        $mustache = new Mustache_Engine(array(
+            'delimiters' => '[[ ]]',
+            'partials'   => array(
+                'one' => '[[> two ]]',
+                'two' => '[[ a ]]',
+            ),
+        ));
+
+        $tpl = $mustache->loadTemplate('[[# a ]][[ b ]][[/a ]]');
+        $this->assertEquals('c', $tpl->render(array('a' => true, 'b' => 'c')));
+
+        $tpl = $mustache->loadTemplate('[[> one ]]');
+        $this->assertEquals('b', $tpl->render(array('a' => 'b')));
+    }
 }
 
 class MustacheStub extends Mustache_Engine

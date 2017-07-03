@@ -54,7 +54,7 @@ class Mustache_Engine
     private $logger;
     private $strictCallables = false;
     private $pragmas = array();
-    private $delimiters = '{{ }}';
+    private $delimiters;
 
     // Services
     private $tokenizer;
@@ -621,7 +621,7 @@ class Mustache_Engine
         // Keep this list in alphabetical order :)
         $chunks = array(
             'charset'         => $this->charset,
-            'delimiters'      => $this->delimiters,
+            'delimiters'      => $this->delimiters ? $this->delimiters : '{{ }}',
             'entityFlags'     => $this->entityFlags,
             'escape'          => isset($this->escape) ? 'custom' : 'default',
             'key'             => ($source instanceof Mustache_Source) ? $source->getKey() : 'source',
