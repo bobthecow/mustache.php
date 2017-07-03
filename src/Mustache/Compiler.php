@@ -626,7 +626,7 @@ class Mustache_Compiler
     /**
      * Select the appropriate Context `find` method for a given $id.
      *
-     * The return value will be one of `find`, `findDot` or `last`.
+     * The return value will be one of `find`, `findDot`, `findAnchoredDot` or `last`.
      *
      * @see Mustache_Context::find
      * @see Mustache_Context::findDot
