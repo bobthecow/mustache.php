@@ -79,4 +79,25 @@ class Mustache_Test_Loader_ProductionFilesystemLoaderTest extends PHPUnit_Framew
 
         $loader->load('fake');
     }
+
+    public function testLoadWithDifferentStatProps()
+    {
+        $baseDir = realpath(dirname(__FILE__) . '/../../../fixtures/templates');
+        $noStatLoader = new Mustache_Loader_ProductionFilesystemLoader($baseDir, array('stat_props' => null));
+        $mtimeLoader = new Mustache_Loader_ProductionFilesystemLoader($baseDir, array('stat_props' => array('mtime')));
+        $sizeLoader = new Mustache_Loader_ProductionFilesystemLoader($baseDir, array('stat_props' => array('size')));
+        $bothLoader = new Mustache_Loader_ProductionFilesystemLoader($baseDir, array('stat_props' => array('mtime', 'size')));
+
+        $noStatKey = $noStatLoader->load('one.mustache')->getKey();
+        $mtimeKey = $mtimeLoader->load('one.mustache')->getKey();
+        $sizeKey = $sizeLoader->load('one.mustache')->getKey();
+        $bothKey = $bothLoader->load('one.mustache')->getKey();
+
+        $this->assertNotEquals($noStatKey, $mtimeKey);
+        $this->assertNotEquals($noStatKey, $sizeKey);
+        $this->assertNotEquals($noStatKey, $bothKey);
+        $this->assertNotEquals($mtimeKey, $sizeKey);
+        $this->assertNotEquals($mtimeKey, $bothKey);
+        $this->assertNotEquals($sizeKey, $bothKey);
+    }
 }
