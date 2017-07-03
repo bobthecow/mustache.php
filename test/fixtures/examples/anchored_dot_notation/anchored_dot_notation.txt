@@ -1,0 +1,11 @@
+ - Punk
+    - Hardcore
+       - First wave of black metal
+          - Norwegian black metal
+          - Death metal
+             - Swedish death metal
+                - New wave of American metal
+       - Thrash metal
+          - Grindcore
+          - Metalcore
+             - Nu metal
