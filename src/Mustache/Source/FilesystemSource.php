@@ -19,19 +19,19 @@
  */
 class Mustache_Source_FilesystemSource implements Mustache_Source
 {
-    private $filename;
+    private $fileName;
     private $statProps;
     private $stat;
 
     /**
      * Filesystem Source constructor.
      *
-     * @param string $filename
+     * @param string $fileName
      * @param array  $statProps
      */
-    public function __construct($filename, array $statProps)
+    public function __construct($fileName, array $statProps)
     {
-        $this->filename = $filename;
+        $this->fileName = $fileName;
         $this->statProps = $statProps;
     }
 
@@ -45,24 +45,24 @@ class Mustache_Source_FilesystemSource implements Mustache_Source
     public function getKey()
     {
         $chunks = array(
-            sprintf('filename:%s', $this->filename),
+            'fileName' => $this->fileName,
         );
 
         if (!empty($this->statProps)) {
             if (!isset($this->stat)) {
-                $this->stat = stat($this->filename);
+                $this->stat = stat($this->fileName);
             }
 
             if ($this->stat === false) {
-                throw new RuntimeException(sprintf('Failed to read source file "%s".', $this->filename));
+                throw new RuntimeException(sprintf('Failed to read source file "%s".', $this->fileName));
             }
 
             foreach ($this->statProps as $prop) {
-                $chunks[] = sprintf('%s:%s', $prop, $this->stat[$prop]);
+                $chunks[$prop] = $this->stat[$prop];
             }
         }
 
-        return implode(',', $chunks);
+        return json_encode($chunks);
     }
 
     /**
@@ -72,6 +72,6 @@ class Mustache_Source_FilesystemSource implements Mustache_Source
      */
     public function getSource()
     {
-        return file_get_contents($this->filename);
+        return file_get_contents($this->fileName);
     }
 }

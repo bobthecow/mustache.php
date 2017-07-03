@@ -611,12 +611,6 @@ class Mustache_Engine
      */
     public function getTemplateClassName($source)
     {
-        if ($source instanceof Mustache_Source) {
-            $key = $source->getKey();
-        } else {
-            $key = sprintf('source:%s', $source);
-        }
-
         // For the most part, adding a new option here should do the trick.
         //
         // Pick a value here which is unique for each possible way the template
@@ -625,17 +619,26 @@ class Mustache_Engine
         // 'default' escapes.
         //
         // Keep this list in alphabetical order :)
-        $options = array(
+        $chunks = array(
             'charset'         => $this->charset,
             'delimiters'      => $this->delimiters,
             'entityFlags'     => $this->entityFlags,
             'escape'          => isset($this->escape) ? 'custom' : 'default',
+            'key'             => ($source instanceof Mustache_Source) ? $source->getKey() : 'source',
             'pragmas'         => $this->getPragmas(),
             'strictCallables' => $this->strictCallables,
             'version'         => self::VERSION,
         );
 
-        return $this->templateClassPrefix . md5(json_encode($options) . "\n" . $key);
+        $key = json_encode($chunks);
+
+        // Template Source instances have already provided their own source key. For strings, just include the whole
+        // source string in the md5 hash.
+        if (!$source instanceof Mustache_Source) {
+            $key .= "\n" . $source;
+        }
+
+        return $this->templateClassPrefix . md5($key);
     }
 
     /**
