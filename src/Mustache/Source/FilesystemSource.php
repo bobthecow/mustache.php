@@ -50,7 +50,7 @@ class Mustache_Source_FilesystemSource implements Mustache_Source
 
         if (!empty($this->statProps)) {
             if (!isset($this->stat)) {
-                $this->stat = stat($this->fileName);
+                $this->stat = @stat($this->fileName);
             }
 
             if ($this->stat === false) {
