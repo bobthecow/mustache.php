@@ -142,6 +142,10 @@ class Mustache_Engine
     public function __construct(array $options = array())
     {
         if (isset($options['template_class_prefix'])) {
+            if ((string) $options['template_class_prefix'] === '') {
+                throw new Mustache_Exception_InvalidArgumentException('Mustache Constructor "template_class_prefix" must not be empty');
+            }
+
             $this->templateClassPrefix = $options['template_class_prefix'];
         }
 

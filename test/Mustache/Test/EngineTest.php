@@ -160,6 +160,16 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
 
     /**
      * @expectedException Mustache_Exception_InvalidArgumentException
+     */
+    public function testEmptyTemplatePrefixThrowsException()
+    {
+        new Mustache_Engine(array(
+            'template_class_prefix' => '',
+        ));
+    }
+
+    /**
+     * @expectedException Mustache_Exception_InvalidArgumentException
      * @dataProvider getBadEscapers
      */
     public function testNonCallableEscapeThrowsException($escape)
