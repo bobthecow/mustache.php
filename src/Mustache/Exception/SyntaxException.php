@@ -27,7 +27,7 @@ class Mustache_Exception_SyntaxException extends LogicException implements Musta
         if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
             parent::__construct($msg, 0, $previous);
         } else {
-            parent::__construct($msg);
+            parent::__construct($msg); // @codeCoverageIgnore
         }
     }
 

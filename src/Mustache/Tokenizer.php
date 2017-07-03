@@ -91,11 +91,14 @@ class Mustache_Tokenizer
     {
         // Setting mbstring.func_overload makes things *really* slow.
         // Let's do everyone a favor and scan this string as ASCII instead.
+        //
+        // @codeCoverageIgnoreStart
         $encoding = null;
         if (function_exists('mb_internal_encoding') && ini_get('mbstring.func_overload') & 2) {
             $encoding = mb_internal_encoding();
             mb_internal_encoding('ASCII');
         }
+        // @codeCoverageIgnoreEnd
 
         $this->reset();
 
@@ -202,9 +205,11 @@ class Mustache_Tokenizer
         $this->flushBuffer();
 
         // Restore the user's encoding...
+        // @codeCoverageIgnoreStart
         if ($encoding) {
             mb_internal_encoding($encoding);
         }
+        // @codeCoverageIgnoreEnd
 
         return $this->tokens;
     }
