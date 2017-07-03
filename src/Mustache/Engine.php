@@ -605,7 +605,7 @@ class Mustache_Engine
      * This method must be updated any time options are added which make it so
      * the same template could be parsed and compiled multiple different ways.
      *
-     * @param string $source
+     * @param string|Mustache_Source $source
      *
      * @return string Mustache Template class name
      */
@@ -619,17 +619,26 @@ class Mustache_Engine
         // 'default' escapes.
         //
         // Keep this list in alphabetical order :)
-        $options = array(
+        $chunks = array(
             'charset'         => $this->charset,
             'delimiters'      => $this->delimiters,
             'entityFlags'     => $this->entityFlags,
             'escape'          => isset($this->escape) ? 'custom' : 'default',
+            'key'             => ($source instanceof Mustache_Source) ? $source->getKey() : 'source',
             'pragmas'         => $this->getPragmas(),
             'strictCallables' => $this->strictCallables,
             'version'         => self::VERSION,
         );
 
-        return $this->templateClassPrefix . md5(json_encode($options) . "\n" . $source);
+        $key = json_encode($chunks);
+
+        // Template Source instances have already provided their own source key. For strings, just include the whole
+        // source string in the md5 hash.
+        if (!$source instanceof Mustache_Source) {
+            $key .= "\n" . $source;
+        }
+
+        return $this->templateClassPrefix . md5($key);
     }
 
     /**
@@ -706,8 +715,8 @@ class Mustache_Engine
      * @see Mustache_Engine::loadPartial
      * @see Mustache_Engine::loadLambda
      *
-     * @param string         $source
-     * @param Mustache_Cache $cache  (default: null)
+     * @param string|Mustache_Source $source
+     * @param Mustache_Cache         $cache  (default: null)
      *
      * @return Mustache_Template
      */
@@ -775,13 +784,12 @@ class Mustache_Engine
      *
      * @see Mustache_Compiler::compile
      *
-     * @param string $source
+     * @param string|Mustache_Source $source
      *
      * @return string generated Mustache template class code
      */
     private function compile($source)
     {
-        $tree = $this->parse($source);
         $name = $this->getTemplateClassName($source);
 
         $this->log(
@@ -789,6 +797,11 @@ class Mustache_Engine
             'Compiling template to "{className}" class',
             array('className' => $name)
         );
+
+        if ($source instanceof Mustache_Source) {
+            $source = $source->getSource();
+        }
+        $tree = $this->parse($source);
 
         $compiler = $this->getCompiler();
         $compiler->setPragmas($this->getPragmas());

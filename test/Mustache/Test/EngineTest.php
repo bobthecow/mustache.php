@@ -331,6 +331,15 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
         ));
     }
 
+    public function testCompileFromMustacheSourceInstance()
+    {
+        $baseDir = realpath(dirname(__FILE__) . '/../../fixtures/templates');
+        $mustache = new Mustache_Engine(array(
+            'loader' => new Mustache_Loader_ProductionFilesystemLoader($baseDir),
+        ));
+        $this->assertEquals('one contents', $mustache->render('one'));
+    }
+
     private function getLoggedMustache($level = Mustache_Logger::ERROR)
     {
         $name     = tempnam(sys_get_temp_dir(), 'mustache-test');
