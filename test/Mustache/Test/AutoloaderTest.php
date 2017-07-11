@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2010-2016 Justin Hileman
+ * (c) 2010-2017 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -32,5 +32,20 @@ class Mustache_Test_AutoloaderTest extends PHPUnit_Framework_TestCase
 
         $loader->autoload('\Mustache_Bar');
         $this->assertTrue(class_exists('Mustache_Bar'));
+    }
+
+    /**
+     * Test that the autoloader won't register multiple times.
+     */
+    public function testRegisterMultiple()
+    {
+        $numLoaders = count(spl_autoload_functions());
+
+        Mustache_Autoloader::register();
+        Mustache_Autoloader::register();
+
+        $expectedNumLoaders = $numLoaders + 1;
+
+        $this->assertCount($expectedNumLoaders, spl_autoload_functions());
     }
 }

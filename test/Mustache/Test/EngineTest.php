@@ -3,7 +3,7 @@
 /*
  * This file is part of Mustache.php.
  *
- * (c) 2010-2016 Justin Hileman
+ * (c) 2010-2017 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -156,6 +156,16 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
 
         $this->assertInstanceOf('Mustache_Cache_NoopCache', $mustache->getProtectedLambdaCache());
         $this->assertNotSame($mustache->getCache(), $mustache->getProtectedLambdaCache());
+    }
+
+    /**
+     * @expectedException Mustache_Exception_InvalidArgumentException
+     */
+    public function testEmptyTemplatePrefixThrowsException()
+    {
+        new Mustache_Engine(array(
+            'template_class_prefix' => '',
+        ));
     }
 
     /**
@@ -331,6 +341,15 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
         ));
     }
 
+    public function testCompileFromMustacheSourceInstance()
+    {
+        $baseDir = realpath(dirname(__FILE__) . '/../../fixtures/templates');
+        $mustache = new Mustache_Engine(array(
+            'loader' => new Mustache_Loader_ProductionFilesystemLoader($baseDir),
+        ));
+        $this->assertEquals('one contents', $mustache->render('one'));
+    }
+
     private function getLoggedMustache($level = Mustache_Logger::ERROR)
     {
         $name     = tempnam(sys_get_temp_dir(), 'mustache-test');
@@ -339,6 +358,23 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
         ));
 
         return array($name, $mustache);
+    }
+
+    public function testCustomDelimiters()
+    {
+        $mustache = new Mustache_Engine(array(
+            'delimiters' => '[[ ]]',
+            'partials'   => array(
+                'one' => '[[> two ]]',
+                'two' => '[[ a ]]',
+            ),
+        ));
+
+        $tpl = $mustache->loadTemplate('[[# a ]][[ b ]][[/a ]]');
+        $this->assertEquals('c', $tpl->render(array('a' => true, 'b' => 'c')));
+
+        $tpl = $mustache->loadTemplate('[[> one ]]');
+        $this->assertEquals('b', $tpl->render(array('a' => 'b')));
     }
 }
 
