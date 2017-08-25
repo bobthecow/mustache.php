@@ -55,6 +55,7 @@ class Mustache_Engine
     private $charset = 'UTF-8';
     private $logger;
     private $strictCallables = false;
+    private $strictVariables = false;
     private $pragmas = array();
     private $delimiters;
 
@@ -132,6 +133,9 @@ class Mustache_Engine
      *         // This currently defaults to false, but will default to true in v3.0.
      *         'strict_callables' => true,
      *
+     *         // Treat unknown variables as a failure and throw an exception instead of silently ignoring them.
+     *         'strict_variables' => true,
+     *
      *         // Enable pragmas across all templates, regardless of the presence of pragma tags in the individual
      *         // templates.
      *         'pragmas' => [Mustache_Engine::PRAGMA_FILTERS],
@@ -204,6 +208,10 @@ class Mustache_Engine
 
         if (isset($options['strict_callables'])) {
             $this->strictCallables = $options['strict_callables'];
+        }
+
+        if (isset($options['strict_variables'])) {
+            $this->strictVariables = $options['strict_variables'];
         }
 
         if (isset($options['delimiters'])) {
@@ -812,7 +820,7 @@ class Mustache_Engine
         $compiler = $this->getCompiler();
         $compiler->setPragmas($this->getPragmas());
 
-        return $compiler->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables, $this->entityFlags);
+        return $compiler->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables, $this->entityFlags, $this->strictVariables);
     }
 
     /**

@@ -26,6 +26,7 @@ class Mustache_Compiler
     private $entityFlags;
     private $charset;
     private $strictCallables;
+    private $strictVariables;
 
     /**
      * Compile a Mustache token parse tree into PHP source code.
@@ -36,11 +37,12 @@ class Mustache_Compiler
      * @param bool   $customEscape    (default: false)
      * @param string $charset         (default: 'UTF-8')
      * @param bool   $strictCallables (default: false)
+     * @param bool   $strictVariables (default: false)
      * @param int    $entityFlags     (default: ENT_COMPAT)
      *
      * @return string Generated PHP source code
      */
-    public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8', $strictCallables = false, $entityFlags = ENT_COMPAT)
+    public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8', $strictCallables = false, $entityFlags = ENT_COMPAT, $strictVariables = false)
     {
         $this->pragmas         = $this->defaultPragmas;
         $this->sections        = array();
@@ -51,6 +53,7 @@ class Mustache_Compiler
         $this->entityFlags     = $entityFlags;
         $this->charset         = $charset;
         $this->strictCallables = $strictCallables;
+        $this->strictVariables = $strictVariables;
 
         return $this->writeCode($tree, $name);
     }
@@ -187,7 +190,7 @@ class Mustache_Compiler
 
         class %s extends Mustache_Template
         {
-            private $lambdaHelper;%s
+            private $lambdaHelper;%s%s
 
             public function renderInternal(Mustache_Context $context, $indent = \'\')
             {
@@ -204,7 +207,7 @@ class Mustache_Compiler
     const KLASS_NO_LAMBDAS = '<?php
 
         class %s extends Mustache_Template
-        {%s
+        {%s%s
             public function renderInternal(Mustache_Context $context, $indent = \'\')
             {
                 $buffer = \'\';
@@ -215,6 +218,8 @@ class Mustache_Compiler
         }';
 
     const STRICT_CALLABLE = 'protected $strictCallables = true;';
+
+    const STRICT_VARIABLE = 'protected $strictVariables = true;';
 
     /**
      * Generate Mustache Template class PHP source.
@@ -232,8 +237,9 @@ class Mustache_Compiler
         $klass    = empty($this->sections) && empty($this->blocks) ? self::KLASS_NO_LAMBDAS : self::KLASS;
 
         $callable = $this->strictCallables ? $this->prepare(self::STRICT_CALLABLE) : '';
+        $variable = $this->strictVariables ? $this->prepare(self::STRICT_VARIABLE) : '';
 
-        return sprintf($this->prepare($klass, 0, false, true), $name, $callable, $code, $sections, $blocks);
+        return sprintf($this->prepare($klass, 0, false, true), $name, $callable, $variable, $code, $sections, $blocks);
     }
 
     const BLOCK_VAR = '
@@ -322,7 +328,11 @@ class Mustache_Compiler
     }
 
     const SECTION_CALL = '
-        $value = $context->%s(%s);%s
+        try {
+            $value = $context->%s(%s);%s
+        } catch (Mustache_Exception_UnknownVariableException $ex) {
+            $value = "";
+        }
         $buffer .= $this->section%s($context, $indent, $value);
     ';
 
@@ -396,7 +406,11 @@ class Mustache_Compiler
     }
 
     const INVERTED_SECTION = '
-        $value = $context->%s(%s);%s
+        try {
+            $value = $context->%s(%s);%s
+        } catch (Mustache_Exception_UnknownVariableException $ex) {
+            $value = "";
+        }
         if (empty($value)) {
             %s
         }
