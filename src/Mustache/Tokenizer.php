@@ -81,6 +81,7 @@ class Mustache_Tokenizer
      * Scan and tokenize template source.
      *
      * @throws Mustache_Exception_SyntaxException when mismatched section tags are encountered
+     * @throws Mustache_Exception_InvalidArgumentException when $delimiters string is invalid
      *
      * @param string $text       Mustache template source to tokenize
      * @param string $delimiters Optionally, pass initial opening and closing delimiters (default: null)
@@ -249,6 +250,8 @@ class Mustache_Tokenizer
     /**
      * Change the current Mustache delimiters. Set new `otag` and `ctag` values.
      *
+     * @throws Mustache_Exception_SyntaxException when delimiter string is invalid
+     *
      * @param string $text  Mustache template source
      * @param int    $index Current tokenizer index
      *
@@ -260,12 +263,18 @@ class Mustache_Tokenizer
         $close      = '=' . $this->ctag;
         $closeIndex = strpos($text, $close, $index);
 
-        $this->setDelimiters(trim(substr($text, $startIndex, $closeIndex - $startIndex)));
-
-        $this->tokens[] = array(
+        $token = array(
             self::TYPE => self::T_DELIM_CHANGE,
             self::LINE => $this->line,
         );
+
+        try {
+            $this->setDelimiters(trim(substr($text, $startIndex, $closeIndex - $startIndex)));
+        } catch (Mustache_Exception_InvalidArgumentException $e) {
+            throw new Mustache_Exception_SyntaxException($e->getMessage(), $token);
+        }
+
+        $this->tokens[] = $token;
 
         return $closeIndex + strlen($close) - 1;
     }
@@ -273,11 +282,18 @@ class Mustache_Tokenizer
     /**
      * Set the current Mustache `otag` and `ctag` delimiters.
      *
+     * @throws Mustache_Exception_InvalidArgumentException when delimiter string is invalid
+     *
      * @param string $delimiters
      */
     private function setDelimiters($delimiters)
     {
-        list($otag, $ctag) = explode(' ', $delimiters);
+        if (!preg_match('/^\s*(\S+)\s+(\S+)\s*$/', $delimiters, $matches)) {
+            throw new Mustache_Exception_InvalidArgumentException(sprintf('Invalid delimiters: %s', $delimiters));
+        }
+
+        list($_, $otag, $ctag) = $matches;
+
         $this->otag = $otag;
         $this->ctag = $ctag;
         $this->otagLen = strlen($otag);
