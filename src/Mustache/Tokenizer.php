@@ -72,9 +72,13 @@ class Mustache_Tokenizer
     private $tokens;
     private $seenTag;
     private $line;
+
     private $otag;
-    private $ctag;
+    private $otagChar;
     private $otagLen;
+
+    private $ctag;
+    private $ctagChar;
     private $ctagLen;
 
     /**
@@ -111,12 +115,13 @@ class Mustache_Tokenizer
         for ($i = 0; $i < $len; $i++) {
             switch ($this->state) {
                 case self::IN_TEXT:
-                    if ($this->tagChange($this->otag, $this->otagLen, $text, $i)) {
+                    $char = $text[$i];
+                    // Test whether it's time to change tags.
+                    if ($char === $this->otagChar && substr($text, $i, $this->otagLen) === $this->otag) {
                         $i--;
                         $this->flushBuffer();
                         $this->state = self::IN_TAG_TYPE;
                     } else {
-                        $char = $text[$i];
                         $this->buffer .= $char;
                         if ($char === "\n") {
                             $this->flushBuffer();
@@ -152,7 +157,9 @@ class Mustache_Tokenizer
                     break;
 
                 default:
-                    if ($this->tagChange($this->ctag, $this->ctagLen, $text, $i)) {
+                    $char = $text[$i];
+                    // Test whether it's time to change tags.
+                    if ($char === $this->ctagChar && substr($text, $i, $this->ctagLen) === $this->ctag) {
                         $token = array(
                             self::TYPE  => $this->tagType,
                             self::NAME  => trim($this->buffer),
@@ -197,7 +204,7 @@ class Mustache_Tokenizer
                         $this->state = self::IN_TEXT;
                         $this->tokens[] = $token;
                     } else {
-                        $this->buffer .= $text[$i];
+                        $this->buffer .= $char;
                     }
                     break;
             }
@@ -220,16 +227,20 @@ class Mustache_Tokenizer
      */
     private function reset()
     {
-        $this->state   = self::IN_TEXT;
-        $this->tagType = null;
-        $this->buffer  = '';
-        $this->tokens  = array();
-        $this->seenTag = false;
-        $this->line    = 0;
-        $this->otag    = '{{';
-        $this->ctag    = '}}';
-        $this->otagLen = 2;
-        $this->ctagLen = 2;
+        $this->state    = self::IN_TEXT;
+        $this->tagType  = null;
+        $this->buffer   = '';
+        $this->tokens   = array();
+        $this->seenTag  = false;
+        $this->line     = 0;
+
+        $this->otag     = '{{';
+        $this->otagChar = '{';
+        $this->otagLen  = 2;
+
+        $this->ctag     = '}}';
+        $this->ctagChar = '}';
+        $this->ctagLen  = 2;
     }
 
     /**
@@ -294,10 +305,13 @@ class Mustache_Tokenizer
 
         list($_, $otag, $ctag) = $matches;
 
-        $this->otag = $otag;
-        $this->ctag = $ctag;
-        $this->otagLen = strlen($otag);
-        $this->ctagLen = strlen($ctag);
+        $this->otag     = $otag;
+        $this->otagChar = $otag[0];
+        $this->otagLen  = strlen($otag);
+
+        $this->ctag     = $ctag;
+        $this->ctagChar = $ctag[0];
+        $this->ctagLen  = strlen($ctag);
     }
 
     /**
@@ -324,20 +338,5 @@ class Mustache_Tokenizer
         ));
 
         return $end + $this->ctagLen - 1;
-    }
-
-    /**
-     * Test whether it's time to change tags.
-     *
-     * @param string $tag    Current tag name
-     * @param int    $tagLen Current tag name length
-     * @param string $text   Mustache template source
-     * @param int    $index  Current tokenizer index
-     *
-     * @return bool True if this is a closing section tag
-     */
-    private function tagChange($tag, $tagLen, $text, $index)
-    {
-        return substr($text, $index, $tagLen) === $tag;
     }
 }
