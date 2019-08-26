@@ -1,23 +1,12 @@
 language: php
 
-sudo: false
-
 matrix:
   include:
-    - php: 5.2
-      dist: precise
-    - php: 5.3
-      dist: precise
-    - php: 5.4
-    - php: 5.5
-    - php: 5.6
-    - php: 7.0
-    - php: 7.1
-    - php: hhvm
-      dist: trusty
+    - php: "7.2"
+    - php: "7.3"
 
 script:
- - '[[ "$TRAVIS_PHP_VERSION" = 5.2* ]] && phpunit || vendor/bin/phpunit --verbose'
+ - 'phpunit'
 
 install:
- - '[[ "$TRAVIS_PHP_VERSION" = 5.2* ]] || composer install'
+ - 'composer install'
