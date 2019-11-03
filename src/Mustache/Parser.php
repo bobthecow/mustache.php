@@ -149,7 +149,7 @@ class Mustache_Parser
                 case Mustache_Tokenizer::T_BLOCK_VAR:
                     if ($this->pragmaBlocks) {
                         // BLOCKS pragma is enabled, let's do this!
-                        if ($parent[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_PARENT) {
+                        if (is_array($parent) && $parent[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_PARENT) {
                             $token[Mustache_Tokenizer::TYPE] = Mustache_Tokenizer::T_BLOCK_ARG;
                         }
                         $this->clearStandaloneLines($nodes, $tokens);
