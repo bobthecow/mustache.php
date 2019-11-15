@@ -45,7 +45,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
     {
         $this->setLevel($level);
 
-        if (is_resource($stream)) {
+        if (\is_resource($stream)) {
             $this->stream = $stream;
         } else {
             $this->url = $stream;
@@ -57,8 +57,8 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      */
     public function __destruct()
     {
-        if (is_resource($this->stream)) {
-            fclose($this->stream);
+        if (\is_resource($this->stream)) {
+            \fclose($this->stream);
         }
     }
 
@@ -71,8 +71,8 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      */
     public function setLevel($level)
     {
-        if (!array_key_exists($level, self::$levels)) {
-            throw new Mustache_Exception_InvalidArgumentException(sprintf('Unexpected logging level: %s', $level));
+        if (!\array_key_exists($level, self::$levels)) {
+            throw new Mustache_Exception_InvalidArgumentException(\sprintf('Unexpected logging level: %s', $level));
         }
 
         $this->level = $level;
@@ -99,8 +99,8 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      */
     public function log($level, $message, array $context = array())
     {
-        if (!array_key_exists($level, self::$levels)) {
-            throw new Mustache_Exception_InvalidArgumentException(sprintf('Unexpected logging level: %s', $level));
+        if (!\array_key_exists($level, self::$levels)) {
+            throw new Mustache_Exception_InvalidArgumentException(\sprintf('Unexpected logging level: %s', $level));
         }
 
         if (self::$levels[$level] >= self::$levels[$this->level]) {
@@ -120,20 +120,20 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      */
     protected function writeLog($level, $message, array $context = array())
     {
-        if (!is_resource($this->stream)) {
+        if (!\is_resource($this->stream)) {
             if (!isset($this->url)) {
                 throw new Mustache_Exception_LogicException('Missing stream url, the stream can not be opened. This may be caused by a premature call to close().');
             }
 
-            $this->stream = fopen($this->url, 'a');
-            if (!is_resource($this->stream)) {
+            $this->stream = \fopen($this->url, 'a');
+            if (!\is_resource($this->stream)) {
                 // @codeCoverageIgnoreStart
-                throw new Mustache_Exception_RuntimeException(sprintf('The stream or file "%s" could not be opened.', $this->url));
+                throw new Mustache_Exception_RuntimeException(\sprintf('The stream or file "%s" could not be opened.', $this->url));
                 // @codeCoverageIgnoreEnd
             }
         }
 
-        fwrite($this->stream, self::formatLine($level, $message, $context));
+        \fwrite($this->stream, self::formatLine($level, $message, $context));
     }
 
     /**
@@ -147,7 +147,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      */
     protected static function getLevelName($level)
     {
-        return strtoupper($level);
+        return \strtoupper($level);
     }
 
     /**
@@ -161,7 +161,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      */
     protected static function formatLine($level, $message, array $context = array())
     {
-        return sprintf(
+        return \sprintf(
             "%s: %s\n",
             self::getLevelName($level),
             self::interpolateMessage($message, $context)
@@ -178,7 +178,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      */
     protected static function interpolateMessage($message, array $context = array())
     {
-        if (strpos($message, '{') === false) {
+        if (\strpos($message, '{') === false) {
             return $message;
         }
 
@@ -189,6 +189,6 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
         }
 
         // interpolate replacement values into the the message and return
-        return strtr($message, $replace);
+        return \strtr($message, $replace);
     }
 }

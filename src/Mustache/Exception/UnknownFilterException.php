@@ -23,8 +23,8 @@ class Mustache_Exception_UnknownFilterException extends UnexpectedValueException
     public function __construct($filterName, Exception $previous = null)
     {
         $this->filterName = $filterName;
-        $message = sprintf('Unknown filter: %s', $filterName);
-        if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
+        $message = \sprintf('Unknown filter: %s', $filterName);
+        if (\version_compare(PHP_VERSION, '5.3.0', '>=')) {
             parent::__construct($message, 0, $previous);
         } else {
             parent::__construct($message); // @codeCoverageIgnore

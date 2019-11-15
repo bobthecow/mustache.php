@@ -46,7 +46,7 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
     public function load($key)
     {
         $fileName = $this->getCacheFilename($key);
-        if (!is_file($fileName)) {
+        if (!\is_file($fileName)) {
             return false;
         }
 
@@ -85,7 +85,7 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
      */
     protected function getCacheFilename($name)
     {
-        return sprintf('%s/%s.php', $this->baseDir, $name);
+        return \sprintf('%s/%s.php', $this->baseDir, $name);
     }
 
     /**
@@ -99,18 +99,18 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
      */
     private function buildDirectoryForFilename($fileName)
     {
-        $dirName = dirname($fileName);
-        if (!is_dir($dirName)) {
+        $dirName = \dirname($fileName);
+        if (!\is_dir($dirName)) {
             $this->log(
                 Mustache_Logger::INFO,
                 'Creating Mustache template cache directory: "{dirName}"',
                 array('dirName' => $dirName)
             );
 
-            @mkdir($dirName, 0777, true);
+            @\mkdir($dirName, 0777, true);
             // @codeCoverageIgnoreStart
-            if (!is_dir($dirName)) {
-                throw new Mustache_Exception_RuntimeException(sprintf('Failed to create cache directory "%s".', $dirName));
+            if (!\is_dir($dirName)) {
+                throw new Mustache_Exception_RuntimeException(\sprintf('Failed to create cache directory "%s".', $dirName));
             }
             // @codeCoverageIgnoreEnd
         }
@@ -136,11 +136,11 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
             array('fileName' => $fileName)
         );
 
-        $tempFile = tempnam($dirName, basename($fileName));
-        if (false !== @file_put_contents($tempFile, $value)) {
-            if (@rename($tempFile, $fileName)) {
-                $mode = isset($this->fileMode) ? $this->fileMode : (0666 & ~umask());
-                @chmod($fileName, $mode);
+        $tempFile = \tempnam($dirName, \basename($fileName));
+        if (false !== @\file_put_contents($tempFile, $value)) {
+            if (@\rename($tempFile, $fileName)) {
+                $mode = isset($this->fileMode) ? $this->fileMode : (0666 & ~\umask());
+                @\chmod($fileName, $mode);
 
                 return;
             }
@@ -155,7 +155,7 @@ class Mustache_Cache_FilesystemCache extends Mustache_Cache_AbstractCache
         }
 
         // @codeCoverageIgnoreStart
-        throw new Mustache_Exception_RuntimeException(sprintf('Failed to write cache file "%s".', $fileName));
+        throw new Mustache_Exception_RuntimeException(\sprintf('Failed to write cache file "%s".', $fileName));
         // @codeCoverageIgnoreEnd
     }
 }

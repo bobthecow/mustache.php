@@ -31,7 +31,7 @@ class Mustache_HelperCollection
             return;
         }
 
-        if (!is_array($helpers) && !$helpers instanceof Traversable) {
+        if (!\is_array($helpers) && !$helpers instanceof Traversable) {
             throw new Mustache_Exception_InvalidArgumentException('HelperCollection constructor expects an array of helpers');
         }
 
@@ -119,7 +119,7 @@ class Mustache_HelperCollection
      */
     public function has($name)
     {
-        return array_key_exists($name, $this->helpers);
+        return \array_key_exists($name, $this->helpers);
     }
 
     /**

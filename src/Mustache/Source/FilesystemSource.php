@@ -50,11 +50,11 @@ class Mustache_Source_FilesystemSource implements Mustache_Source
 
         if (!empty($this->statProps)) {
             if (!isset($this->stat)) {
-                $this->stat = @stat($this->fileName);
+                $this->stat = @\stat($this->fileName);
             }
 
             if ($this->stat === false) {
-                throw new RuntimeException(sprintf('Failed to read source file "%s".', $this->fileName));
+                throw new RuntimeException(\sprintf('Failed to read source file "%s".', $this->fileName));
             }
 
             foreach ($this->statProps as $prop) {
@@ -62,7 +62,7 @@ class Mustache_Source_FilesystemSource implements Mustache_Source
             }
         }
 
-        return json_encode($chunks);
+        return \json_encode($chunks);
     }
 
     /**
@@ -72,6 +72,6 @@ class Mustache_Source_FilesystemSource implements Mustache_Source
      */
     public function getSource()
     {
-        return file_get_contents($this->fileName);
+        return \file_get_contents($this->fileName);
     }
 }

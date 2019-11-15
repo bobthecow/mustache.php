@@ -36,7 +36,7 @@ class Mustache_Context
      */
     public function push($value)
     {
-        array_push($this->stack, $value);
+        \array_push($this->stack, $value);
     }
 
     /**
@@ -46,7 +46,7 @@ class Mustache_Context
      */
     public function pushBlockContext($value)
     {
-        array_push($this->blockStack, $value);
+        \array_push($this->blockStack, $value);
     }
 
     /**
@@ -56,7 +56,7 @@ class Mustache_Context
      */
     public function pop()
     {
-        return array_pop($this->stack);
+        return \array_pop($this->stack);
     }
 
     /**
@@ -66,7 +66,7 @@ class Mustache_Context
      */
     public function popBlockContext()
     {
-        return array_pop($this->blockStack);
+        return \array_pop($this->blockStack);
     }
 
     /**
@@ -76,7 +76,7 @@ class Mustache_Context
      */
     public function last()
     {
-        return end($this->stack);
+        return \end($this->stack);
     }
 
     /**
@@ -126,8 +126,8 @@ class Mustache_Context
      */
     public function findDot($id)
     {
-        $chunks = explode('.', $id);
-        $first  = array_shift($chunks);
+        $chunks = \explode('.', $id);
+        $first  = \array_shift($chunks);
         $value  = $this->findVariableInStack($first, $this->stack);
 
         foreach ($chunks as $chunk) {
@@ -158,10 +158,10 @@ class Mustache_Context
      */
     public function findAnchoredDot($id)
     {
-        $chunks = explode('.', $id);
-        $first  = array_shift($chunks);
+        $chunks = \explode('.', $id);
+        $first  = \array_shift($chunks);
         if ($first !== '') {
-            throw new Mustache_Exception_InvalidArgumentException(sprintf('Unexpected id for findAnchoredDot: %s', $id));
+            throw new Mustache_Exception_InvalidArgumentException(\sprintf('Unexpected id for findAnchoredDot: %s', $id));
         }
 
         $value  = $this->last();
@@ -187,7 +187,7 @@ class Mustache_Context
     public function findInBlock($id)
     {
         foreach ($this->blockStack as $context) {
-            if (array_key_exists($id, $context)) {
+            if (\array_key_exists($id, $context)) {
                 return $context[$id];
             }
         }
@@ -207,15 +207,15 @@ class Mustache_Context
      */
     private function findVariableInStack($id, array $stack)
     {
-        for ($i = count($stack) - 1; $i >= 0; $i--) {
+        for ($i = \count($stack) - 1; $i >= 0; $i--) {
             $frame = &$stack[$i];
 
-            switch (gettype($frame)) {
+            switch (\gettype($frame)) {
                 case 'object':
                     if (!($frame instanceof Closure)) {
                         // Note that is_callable() *will not work here*
                         // See https://github.com/bobthecow/mustache.php/wiki/Magic-Methods
-                        if (method_exists($frame, $id)) {
+                        if (\method_exists($frame, $id)) {
                             return $frame->$id();
                         }
 
@@ -230,7 +230,7 @@ class Mustache_Context
                     break;
 
                 case 'array':
-                    if (array_key_exists($id, $frame)) {
+                    if (\array_key_exists($id, $frame)) {
                         return $frame[$id];
                     }
                     break;

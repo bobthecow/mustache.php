@@ -113,7 +113,7 @@ abstract class Mustache_Template
      */
     protected function isIterable($value)
     {
-        switch (gettype($value)) {
+        switch (\gettype($value)) {
             case 'object':
                 return $value instanceof Traversable;
 
@@ -169,9 +169,9 @@ abstract class Mustache_Template
      */
     protected function resolveValue($value, Mustache_Context $context)
     {
-        if (($this->strictCallables ? is_object($value) : !is_string($value)) && is_callable($value)) {
+        if (($this->strictCallables ? \is_object($value) : !\is_string($value)) && \is_callable($value)) {
             return $this->mustache
-                ->loadLambda((string) call_user_func($value))
+                ->loadLambda((string) \call_user_func($value))
                 ->renderInternal($context);
         }
 

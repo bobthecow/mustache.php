@@ -75,7 +75,7 @@ class Mustache_Parser
         $nodes = array();
 
         while (!empty($tokens)) {
-            $token = array_shift($tokens);
+            $token = \array_shift($tokens);
 
             if ($token[Mustache_Tokenizer::LINE] === $this->lineNum) {
                 $this->lineTokens++;
@@ -107,7 +107,7 @@ class Mustache_Parser
 
                 case Mustache_Tokenizer::T_END_SECTION:
                     if (!isset($parent)) {
-                        $msg = sprintf(
+                        $msg = \sprintf(
                             'Unexpected closing tag: /%s on line %d',
                             $token[Mustache_Tokenizer::NAME],
                             $token[Mustache_Tokenizer::LINE]
@@ -116,7 +116,7 @@ class Mustache_Parser
                     }
 
                     if ($token[Mustache_Tokenizer::NAME] !== $parent[Mustache_Tokenizer::NAME]) {
-                        $msg = sprintf(
+                        $msg = \sprintf(
                             'Nesting error: %s (on line %d) vs. %s (on line %d)',
                             $parent[Mustache_Tokenizer::NAME],
                             $parent[Mustache_Tokenizer::LINE],
@@ -179,7 +179,7 @@ class Mustache_Parser
         }
 
         if (isset($parent)) {
-            $msg = sprintf(
+            $msg = \sprintf(
                 'Missing closing tag: %s opened on line %d',
                 $parent[Mustache_Tokenizer::NAME],
                 $parent[Mustache_Tokenizer::LINE]
@@ -211,14 +211,14 @@ class Mustache_Parser
         if ($this->lineTokens === 1) {
             // this is the second node on this line, so it can't be standalone
             // unless the previous node is whitespace.
-            if ($prev = end($nodes)) {
+            if ($prev = \end($nodes)) {
                 if (!$this->tokenIsWhitespace($prev)) {
                     return;
                 }
             }
         }
 
-        if ($next = reset($tokens)) {
+        if ($next = \reset($tokens)) {
             // If we're on a new line, bail.
             if ($next[Mustache_Tokenizer::LINE] !== $this->lineNum) {
                 return;
@@ -229,21 +229,21 @@ class Mustache_Parser
                 return;
             }
 
-            if (count($tokens) !== 1) {
+            if (\count($tokens) !== 1) {
                 // Unless it's the last token in the template, the next token
                 // must end in newline for this to be standalone.
-                if (substr($next[Mustache_Tokenizer::VALUE], -1) !== "\n") {
+                if (\substr($next[Mustache_Tokenizer::VALUE], -1) !== "\n") {
                     return;
                 }
             }
 
             // Discard the whitespace suffix
-            array_shift($tokens);
+            \array_shift($tokens);
         }
 
         if ($prev) {
             // Return the whitespace prefix, if any
-            return array_pop($nodes);
+            return \array_pop($nodes);
         }
     }
 
@@ -259,7 +259,7 @@ class Mustache_Parser
     private function tokenIsWhitespace(array $token)
     {
         if ($token[Mustache_Tokenizer::TYPE] === Mustache_Tokenizer::T_TEXT) {
-            return preg_match('/^\s*$/', $token[Mustache_Tokenizer::VALUE]);
+            return \preg_match('/^\s*$/', $token[Mustache_Tokenizer::VALUE]);
         }
 
         return false;
@@ -289,8 +289,8 @@ class Mustache_Parser
      */
     private function getNameAndFilters($name)
     {
-        $filters = array_map('trim', explode('|', $name));
-        $name    = array_shift($filters);
+        $filters = \array_map('trim', \explode('|', $name));
+        $name    = \array_shift($filters);
 
         return array($name, $filters);
     }

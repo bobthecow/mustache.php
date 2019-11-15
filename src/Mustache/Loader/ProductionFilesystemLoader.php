@@ -53,7 +53,7 @@ class Mustache_Loader_ProductionFilesystemLoader extends Mustache_Loader_Filesys
     {
         parent::__construct($baseDir, $options);
 
-        if (array_key_exists('stat_props', $options)) {
+        if (\array_key_exists('stat_props', $options)) {
             if (empty($options['stat_props'])) {
                 $this->statProps = array();
             } else {
@@ -77,7 +77,7 @@ class Mustache_Loader_ProductionFilesystemLoader extends Mustache_Loader_Filesys
     {
         $fileName = $this->getFileName($name);
 
-        if (!file_exists($fileName)) {
+        if (!\file_exists($fileName)) {
             throw new Mustache_Exception_UnknownTemplateException($name);
         }
 

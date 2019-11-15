@@ -94,19 +94,19 @@ class Mustache_Tokenizer
         //
         // @codeCoverageIgnoreStart
         $encoding = null;
-        if (function_exists('mb_internal_encoding') && ini_get('mbstring.func_overload') & 2) {
-            $encoding = mb_internal_encoding();
-            mb_internal_encoding('ASCII');
+        if (\function_exists('mb_internal_encoding') && \ini_get('mbstring.func_overload') & 2) {
+            $encoding = \mb_internal_encoding();
+            \mb_internal_encoding('ASCII');
         }
         // @codeCoverageIgnoreEnd
 
         $this->reset();
 
-        if ($delimiters = trim($delimiters)) {
+        if ($delimiters = \trim($delimiters)) {
             $this->setDelimiters($delimiters);
         }
 
-        $len = strlen($text);
+        $len = \strlen($text);
         for ($i = 0; $i < $len; $i++) {
             switch ($this->state) {
                 case self::IN_TEXT:
@@ -154,7 +154,7 @@ class Mustache_Tokenizer
                     if ($this->tagChange($this->ctag, $this->ctagLen, $text, $i)) {
                         $token = array(
                             self::TYPE  => $this->tagType,
-                            self::NAME  => trim($this->buffer),
+                            self::NAME  => \trim($this->buffer),
                             self::OTAG  => $this->otag,
                             self::CTAG  => $this->ctag,
                             self::LINE  => $this->line,
@@ -167,7 +167,7 @@ class Mustache_Tokenizer
                                 if (($i + 2 < $len) && $text[$i + 2] === '}') {
                                     $i++;
                                 } else {
-                                    $msg = sprintf(
+                                    $msg = \sprintf(
                                         'Mismatched tag delimiters: %s on line %d',
                                         $token[self::NAME],
                                         $token[self::LINE]
@@ -177,10 +177,10 @@ class Mustache_Tokenizer
                                 }
                             } else {
                                 $lastName = $token[self::NAME];
-                                if (substr($lastName, -1) === '}') {
-                                    $token[self::NAME] = trim(substr($lastName, 0, -1));
+                                if (\substr($lastName, -1) === '}') {
+                                    $token[self::NAME] = \trim(\substr($lastName, 0, -1));
                                 } else {
-                                    $msg = sprintf(
+                                    $msg = \sprintf(
                                         'Mismatched tag delimiters: %s on line %d',
                                         $token[self::NAME],
                                         $token[self::LINE]
@@ -207,7 +207,7 @@ class Mustache_Tokenizer
         // Restore the user's encoding...
         // @codeCoverageIgnoreStart
         if ($encoding) {
-            mb_internal_encoding($encoding);
+            \mb_internal_encoding($encoding);
         }
         // @codeCoverageIgnoreEnd
 
@@ -236,7 +236,7 @@ class Mustache_Tokenizer
      */
     private function flushBuffer()
     {
-        if (strlen($this->buffer) > 0) {
+        if (\strlen($this->buffer) > 0) {
             $this->tokens[] = array(
                 self::TYPE  => self::T_TEXT,
                 self::LINE  => $this->line,
@@ -256,18 +256,18 @@ class Mustache_Tokenizer
      */
     private function changeDelimiters($text, $index)
     {
-        $startIndex = strpos($text, '=', $index) + 1;
+        $startIndex = \strpos($text, '=', $index) + 1;
         $close      = '=' . $this->ctag;
-        $closeIndex = strpos($text, $close, $index);
+        $closeIndex = \strpos($text, $close, $index);
 
-        $this->setDelimiters(trim(substr($text, $startIndex, $closeIndex - $startIndex)));
+        $this->setDelimiters(\trim(\substr($text, $startIndex, $closeIndex - $startIndex)));
 
         $this->tokens[] = array(
             self::TYPE => self::T_DELIM_CHANGE,
             self::LINE => $this->line,
         );
 
-        return $closeIndex + strlen($close) - 1;
+        return $closeIndex + \strlen($close) - 1;
     }
 
     /**
@@ -277,11 +277,11 @@ class Mustache_Tokenizer
      */
     private function setDelimiters($delimiters)
     {
-        list($otag, $ctag) = explode(' ', $delimiters);
+        list($otag, $ctag) = \explode(' ', $delimiters);
         $this->otag = $otag;
         $this->ctag = $ctag;
-        $this->otagLen = strlen($otag);
-        $this->ctagLen = strlen($ctag);
+        $this->otagLen = \strlen($otag);
+        $this->ctagLen = \strlen($ctag);
     }
 
     /**
@@ -297,11 +297,11 @@ class Mustache_Tokenizer
      */
     private function addPragma($text, $index)
     {
-        $end    = strpos($text, $this->ctag, $index);
-        $pragma = trim(substr($text, $index + 2, $end - $index - 2));
+        $end    = \strpos($text, $this->ctag, $index);
+        $pragma = \trim(\substr($text, $index + 2, $end - $index - 2));
 
         // Pragmas are hoisted to the front of the template.
-        array_unshift($this->tokens, array(
+        \array_unshift($this->tokens, array(
             self::TYPE => self::T_PRAGMA,
             self::NAME => $pragma,
             self::LINE => 0,
@@ -322,6 +322,6 @@ class Mustache_Tokenizer
      */
     private function tagChange($tag, $tagLen, $text, $index)
     {
-        return substr($text, $index, $tagLen) === $tag;
+        return \substr($text, $index, $tagLen) === $tag;
     }
 }

@@ -49,19 +49,19 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
     {
         $this->baseDir = $baseDir;
 
-        if (strpos($this->baseDir, '://') === false) {
-            $this->baseDir = realpath($this->baseDir);
+        if (\strpos($this->baseDir, '://') === false) {
+            $this->baseDir = \realpath($this->baseDir);
         }
 
-        if ($this->shouldCheckPath() && !is_dir($this->baseDir)) {
-            throw new Mustache_Exception_RuntimeException(sprintf('FilesystemLoader baseDir must be a directory: %s', $baseDir));
+        if ($this->shouldCheckPath() && !\is_dir($this->baseDir)) {
+            throw new Mustache_Exception_RuntimeException(\sprintf('FilesystemLoader baseDir must be a directory: %s', $baseDir));
         }
 
-        if (array_key_exists('extension', $options)) {
+        if (\array_key_exists('extension', $options)) {
             if (empty($options['extension'])) {
                 $this->extension = '';
             } else {
-                $this->extension = '.' . ltrim($options['extension'], '.');
+                $this->extension = '.' . \ltrim($options['extension'], '.');
             }
         }
     }
@@ -98,11 +98,11 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
     {
         $fileName = $this->getFileName($name);
 
-        if ($this->shouldCheckPath() && !file_exists($fileName)) {
+        if ($this->shouldCheckPath() && !\file_exists($fileName)) {
             throw new Mustache_Exception_UnknownTemplateException($name);
         }
 
-        return file_get_contents($fileName);
+        return \file_get_contents($fileName);
     }
 
     /**
@@ -115,7 +115,7 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
     protected function getFileName($name)
     {
         $fileName = $this->baseDir . '/' . $name;
-        if (substr($fileName, 0 - strlen($this->extension)) !== $this->extension) {
+        if (\substr($fileName, 0 - \strlen($this->extension)) !== $this->extension) {
             $fileName .= $this->extension;
         }
 
@@ -130,6 +130,6 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
      */
     protected function shouldCheckPath()
     {
-        return strpos($this->baseDir, '://') === false || strpos($this->baseDir, 'file://') === 0;
+        return \strpos($this->baseDir, '://') === false || \strpos($this->baseDir, 'file://') === 0;
     }
 }

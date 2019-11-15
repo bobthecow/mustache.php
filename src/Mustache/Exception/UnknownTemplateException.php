@@ -23,8 +23,8 @@ class Mustache_Exception_UnknownTemplateException extends InvalidArgumentExcepti
     public function __construct($templateName, Exception $previous = null)
     {
         $this->templateName = $templateName;
-        $message = sprintf('Unknown template: %s', $templateName);
-        if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
+        $message = \sprintf('Unknown template: %s', $templateName);
+        if (\version_compare(PHP_VERSION, '5.3.0', '>=')) {
             parent::__construct($message, 0, $previous);
         } else {
             parent::__construct($message); // @codeCoverageIgnore

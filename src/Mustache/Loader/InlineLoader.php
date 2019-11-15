@@ -72,11 +72,11 @@ class Mustache_Loader_InlineLoader implements Mustache_Loader
      */
     public function __construct($fileName, $offset)
     {
-        if (!is_file($fileName)) {
+        if (!\is_file($fileName)) {
             throw new Mustache_Exception_InvalidArgumentException('InlineLoader expects a valid filename.');
         }
 
-        if (!is_int($offset) || $offset < 0) {
+        if (!\is_int($offset) || $offset < 0) {
             throw new Mustache_Exception_InvalidArgumentException('InlineLoader expects a valid file offset.');
         }
 
@@ -97,7 +97,7 @@ class Mustache_Loader_InlineLoader implements Mustache_Loader
     {
         $this->loadTemplates();
 
-        if (!array_key_exists($name, $this->templates)) {
+        if (!\array_key_exists($name, $this->templates)) {
             throw new Mustache_Exception_UnknownTemplateException($name);
         }
 
@@ -111,11 +111,11 @@ class Mustache_Loader_InlineLoader implements Mustache_Loader
     {
         if ($this->templates === null) {
             $this->templates = array();
-            $data = file_get_contents($this->fileName, false, null, $this->offset);
-            foreach (preg_split("/^@@(?= [\w\d\.]+$)/m", $data, -1) as $chunk) {
-                if (trim($chunk)) {
-                    list($name, $content)         = explode("\n", $chunk, 2);
-                    $this->templates[trim($name)] = trim($content);
+            $data = \file_get_contents($this->fileName, false, null, $this->offset);
+            foreach (\preg_split("/^@@(?= [\w\d\.]+$)/m", $data, -1) as $chunk) {
+                if (\trim($chunk)) {
+                    list($name, $content)         = \explode("\n", $chunk, 2);
+                    $this->templates[\trim($name)] = \trim($content);
                 }
             }
         }

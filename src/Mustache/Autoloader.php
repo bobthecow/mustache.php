@@ -32,12 +32,12 @@ class Mustache_Autoloader
     public function __construct($baseDir = null)
     {
         if ($baseDir === null) {
-            $baseDir = dirname(__FILE__) . '/..';
+            $baseDir = \dirname(__FILE__) . '/..';
         }
 
         // realpath doesn't always work, for example, with stream URIs
-        $realDir = realpath($baseDir);
-        if (is_dir($realDir)) {
+        $realDir = \realpath($baseDir);
+        if (\is_dir($realDir)) {
             $this->baseDir = $realDir;
         } else {
             $this->baseDir = $baseDir;
@@ -60,7 +60,7 @@ class Mustache_Autoloader
         }
 
         $loader = self::$instances[$key];
-        spl_autoload_register(array($loader, 'autoload'));
+        \spl_autoload_register(array($loader, 'autoload'));
 
         return $loader;
     }
@@ -73,15 +73,15 @@ class Mustache_Autoloader
     public function autoload($class)
     {
         if ($class[0] === '\\') {
-            $class = substr($class, 1);
+            $class = \substr($class, 1);
         }
 
-        if (strpos($class, 'Mustache') !== 0) {
+        if (\strpos($class, 'Mustache') !== 0) {
             return;
         }
 
-        $file = sprintf('%s/%s.php', $this->baseDir, str_replace('_', '/', $class));
-        if (is_file($file)) {
+        $file = \sprintf('%s/%s.php', $this->baseDir, \str_replace('_', '/', $class));
+        if (\is_file($file)) {
             require $file;
         }
     }

@@ -152,7 +152,7 @@ class Mustache_Engine
         if (isset($options['cache'])) {
             $cache = $options['cache'];
 
-            if (is_string($cache)) {
+            if (\is_string($cache)) {
                 $mode  = isset($options['cache_file_mode']) ? $options['cache_file_mode'] : null;
                 $cache = new Mustache_Cache_FilesystemCache($cache, $mode);
             }
@@ -181,7 +181,7 @@ class Mustache_Engine
         }
 
         if (isset($options['escape'])) {
-            if (!is_callable($options['escape'])) {
+            if (!\is_callable($options['escape'])) {
                 throw new Mustache_Exception_InvalidArgumentException('Mustache Constructor "escape" option must be callable');
             }
 
@@ -211,7 +211,7 @@ class Mustache_Engine
         if (isset($options['pragmas'])) {
             foreach ($options['pragmas'] as $pragma) {
                 if (!isset(self::$knownPragmas[$pragma])) {
-                    throw new Mustache_Exception_InvalidArgumentException(sprintf('Unknown pragma: "%s".', $pragma));
+                    throw new Mustache_Exception_InvalidArgumentException(\sprintf('Unknown pragma: "%s".', $pragma));
                 }
                 $this->pragmas[$pragma] = true;
             }
@@ -273,7 +273,7 @@ class Mustache_Engine
      */
     public function getPragmas()
     {
-        return array_keys($this->pragmas);
+        return \array_keys($this->pragmas);
     }
 
     /**
@@ -363,7 +363,7 @@ class Mustache_Engine
      */
     public function setHelpers($helpers)
     {
-        if (!is_array($helpers) && !$helpers instanceof Traversable) {
+        if (!\is_array($helpers) && !$helpers instanceof Traversable) {
             throw new Mustache_Exception_InvalidArgumentException('setHelpers expects an array of helpers');
         }
 
@@ -452,7 +452,7 @@ class Mustache_Engine
      */
     public function setLogger($logger = null)
     {
-        if ($logger !== null && !($logger instanceof Mustache_Logger || is_a($logger, 'Psr\\Log\\LoggerInterface'))) {
+        if ($logger !== null && !($logger instanceof Mustache_Logger || \is_a($logger, 'Psr\\Log\\LoggerInterface'))) {
             throw new Mustache_Exception_InvalidArgumentException('Expected an instance of Mustache_Logger or Psr\\Log\\LoggerInterface.');
         }
 
@@ -634,7 +634,7 @@ class Mustache_Engine
             'version'         => self::VERSION,
         );
 
-        $key = json_encode($chunks);
+        $key = \json_encode($chunks);
 
         // Template Source instances have already provided their own source key. For strings, just include the whole
         // source string in the md5 hash.
@@ -642,7 +642,7 @@ class Mustache_Engine
             $key .= "\n" . $source;
         }
 
-        return $this->templateClassPrefix . md5($key);
+        return $this->templateClassPrefix . \md5($key);
     }
 
     /**
@@ -733,7 +733,7 @@ class Mustache_Engine
                 $cache = $this->getCache();
             }
 
-            if (!class_exists($className, false)) {
+            if (!\class_exists($className, false)) {
                 if (!$cache->load($className)) {
                     $compiled = $this->compile($source);
                     $cache->cache($className, $compiled);
