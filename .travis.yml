@@ -22,6 +22,7 @@ matrix:
       dist: trusty
   allow_failures:
     - php: hhvm
+    - php: 7.4snapshot
 
 script:
   - '[[ "$TRAVIS_PHP_VERSION" = 5.2* ]] && phpunit || vendor/bin/phpunit --verbose'
