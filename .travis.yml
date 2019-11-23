@@ -5,17 +5,27 @@ sudo: false
 matrix:
   include:
     - php: 5.2
+      dist: precise
     - php: 5.3
+      dist: precise
     - php: 5.4
+      dist: trusty
     - php: 5.5
+      dist: trusty
     - php: 5.6
     - php: 7.0
     - php: 7.1
+    - php: 7.2
+    - php: 7.3
+    - php: 7.4snapshot
     - php: hhvm
       dist: trusty
+  allow_failures:
+    - php: hhvm
+    - php: 7.4snapshot
 
 script:
- - '[[ "$TRAVIS_PHP_VERSION" = 5.2* ]] && phpunit || vendor/bin/phpunit --verbose'
+  - '[[ "$TRAVIS_PHP_VERSION" = 5.2* ]] && phpunit || vendor/bin/phpunit --verbose'
 
 install:
- - '[[ "$TRAVIS_PHP_VERSION" = 5.2* ]] || composer install'
+  - '[[ "$TRAVIS_PHP_VERSION" = 5.2* ]] || composer install'
