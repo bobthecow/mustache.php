@@ -21,7 +21,7 @@ class Mustache_Test_CompilerTest extends PHPUnit_Framework_TestCase
     {
         $compiler = new Mustache_Compiler();
 
-        $compiled = $compiler->compile($source, $tree, $name, $customEscaper, $charset, false, $entityFlags);
+        $compiled = $compiler->compile($source, $tree, $name, $customEscaper, $charset, false, $entityFlags, false);
         foreach ($expected as $contains) {
             $this->assertContains($contains, $compiled);
         }

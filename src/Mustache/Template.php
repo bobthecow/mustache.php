@@ -27,6 +27,11 @@ abstract class Mustache_Template
     protected $strictCallables = false;
 
     /**
+     * @var bool
+     */
+    protected $strictVariables = false;
+
+    /**
      * Mustache Template constructor.
      *
      * @param Mustache_Engine $mustache
@@ -143,7 +148,7 @@ abstract class Mustache_Template
      */
     protected function prepareContextStack($context = null)
     {
-        $stack = new Mustache_Context();
+        $stack = new Mustache_Context(null, $this->strictVariables);
 
         $helpers = $this->mustache->getHelpers();
         if (!$helpers->isEmpty()) {
