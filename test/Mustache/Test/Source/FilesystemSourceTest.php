@@ -15,7 +15,7 @@
 class Mustache_Test_Source_FilesystemSourceTest extends PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException RuntimeException
+     * @expectedException Mustache_Exception_RuntimeException
      */
     public function testMissingTemplateThrowsException()
     {
