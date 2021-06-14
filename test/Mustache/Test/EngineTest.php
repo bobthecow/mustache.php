@@ -81,6 +81,17 @@ class Mustache_Test_EngineTest extends Mustache_Test_FunctionalTestCase
         $this->assertEquals($source, $mustache->source);
     }
 
+    public function testRenderSource()
+    {
+        $source = 'Hello {{ foo }}!';
+        $data = array('foo' => 'World');
+
+        $mustache = new Mustache_Engine();
+        $ret =$mustache->renderSource($source, $data);
+        $this->assertEquals('Hello World!', $ret);
+
+    }
+
     public function testSettingServices()
     {
         $logger    = new Mustache_Logger_StreamLogger(tmpfile());
