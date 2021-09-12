@@ -1,7 +1,7 @@
 Mustache.php
 ============
 
-A [Mustache](http://mustache.github.com/) implementation in PHP.
+A [Mustache](https://mustache.github.io/) implementation in PHP.
 
 [![Package version](http://img.shields.io/packagist/v/mustache/mustache.svg?style=flat-square)](https://packagist.org/packages/mustache/mustache)
 [![Build status](http://img.shields.io/travis/bobthecow/mustache.php/dev.svg?style=flat-square)](http://travis-ci.org/bobthecow/mustache.php)
