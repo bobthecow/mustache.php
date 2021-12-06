@@ -88,11 +88,11 @@ class Mustache_Tokenizer
      * @throws Mustache_Exception_InvalidArgumentException when $delimiters string is invalid
      *
      * @param string $text       Mustache template source to tokenize
-     * @param string $delimiters Optionally, pass initial opening and closing delimiters (default: null)
+     * @param string $delimiters Optionally, pass initial opening and closing delimiters (default: empty string)
      *
      * @return array Set of Mustache tokens
      */
-    public function scan($text, $delimiters = null)
+    public function scan($text, $delimiters = '')
     {
         // Setting mbstring.func_overload makes things *really* slow.
         // Let's do everyone a favor and scan this string as ASCII instead.
