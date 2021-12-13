@@ -301,6 +301,54 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
                     ),
                 ),
             ),
+
+            // Delimiters are trimmed
+            array(
+                '<% name %>',
+                ' <% %> ',
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME  => 'name',
+                        Mustache_Tokenizer::OTAG  => '<%',
+                        Mustache_Tokenizer::CTAG  => '%>',
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::INDEX => 10,
+                    ),
+                ),
+            ),
+
+            // An empty string makes delimiters fall back to default
+            array(
+                '{{ name }}',
+                '',
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME  => 'name',
+                        Mustache_Tokenizer::OTAG  => '{{',
+                        Mustache_Tokenizer::CTAG  => '}}',
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::INDEX => 10,
+                    ),
+                ),
+            ),
+
+            // A bad delimiter type makes delimiters fall back to default
+            array(
+                '{{ name }}',
+                42,
+                array(
+                    array(
+                        Mustache_Tokenizer::TYPE  => Mustache_Tokenizer::T_ESCAPED,
+                        Mustache_Tokenizer::NAME  => 'name',
+                        Mustache_Tokenizer::OTAG  => '{{',
+                        Mustache_Tokenizer::CTAG  => '}}',
+                        Mustache_Tokenizer::LINE  => 0,
+                        Mustache_Tokenizer::INDEX => 10,
+                    ),
+                ),
+            ),
         );
     }
 }
