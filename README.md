@@ -69,5 +69,5 @@ Read [the Mustache.php documentation](https://github.com/bobthecow/mustache.php/
 See Also
 --------
 
+ * [mustache(5)](http://mustache.github.io/mustache.5.html) man page.
  * [Readme for the Ruby Mustache implementation](http://github.com/defunkt/mustache/blob/master/README.md).
- * [mustache(5)](http://mustache.github.com/mustache.5.html) man page.
