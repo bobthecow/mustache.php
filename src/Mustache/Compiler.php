@@ -333,12 +333,12 @@ class Mustache_Compiler
 
             if (%s) {
                 $source = %s;
-                $result = call_user_func($value, $source, %s);
+                $result = (string) call_user_func($value, $source, %s);
                 if (strpos($result, \'{{\') === false) {
                     $buffer .= $result;
                 } else {
                     $buffer .= $this->mustache
-                        ->loadLambda((string) $result%s)
+                        ->loadLambda($result%s)
                         ->renderInternal($context);
                 }
             } elseif (!empty($value)) {
