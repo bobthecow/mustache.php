@@ -604,7 +604,7 @@ class Mustache_Compiler
         return preg_replace("/\n( {8})?/", "\n" . str_repeat(' ', $bonus * 4), $text);
     }
 
-    const DEFAULT_ESCAPE = 'htmlspecialchars(%s, %s, %s)';
+    const DEFAULT_ESCAPE = 'htmlspecialchars((string) %s, %s, %s)';
     const CUSTOM_ESCAPE  = 'call_user_func($this->mustache->getEscape(), %s)';
 
     /**
