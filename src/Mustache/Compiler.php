@@ -286,7 +286,6 @@ class Mustache_Compiler
     private function blockArg($nodes, $id, $start, $end, $otag, $ctag, $level)
     {
         $key = $this->block($nodes);
-        $keystr = var_export($key, true);
         $id = var_export($id, true);
 
         return sprintf($this->prepare(self::BLOCK_ARG, $level), $id, $key);
