@@ -506,7 +506,7 @@ class Mustache_Compiler
 
     const VARIABLE = '
         $value = $this->resolveValue($context->%s(%s), $context);%s
-        $buffer .= %s%s;
+        $buffer .= %s($value === null ? \'\' : %s);
     ';
 
     /**
