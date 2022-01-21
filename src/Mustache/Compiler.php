@@ -320,7 +320,6 @@ class Mustache_Compiler
     }
 
     const SECTION_CALL = '
-        // %s section
         $value = $context->%s(%s);%s
         $buffer .= $this->section%s($context, $indent, $value);
     ';
@@ -391,11 +390,10 @@ class Mustache_Compiler
         $id      = var_export($id, true);
         $filters = $this->getFilters($filters, $level);
 
-        return sprintf($this->prepare(self::SECTION_CALL, $level), $id, $method, $id, $filters, $key);
+        return sprintf($this->prepare(self::SECTION_CALL, $level), $method, $id, $filters, $key);
     }
 
     const INVERTED_SECTION = '
-        // %s inverted section
         $value = $context->%s(%s);%s
         if (empty($value)) {
             %s
@@ -418,7 +416,7 @@ class Mustache_Compiler
         $id      = var_export($id, true);
         $filters = $this->getFilters($filters, $level);
 
-        return sprintf($this->prepare(self::INVERTED_SECTION, $level), $id, $method, $id, $filters, $this->walk($nodes, $level));
+        return sprintf($this->prepare(self::INVERTED_SECTION, $level), $method, $id, $filters, $this->walk($nodes, $level));
     }
 
     const PARTIAL_INDENT = ', $indent . %s';
