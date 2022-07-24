@@ -86,19 +86,21 @@ class Mustache_Parser
                 $this->lineTokens = 0;
             }
 
-            if ($this->pragmaDynamicNames && isset($token[Mustache_Tokenizer::NAME])) {
-                list($name, $isDynamic) = $this->getDynamicName($token);
-                if ($isDynamic) {
-                    $token[Mustache_Tokenizer::NAME]    = $name;
-                    $token[Mustache_Tokenizer::DYNAMIC] = true;
+            if ($token[Mustache_Tokenizer::TYPE] !== Mustache_Tokenizer::T_COMMENT) {
+                if ($this->pragmaDynamicNames && isset($token[Mustache_Tokenizer::NAME])) {
+                    list($name, $isDynamic) = $this->getDynamicName($token);
+                    if ($isDynamic) {
+                        $token[Mustache_Tokenizer::NAME]    = $name;
+                        $token[Mustache_Tokenizer::DYNAMIC] = true;
+                    }
                 }
-            }
 
-            if ($this->pragmaFilters && isset($token[Mustache_Tokenizer::NAME])) {
-                list($name, $filters) = $this->getNameAndFilters($token[Mustache_Tokenizer::NAME]);
-                if (!empty($filters)) {
-                    $token[Mustache_Tokenizer::NAME]    = $name;
-                    $token[Mustache_Tokenizer::FILTERS] = $filters;
+                if ($this->pragmaFilters && isset($token[Mustache_Tokenizer::NAME])) {
+                    list($name, $filters) = $this->getNameAndFilters($token[Mustache_Tokenizer::NAME]);
+                    if (!empty($filters)) {
+                        $token[Mustache_Tokenizer::NAME]    = $name;
+                        $token[Mustache_Tokenizer::FILTERS] = $filters;
+                    }
                 }
             }
 
