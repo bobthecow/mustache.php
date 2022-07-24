@@ -23,6 +23,7 @@ class Mustache_Parser
 
     private $pragmaFilters;
     private $pragmaBlocks;
+    private $pragmaDynamicNames;
 
     /**
      * Process an array of Mustache tokens and convert them into a parse tree.
@@ -37,8 +38,9 @@ class Mustache_Parser
         $this->lineTokens = 0;
         $this->pragmas    = $this->defaultPragmas;
 
-        $this->pragmaFilters = isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS]);
-        $this->pragmaBlocks  = isset($this->pragmas[Mustache_Engine::PRAGMA_BLOCKS]);
+        $this->pragmaFilters      = isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS]);
+        $this->pragmaBlocks       = isset($this->pragmas[Mustache_Engine::PRAGMA_BLOCKS]);
+        $this->pragmaDynamicNames = isset($this->pragmas[Mustache_Engine::PRAGMA_DYNAMIC_NAMES]);
 
         return $this->buildTree($tokens);
     }
@@ -82,6 +84,14 @@ class Mustache_Parser
             } else {
                 $this->lineNum    = $token[Mustache_Tokenizer::LINE];
                 $this->lineTokens = 0;
+            }
+
+            if ($this->pragmaDynamicNames && isset($token[Mustache_Tokenizer::NAME])) {
+                list($name, $isDynamic) = $this->getDynamicName($token);
+                if ($isDynamic) {
+                    $token[Mustache_Tokenizer::NAME]    = $name;
+                    $token[Mustache_Tokenizer::DYNAMIC] = true;
+                }
             }
 
             if ($this->pragmaFilters && isset($token[Mustache_Tokenizer::NAME])) {
@@ -281,6 +291,57 @@ class Mustache_Parser
     }
 
     /**
+     * Parse dynamic names.
+     *
+     * @throws Mustache_Exception_SyntaxException when a tag does not allow *
+     * @throws Mustache_Exception_SyntaxException on multiple *s, or dots or filters with *
+     */
+    private function getDynamicName(array $token)
+    {
+        $name = $token[Mustache_Tokenizer::NAME];
+        $isDynamic = false;
+
+        if (preg_match('/^\s*\*\s*/', $name)) {
+            $this->ensureTagAllowsDynamicNames($token);
+            $name = preg_replace('/^\s*\*\s*/', '', $name);
+            $isDynamic = true;
+        }
+
+        // Two stars is two many!
+        if (preg_match('/^\s*\*\s*/', $name) || preg_match('/[|.]\s*\*/', $name)) {
+            $msg = sprintf('Invalid dynamic name: %s', $name);
+            throw new Mustache_Exception_SyntaxException($msg, $token);
+        }
+
+        return array($name, $isDynamic);
+    }
+
+    /**
+     * Check whether the given token supports dynamic tag names.
+     *
+     * @throws Mustache_Exception_SyntaxException when a tag does not allow *
+     *
+     * @param array $token
+     */
+    private function ensureTagAllowsDynamicNames(array $token)
+    {
+        switch ($token[Mustache_Tokenizer::TYPE]) {
+            case Mustache_Tokenizer::T_PARTIAL:
+            case Mustache_Tokenizer::T_PARENT:
+                return;
+        }
+
+        $msg = sprintf(
+            'Invalid dynamic name: %s in %s tag',
+            $token[Mustache_Tokenizer::NAME],
+            $token[Mustache_Tokenizer::TYPE]
+        );
+
+        throw new Mustache_Exception_SyntaxException($msg, $token);
+    }
+
+
+    /**
      * Split a tag name into name and filters.
      *
      * @param string $name
@@ -311,6 +372,10 @@ class Mustache_Parser
 
             case Mustache_Engine::PRAGMA_FILTERS:
                 $this->pragmaFilters = true;
+                break;
+
+            case Mustache_Engine::PRAGMA_DYNAMIC_NAMES:
+                $this->pragmaDynamicNames = true;
                 break;
         }
     }

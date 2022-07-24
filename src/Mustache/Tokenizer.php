@@ -56,6 +56,7 @@ class Mustache_Tokenizer
     // Token properties
     const TYPE    = 'type';
     const NAME    = 'name';
+    const DYNAMIC = 'dynamic';
     const OTAG    = 'otag';
     const CTAG    = 'ctag';
     const LINE    = 'line';

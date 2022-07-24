@@ -117,6 +117,7 @@ class Mustache_Compiler
                 case Mustache_Tokenizer::T_PARTIAL:
                     $code .= $this->partial(
                         $node[Mustache_Tokenizer::NAME],
+                        isset($node[Mustache_Tokenizer::DYNAMIC]) ? $node[Mustache_Tokenizer::DYNAMIC] : false,
                         isset($node[Mustache_Tokenizer::INDENT]) ? $node[Mustache_Tokenizer::INDENT] : '',
                         $level
                     );
@@ -125,6 +126,7 @@ class Mustache_Compiler
                 case Mustache_Tokenizer::T_PARENT:
                     $code .= $this->parent(
                         $node[Mustache_Tokenizer::NAME],
+                        isset($node[Mustache_Tokenizer::DYNAMIC]) ? $node[Mustache_Tokenizer::DYNAMIC] : false,
                         isset($node[Mustache_Tokenizer::INDENT]) ? $node[Mustache_Tokenizer::INDENT] : '',
                         $node[Mustache_Tokenizer::NODES],
                         $level
@@ -419,6 +421,30 @@ class Mustache_Compiler
         return sprintf($this->prepare(self::INVERTED_SECTION, $level), $method, $id, $filters, $this->walk($nodes, $level));
     }
 
+    const DYNAMIC_NAME = '$this->resolveValue($context->%s(%s), $context)';
+
+    /**
+     * Generate Mustache Template dynamic name resolution PHP source.
+     *
+     * @param string $id      Tag name
+     * @param bool   $dynamic True if the name is dynamic
+     *
+     * @return string Dynamic name resolution PHP source code
+     */
+    private function resolveDynamicName($id, $dynamic)
+    {
+        if (!$dynamic) {
+            return var_export($id, true);
+        }
+
+        $method = $this->getFindMethod($id);
+        $id     = ($method !== 'last') ? var_export($id, true) : '';
+
+        // TODO: filters?
+
+        return sprintf(self::DYNAMIC_NAME, $method, $id);
+    }
+
     const PARTIAL_INDENT = ', $indent . %s';
     const PARTIAL = '
         if ($partial = $this->mustache->loadPartial(%s)) {
@@ -429,13 +455,14 @@ class Mustache_Compiler
     /**
      * Generate Mustache Template partial call PHP source.
      *
-     * @param string $id     Partial name
-     * @param string $indent Whitespace indent to apply to partial
+     * @param string $id      Partial name
+     * @param bool   $dynamic Partial name is dynamic
+     * @param string $indent  Whitespace indent to apply to partial
      * @param int    $level
      *
      * @return string Generated partial call PHP source code
      */
-    private function partial($id, $indent, $level)
+    private function partial($id, $dynamic, $indent, $level)
     {
         if ($indent !== '') {
             $indentParam = sprintf(self::PARTIAL_INDENT, var_export($indent, true));
@@ -445,7 +472,7 @@ class Mustache_Compiler
 
         return sprintf(
             $this->prepare(self::PARTIAL, $level),
-            var_export($id, true),
+            $this->resolveDynamicName($id, $dynamic),
             $indentParam
         );
     }
@@ -469,23 +496,25 @@ class Mustache_Compiler
      * Generate Mustache Template inheritance parent call PHP source.
      *
      * @param string $id       Parent tag name
+     * @param bool   $dynamic  Tag name is dynamic
      * @param string $indent   Whitespace indent to apply to parent
      * @param array  $children Child nodes
      * @param int    $level
      *
      * @return string Generated PHP source code
      */
-    private function parent($id, $indent, array $children, $level)
+    private function parent($id, $dynamic, $indent, array $children, $level)
     {
         $realChildren = array_filter($children, array(__CLASS__, 'onlyBlockArgs'));
+        $partialName = $this->resolveDynamicName($id, $dynamic);
 
         if (empty($realChildren)) {
-            return sprintf($this->prepare(self::PARENT_NO_CONTEXT, $level), var_export($id, true));
+            return sprintf($this->prepare(self::PARENT_NO_CONTEXT, $level), $partialName);
         }
 
         return sprintf(
             $this->prepare(self::PARENT, $level),
-            var_export($id, true),
+            $partialName,
             $this->walk($realChildren, $level + 1)
         );
     }
