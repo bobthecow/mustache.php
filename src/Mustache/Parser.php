@@ -127,7 +127,11 @@ class Mustache_Parser
                         throw new Mustache_Exception_SyntaxException($msg, $token);
                     }
 
-                    if ($token[Mustache_Tokenizer::NAME] !== $parent[Mustache_Tokenizer::NAME]) {
+                    $sameName = $token[Mustache_Tokenizer::NAME] !== $parent[Mustache_Tokenizer::NAME];
+                    $tokenDynamic = isset($token[Mustache_Tokenizer::DYNAMIC]) && $token[Mustache_Tokenizer::DYNAMIC];
+                    $parentDynamic = isset($parent[Mustache_Tokenizer::DYNAMIC]) && $parent[Mustache_Tokenizer::DYNAMIC];
+
+                    if ($sameName || ($tokenDynamic !== $parentDynamic)) {
                         $msg = sprintf(
                             'Nesting error: %s (on line %d) vs. %s (on line %d)',
                             $parent[Mustache_Tokenizer::NAME],
@@ -330,6 +334,7 @@ class Mustache_Parser
         switch ($token[Mustache_Tokenizer::TYPE]) {
             case Mustache_Tokenizer::T_PARTIAL:
             case Mustache_Tokenizer::T_PARENT:
+            case Mustache_Tokenizer::T_END_SECTION:
                 return;
         }
 
