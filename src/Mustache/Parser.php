@@ -334,7 +334,7 @@ class Mustache_Parser
         $msg = sprintf(
             'Invalid dynamic name: %s in %s tag',
             $token[Mustache_Tokenizer::NAME],
-            $token[Mustache_Tokenizer::TYPE]
+            Mustache_Tokenizer::getTagName($token[Mustache_Tokenizer::TYPE])
         );
 
         throw new Mustache_Exception_SyntaxException($msg, $token);
