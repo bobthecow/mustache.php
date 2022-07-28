@@ -351,4 +351,43 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
             ),
         );
     }
+
+    /**
+     * @dataProvider getUnclosedTags
+     * @expectedException Mustache_Exception_SyntaxException
+     */
+    public function testUnclosedTagsThrowExceptions($text)
+    {
+        $tokenizer = new Mustache_Tokenizer();
+        $tokenizer->scan($text, null);
+    }
+
+    public function getUnclosedTags()
+    {
+        return array(
+            array('{{ name'),
+            array('{{ name }'),
+            array('{{{ name'),
+            array('{{{ name }'),
+            array('{{& name'),
+            array('{{& name }'),
+            array('{{# name'),
+            array('{{# name }'),
+            array('{{^ name'),
+            array('{{^ name }'),
+            array('{{/ name'),
+            array('{{/ name }'),
+            array('{{> name'),
+            array('{{< name'),
+            array('{{> name }'),
+            array('{{< name }'),
+            array('{{$ name'),
+            array('{{$ name }'),
+            array('{{= <% %>'),
+            array('{{= <% %>='),
+            array('{{= <% %>=}'),
+            array('{{% name'),
+            array('{{% name }'),
+        );
+    }
 }
