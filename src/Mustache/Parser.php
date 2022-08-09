@@ -313,12 +313,6 @@ class Mustache_Parser
             $isDynamic = true;
         }
 
-        // Two stars is two many!
-        if (preg_match('/^\s*\*\s*/', $name) || preg_match('/[|.]\s*\*/', $name)) {
-            $msg = sprintf('Invalid dynamic name: %s', $name);
-            throw new Mustache_Exception_SyntaxException($msg, $token);
-        }
-
         return array($name, $isDynamic);
     }
 

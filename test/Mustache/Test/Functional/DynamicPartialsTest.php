@@ -24,34 +24,6 @@ class Mustache_Test_Functional_DynamicPartialsTest extends PHPUnit_Framework_Tes
         ));
     }
 
-    public function getInvalidDynamicNamesExamples()
-    {
-        return array(
-            array('{{> **foo}}'),
-            array('{{> *foo.*bar}}'),
-            array('{{> foo.*bar}}'),
-            array('{{ *foo }}'),
-            array('{{{ *foo }}}'),
-            array('{{& *foo }}'),
-            array('{{# *foo }}{{/ *foo }}'),
-            array('{{^ *foo }}{{/ *foo }}'),
-            array('{{% FILTERS}}{{> *foo | *bar}}'),
-            array('{{% FILTERS}}{{> foo | *bar}}'),
-            array('{{% BLOCKS }}{{$ *foo }}{{/ *foo }}'),
-        );
-    }
-
-    /**
-     * @dataProvider getInvalidDynamicNamesExamples
-     * @expectedException Mustache_Exception_SyntaxException
-     * @expectedExceptionMessage Invalid dynamic name:
-     */
-    public function testInvalidDynamicNamesExamples($template)
-    {
-        $this->mustache->render($template);
-    }
-
-
     public function getValidDynamicNamesExamples()
     {
       // technically not all dynamic names, but also not invalid
