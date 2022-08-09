@@ -1,6 +1,3 @@
 [submodule "vendor/spec"]
 	path = vendor/spec
 	url = https://github.com/mustache/spec.git
-[submodule "vendor/yaml"]
-	path = vendor/yaml
-	url = https://github.com/fabpot/yaml.git

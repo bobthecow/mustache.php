@@ -49,9 +49,10 @@ class Mustache_Test_FiveThree_Functional_MustacheSpecTest extends Mustache_Test_
     private function prepareLambdasSpec($data)
     {
         foreach ($data as $key => $val) {
-            if ($key === 'lambda') {
+            if (isset($val['__tag__']) && $val['__tag__'] === 'code') {
                 if (!isset($val['php'])) {
                     $this->markTestSkipped(sprintf('PHP lambda test not implemented for this test.'));
+                    return;
                 }
 
                 $func = $val['php'];

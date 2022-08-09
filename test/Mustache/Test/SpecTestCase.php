@@ -28,7 +28,7 @@ abstract class Mustache_Test_SpecTestCase extends PHPUnit_Framework_TestCase
     /**
      * Data provider for the mustache spec test.
      *
-     * Loads YAML files from the spec and converts them to PHPisms.
+     * Loads JSON files from the spec and converts them to PHPisms.
      *
      * @param string $name
      *
@@ -36,21 +36,14 @@ abstract class Mustache_Test_SpecTestCase extends PHPUnit_Framework_TestCase
      */
     protected function loadSpec($name)
     {
-        $filename = dirname(__FILE__) . '/../../../vendor/spec/specs/' . $name . '.yml';
+        $filename = dirname(__FILE__) . '/../../../vendor/spec/specs/' . $name . '.json';
         if (!file_exists($filename)) {
             return array();
         }
 
         $data = array();
-        $yaml = new sfYamlParser();
         $file = file_get_contents($filename);
-
-        // @hack: pre-process the 'lambdas' spec so the Symfony YAML parser doesn't complain.
-        if ($name === '~lambdas') {
-            $file = str_replace(" !code\n", "\n", $file);
-        }
-
-        $spec = $yaml->parse($file);
+        $spec = json_decode($file, true);
 
         foreach ($spec['tests'] as $test) {
             $data[] = array(
