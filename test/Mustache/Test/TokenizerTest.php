@@ -12,7 +12,7 @@
 /**
  * @group unit
  */
-class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_TokenizerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider getTokens
@@ -23,24 +23,20 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
         $this->assertSame($expected, $tokenizer->scan($text, $delimiters));
     }
 
-    /**
-     * @expectedException Mustache_Exception_SyntaxException
-     */
     public function testUnevenBracesThrowExceptions()
     {
         $tokenizer = new Mustache_Tokenizer();
 
+        $this->expectException(Mustache_Exception_SyntaxException::class);
         $text = '{{{ name }}';
         $tokenizer->scan($text, null);
     }
 
-    /**
-     * @expectedException Mustache_Exception_SyntaxException
-     */
     public function testUnevenBracesWithCustomDelimiterThrowExceptions()
     {
         $tokenizer = new Mustache_Tokenizer();
 
+        $this->expectException(Mustache_Exception_SyntaxException::class);
         $text = '<%{ name %>';
         $tokenizer->scan($text, '<% %>');
     }
@@ -354,11 +350,12 @@ class Mustache_Test_TokenizerTest extends PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getUnclosedTags
-     * @expectedException Mustache_Exception_SyntaxException
      */
     public function testUnclosedTagsThrowExceptions($text)
     {
         $tokenizer = new Mustache_Tokenizer();
+
+        $this->expectException(Mustache_Exception_SyntaxException::class);
         $tokenizer->scan($text, null);
     }
 

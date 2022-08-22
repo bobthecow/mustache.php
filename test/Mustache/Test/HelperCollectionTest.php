@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-class Mustache_Test_HelperCollectionTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_HelperCollectionTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructor()
     {
@@ -96,7 +96,7 @@ class Mustache_Test_HelperCollectionTest extends PHPUnit_Framework_TestCase
     public function testHelperCollectionIsntAfraidToThrowExceptions($helpers = array(), $actions = array(), $exception = null)
     {
         if ($exception) {
-            $this->setExpectedException($exception);
+            $this->expectException($exception);
         }
 
         $helpers = new Mustache_HelperCollection($helpers);
@@ -104,6 +104,7 @@ class Mustache_Test_HelperCollectionTest extends PHPUnit_Framework_TestCase
         foreach ($actions as $method => $args) {
             call_user_func_array(array($helpers, $method), $args);
         }
+        $this->assertTrue(true);
     }
 
     public function getInvalidHelperArguments()

@@ -12,7 +12,7 @@
 /**
  * @group unit
  */
-class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_ParserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider getTokenSets
@@ -317,11 +317,11 @@ class Mustache_Test_ParserTest extends PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getBadParseTrees
-     * @expectedException Mustache_Exception_SyntaxException
      */
     public function testParserThrowsExceptions($tokens)
     {
         $parser = new Mustache_Parser();
+        $this->expectException(Mustache_Exception_SyntaxException::class);
         $parser->parse($tokens);
     }
 

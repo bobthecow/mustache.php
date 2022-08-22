@@ -13,7 +13,7 @@
  * @group examples
  * @group functional
  */
-class Mustache_Test_Functional_ExamplesTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_Functional_ExamplesTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Test everything in the `examples` directory.

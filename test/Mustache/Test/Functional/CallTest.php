@@ -13,7 +13,7 @@
  * @group magic_methods
  * @group functional
  */
-class Mustache_Test_Functional_CallTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_Functional_CallTest extends \PHPUnit\Framework\TestCase
 {
     public function testCallEatsContext()
     {

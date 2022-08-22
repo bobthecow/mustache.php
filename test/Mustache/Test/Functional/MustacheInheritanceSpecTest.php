@@ -17,7 +17,7 @@
  */
 class Mustache_Test_Functional_MustacheInheritanceSpecTest extends Mustache_Test_SpecTestCase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$mustache = new Mustache_Engine(array(
           'pragmas' => array(Mustache_Engine::PRAGMA_BLOCKS),
@@ -33,6 +33,7 @@ class Mustache_Test_Functional_MustacheInheritanceSpecTest extends Mustache_Test
         if (!file_exists(dirname(__FILE__) . '/../../../../vendor/spec/specs/')) {
             $this->markTestSkipped('Mustache spec submodule not initialized: run "git submodule update --init"');
         }
+        $this->assertTrue(true);
     }
 
     /**

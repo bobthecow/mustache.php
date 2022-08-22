@@ -17,7 +17,7 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends Mustache_Test_Fun
 {
     private $mustache;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->mustache = new Mustache_Engine();
     }
@@ -75,7 +75,9 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends Mustache_Test_Fun
 
     public function testPassthroughOptimization()
     {
-        $mustache = $this->getMock('Mustache_Engine', array('loadLambda'));
+        $mustache = $this->getMockBuilder(Mustache_Engine::class)
+            ->onlyMethods(['loadLambda'])
+            ->getMock();
         $mustache->expects($this->never())
             ->method('loadLambda');
 
@@ -89,7 +91,9 @@ class Mustache_Test_Functional_HigherOrderSectionsTest extends Mustache_Test_Fun
 
     public function testWithoutPassthroughOptimization()
     {
-        $mustache = $this->getMock('Mustache_Engine', array('loadLambda'));
+        $mustache = $this->getMockBuilder(Mustache_Engine::class)
+            ->onlyMethods(['loadLambda'])
+            ->getMock();
         $mustache->expects($this->once())
             ->method('loadLambda')
             ->will($this->returnValue($mustache->loadTemplate('<em>{{ name }}</em>')));

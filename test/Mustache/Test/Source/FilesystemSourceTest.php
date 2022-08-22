@@ -12,14 +12,13 @@
 /**
  * @group unit
  */
-class Mustache_Test_Source_FilesystemSourceTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_Source_FilesystemSourceTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException Mustache_Exception_RuntimeException
-     */
     public function testMissingTemplateThrowsException()
     {
         $source = new Mustache_Source_FilesystemSource(dirname(__FILE__) . '/not_a_file.mustache', array('mtime'));
+
+        $this->expectException(Mustache_Exception_RuntimeException::class);
         $source->getKey();
     }
 }

@@ -13,7 +13,7 @@
  * @group lambdas
  * @group functional
  */
-class Mustache_Test_FiveThree_Functional_StrictCallablesTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_FiveThree_Functional_StrictCallablesTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider callables

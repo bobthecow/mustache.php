@@ -12,7 +12,7 @@
 /**
  * @group unit
  */
-class Mustache_Test_Loader_StringLoaderTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_Loader_StringLoaderTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoadTemplates()
     {
