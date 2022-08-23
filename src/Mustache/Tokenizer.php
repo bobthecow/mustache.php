@@ -53,9 +53,26 @@ class Mustache_Tokenizer
         self::T_BLOCK_VAR    => true,
     );
 
+    private static $tagNames = array(
+        self::T_SECTION      => 'section',
+        self::T_INVERTED     => 'inverted section',
+        self::T_END_SECTION  => 'section end',
+        self::T_COMMENT      => 'comment',
+        self::T_PARTIAL      => 'partial',
+        self::T_PARENT       => 'parent',
+        self::T_DELIM_CHANGE => 'set delimiter',
+        self::T_ESCAPED      => 'variable',
+        self::T_UNESCAPED    => 'unescaped variable',
+        self::T_UNESCAPED_2  => 'unescaped variable',
+        self::T_PRAGMA       => 'pragma',
+        self::T_BLOCK_VAR    => 'block variable',
+        self::T_BLOCK_ARG    => 'block variable',
+    );
+
     // Token properties
     const TYPE    = 'type';
     const NAME    = 'name';
+    const DYNAMIC = 'dynamic';
     const OTAG    = 'otag';
     const CTAG    = 'ctag';
     const LINE    = 'line';
@@ -357,6 +374,7 @@ class Mustache_Tokenizer
         return $end + $this->ctagLen - 1;
     }
 
+
     private function throwUnclosedTagException()
     {
         $name = trim($this->buffer);
@@ -374,5 +392,17 @@ class Mustache_Tokenizer
             self::LINE  => $this->line,
             self::INDEX => $this->seenTag - $this->otagLen,
         ));
+    }
+
+    /**
+     * Get the human readable name for a tag type.
+     *
+     * @param string $tagType One of the tokenizer T_* constants
+     *
+     * @return string
+     */
+    static function getTagName($tagType)
+    {
+        return isset(self::$tagNames[$tagType]) ? self::$tagNames[$tagType] : 'unknown';
     }
 }

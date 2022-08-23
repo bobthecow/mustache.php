@@ -23,6 +23,7 @@ class Mustache_Parser
 
     private $pragmaFilters;
     private $pragmaBlocks;
+    private $pragmaDynamicNames;
 
     /**
      * Process an array of Mustache tokens and convert them into a parse tree.
@@ -37,8 +38,9 @@ class Mustache_Parser
         $this->lineTokens = 0;
         $this->pragmas    = $this->defaultPragmas;
 
-        $this->pragmaFilters = isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS]);
-        $this->pragmaBlocks  = isset($this->pragmas[Mustache_Engine::PRAGMA_BLOCKS]);
+        $this->pragmaFilters      = isset($this->pragmas[Mustache_Engine::PRAGMA_FILTERS]);
+        $this->pragmaBlocks       = isset($this->pragmas[Mustache_Engine::PRAGMA_BLOCKS]);
+        $this->pragmaDynamicNames = isset($this->pragmas[Mustache_Engine::PRAGMA_DYNAMIC_NAMES]);
 
         return $this->buildTree($tokens);
     }
@@ -84,11 +86,21 @@ class Mustache_Parser
                 $this->lineTokens = 0;
             }
 
-            if ($this->pragmaFilters && isset($token[Mustache_Tokenizer::NAME])) {
-                list($name, $filters) = $this->getNameAndFilters($token[Mustache_Tokenizer::NAME]);
-                if (!empty($filters)) {
-                    $token[Mustache_Tokenizer::NAME]    = $name;
-                    $token[Mustache_Tokenizer::FILTERS] = $filters;
+            if ($token[Mustache_Tokenizer::TYPE] !== Mustache_Tokenizer::T_COMMENT) {
+                if ($this->pragmaDynamicNames && isset($token[Mustache_Tokenizer::NAME])) {
+                    list($name, $isDynamic) = $this->getDynamicName($token);
+                    if ($isDynamic) {
+                        $token[Mustache_Tokenizer::NAME]    = $name;
+                        $token[Mustache_Tokenizer::DYNAMIC] = true;
+                    }
+                }
+
+                if ($this->pragmaFilters && isset($token[Mustache_Tokenizer::NAME])) {
+                    list($name, $filters) = $this->getNameAndFilters($token[Mustache_Tokenizer::NAME]);
+                    if (!empty($filters)) {
+                        $token[Mustache_Tokenizer::NAME]    = $name;
+                        $token[Mustache_Tokenizer::FILTERS] = $filters;
+                    }
                 }
             }
 
@@ -115,7 +127,11 @@ class Mustache_Parser
                         throw new Mustache_Exception_SyntaxException($msg, $token);
                     }
 
-                    if ($token[Mustache_Tokenizer::NAME] !== $parent[Mustache_Tokenizer::NAME]) {
+                    $sameName = $token[Mustache_Tokenizer::NAME] !== $parent[Mustache_Tokenizer::NAME];
+                    $tokenDynamic = isset($token[Mustache_Tokenizer::DYNAMIC]) && $token[Mustache_Tokenizer::DYNAMIC];
+                    $parentDynamic = isset($parent[Mustache_Tokenizer::DYNAMIC]) && $parent[Mustache_Tokenizer::DYNAMIC];
+
+                    if ($sameName || ($tokenDynamic !== $parentDynamic)) {
                         $msg = sprintf(
                             'Nesting error: %s (on line %d) vs. %s (on line %d)',
                             $parent[Mustache_Tokenizer::NAME],
@@ -281,6 +297,52 @@ class Mustache_Parser
     }
 
     /**
+     * Parse dynamic names.
+     *
+     * @throws Mustache_Exception_SyntaxException when a tag does not allow *
+     * @throws Mustache_Exception_SyntaxException on multiple *s, or dots or filters with *
+     */
+    private function getDynamicName(array $token)
+    {
+        $name = $token[Mustache_Tokenizer::NAME];
+        $isDynamic = false;
+
+        if (preg_match('/^\s*\*\s*/', $name)) {
+            $this->ensureTagAllowsDynamicNames($token);
+            $name = preg_replace('/^\s*\*\s*/', '', $name);
+            $isDynamic = true;
+        }
+
+        return array($name, $isDynamic);
+    }
+
+    /**
+     * Check whether the given token supports dynamic tag names.
+     *
+     * @throws Mustache_Exception_SyntaxException when a tag does not allow *
+     *
+     * @param array $token
+     */
+    private function ensureTagAllowsDynamicNames(array $token)
+    {
+        switch ($token[Mustache_Tokenizer::TYPE]) {
+            case Mustache_Tokenizer::T_PARTIAL:
+            case Mustache_Tokenizer::T_PARENT:
+            case Mustache_Tokenizer::T_END_SECTION:
+                return;
+        }
+
+        $msg = sprintf(
+            'Invalid dynamic name: %s in %s tag',
+            $token[Mustache_Tokenizer::NAME],
+            Mustache_Tokenizer::getTagName($token[Mustache_Tokenizer::TYPE])
+        );
+
+        throw new Mustache_Exception_SyntaxException($msg, $token);
+    }
+
+
+    /**
      * Split a tag name into name and filters.
      *
      * @param string $name
@@ -311,6 +373,10 @@ class Mustache_Parser
 
             case Mustache_Engine::PRAGMA_FILTERS:
                 $this->pragmaFilters = true;
+                break;
+
+            case Mustache_Engine::PRAGMA_DYNAMIC_NAMES:
+                $this->pragmaDynamicNames = true;
                 break;
         }
     }
