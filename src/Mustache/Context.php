@@ -223,6 +223,13 @@ class Mustache_Context
                             return $frame->$id;
                         }
 
+                        if (property_exists($frame, $id)) {
+                            $rp = new \ReflectionProperty($frame, $id);
+                            if ($rp->isPublic()) {
+                                return $frame->$id;
+                            }
+                        }
+
                         if ($frame instanceof ArrayAccess && isset($frame[$id])) {
                             return $frame[$id];
                         }
