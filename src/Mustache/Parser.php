@@ -133,9 +133,11 @@ class Mustache_Parser
 
                     if ($sameName || ($tokenDynamic !== $parentDynamic)) {
                         $msg = sprintf(
-                            'Nesting error: %s (on line %d) vs. %s (on line %d)',
+                            'Nesting error: %s%s (on line %d) vs. %s%s (on line %d)',
+                            $parentDynamic ? '*' : '',
                             $parent[Mustache_Tokenizer::NAME],
                             $parent[Mustache_Tokenizer::LINE],
+                            $tokenDynamic ? '*' : '',
                             $token[Mustache_Tokenizer::NAME],
                             $token[Mustache_Tokenizer::LINE]
                         );
