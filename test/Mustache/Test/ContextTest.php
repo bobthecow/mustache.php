@@ -180,6 +180,40 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
         $context->push(array('a' => 1));
         $context->findAnchoredDot('a');
     }
+
+    public function testNullArrayValueMasking()
+    {
+        $context = new Mustache_Context();
+
+        $a = array(
+            'name' => 'not null'
+        );
+        $b = array(
+            'name' => null
+        );
+
+        $context->push($a);
+        $context->push($b);
+
+        $this->assertNull($context->find('name'));
+    }
+
+    public function testNullPropertyValueMasking()
+    {
+        $context = new Mustache_Context();
+
+        $a = (object) array(
+            'name' => 'not null'
+        );
+        $b = (object) array(
+            'name' => null
+        );
+
+        $context->push($a);
+        $context->push($b);
+
+        $this->assertNull($context->find('name'));
+    }
 }
 
 class Mustache_Test_TestDummy
