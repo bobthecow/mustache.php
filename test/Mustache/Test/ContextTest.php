@@ -12,7 +12,7 @@
 /**
  * @group unit
  */
-class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_ContextTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructor()
     {
@@ -171,13 +171,11 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('', $context->findAnchoredDot('.child.name'));
     }
 
-    /**
-     * @expectedException Mustache_Exception_InvalidArgumentException
-     */
     public function testAnchoredDotNotationThrowsExceptions()
     {
         $context = new Mustache_Context();
         $context->push(array('a' => 1));
+        $this->expectException(Mustache_Exception_InvalidArgumentException::class);
         $context->findAnchoredDot('a');
     }
 }

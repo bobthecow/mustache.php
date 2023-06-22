@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-class Mustache_Test_Exception_UnknownFilterExceptionTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_Exception_UnknownFilterExceptionTest extends \PHPUnit\Framework\TestCase
 {
     public function testInstance()
     {

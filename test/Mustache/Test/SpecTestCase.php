@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-abstract class Mustache_Test_SpecTestCase extends PHPUnit_Framework_TestCase
+abstract class Mustache_Test_SpecTestCase extends \PHPUnit\Framework\TestCase
 {
     protected static $mustache;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$mustache = new Mustache_Engine();
     }

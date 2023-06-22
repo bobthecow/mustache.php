@@ -13,7 +13,7 @@
  * @group functional
  * @group partials
  */
-class Mustache_Test_Functional_NestedPartialIndentTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_Functional_NestedPartialIndentTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider partialsAndStuff

@@ -12,7 +12,7 @@
 /**
  * @group unit
  */
-class Mustache_Test_AutoloaderTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_AutoloaderTest extends \PHPUnit\Framework\TestCase
 {
     public function testRegister()
     {

@@ -13,7 +13,7 @@
  * @group pragmas
  * @group functional
  */
-class Mustache_Test_FiveThree_Functional_EngineTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_FiveThree_Functional_EngineTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider pragmaData

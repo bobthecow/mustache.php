@@ -13,11 +13,11 @@
  * @group sections
  * @group functional
  */
-class Mustache_Test_Functional_ObjectSectionTest extends PHPUnit_Framework_TestCase
+class Mustache_Test_Functional_ObjectSectionTest extends \PHPUnit\Framework\TestCase
 {
     private $mustache;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->mustache = new Mustache_Engine();
     }
