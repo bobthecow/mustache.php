@@ -55,6 +55,7 @@ class Mustache_Engine
     private $charset = 'UTF-8';
     private $logger;
     private $strictCallables = false;
+    private $disableLambdaRendering = false;
     private $pragmas = array();
     private $delimiters;
 
@@ -132,6 +133,11 @@ class Mustache_Engine
      *         // This currently defaults to false, but will default to true in v3.0.
      *         'strict_callables' => true,
      *
+     *         // Do not render the output of lambdas. Use this to prevent repeated rendering if the lambda already
+     *         // takes care of rendering its content. This helps protect against mustache code injection when user
+     *         // input is passed directly into the template. Defaults to false.
+     *         'disable_lambda_rendering' => true,
+     *
      *         // Enable pragmas across all templates, regardless of the presence of pragma tags in the individual
      *         // templates.
      *         'pragmas' => [Mustache_Engine::PRAGMA_FILTERS],
@@ -204,6 +210,10 @@ class Mustache_Engine
 
         if (isset($options['strict_callables'])) {
             $this->strictCallables = $options['strict_callables'];
+        }
+
+        if (isset($options['disable_lambda_rendering'])) {
+            $this->disableLambdaRendering = $options['disable_lambda_rendering'];
         }
 
         if (isset($options['delimiters'])) {
@@ -626,14 +636,15 @@ class Mustache_Engine
         //
         // Keep this list in alphabetical order :)
         $chunks = array(
-            'charset'         => $this->charset,
-            'delimiters'      => $this->delimiters ? $this->delimiters : '{{ }}',
-            'entityFlags'     => $this->entityFlags,
-            'escape'          => isset($this->escape) ? 'custom' : 'default',
-            'key'             => ($source instanceof Mustache_Source) ? $source->getKey() : 'source',
-            'pragmas'         => $this->getPragmas(),
-            'strictCallables' => $this->strictCallables,
-            'version'         => self::VERSION,
+            'charset'                => $this->charset,
+            'delimiters'             => $this->delimiters ? $this->delimiters : '{{ }}',
+            'entityFlags'            => $this->entityFlags,
+            'escape'                 => isset($this->escape) ? 'custom' : 'default',
+            'key'                    => ($source instanceof Mustache_Source) ? $source->getKey() : 'source',
+            'pragmas'                => $this->getPragmas(),
+            'strictCallables'        => $this->strictCallables,
+            'disableLambdaRendering' => $this->disableLambdaRendering,
+            'version'                => self::VERSION,
         );
 
         $key = json_encode($chunks);
@@ -812,7 +823,7 @@ class Mustache_Engine
         $compiler = $this->getCompiler();
         $compiler->setPragmas($this->getPragmas());
 
-        return $compiler->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables, $this->entityFlags);
+        return $compiler->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables, $this->entityFlags, $this->disableLambdaRendering);
     }
 
     /**
