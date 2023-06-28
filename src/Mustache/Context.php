@@ -14,19 +14,22 @@
  */
 class Mustache_Context
 {
-    private $stack      = array();
-    private $blockStack = array();
+    private $stack           = array();
+    private $blockStack      = array();
+    private $strictVariables;
 
     /**
      * Mustache rendering Context constructor.
      *
      * @param mixed $context Default rendering context (default: null)
+     * @param bool $strictVariables
      */
-    public function __construct($context = null)
+    public function __construct($context = null, $strictVariables = false)
     {
         if ($context !== null) {
             $this->stack = array($context);
         }
+        $this->strictVariables = $strictVariables;
     }
 
     /**
@@ -200,10 +203,11 @@ class Mustache_Context
      *
      * @see Mustache_Context::find
      *
-     * @param string $id    Variable name
-     * @param array  $stack Context stack
+     * @param string $id Variable name
+     * @param array $stack Context stack
      *
      * @return mixed Variable value, or '' if not found
+     * @throws \Mustache_Exception_UnknownVariableException
      */
     private function findVariableInStack($id, array $stack)
     {
@@ -237,6 +241,9 @@ class Mustache_Context
             }
         }
 
+        if ($this->strictVariables) {
+            throw new Mustache_Exception_UnknownVariableException($id);
+        }
         return '';
     }
 }

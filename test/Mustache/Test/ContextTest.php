@@ -180,6 +180,29 @@ class Mustache_Test_ContextTest extends PHPUnit_Framework_TestCase
         $context->push(array('a' => 1));
         $context->findAnchoredDot('a');
     }
+
+    /**
+     * @expectedException Mustache_Exception_UnknownVariableException
+     */
+    public function testUnknownVariableThrowsException()
+    {
+        $context = new Mustache_Context(null, true);
+        $context->push(array('a' => 1));
+        $context->find('b');
+    }
+
+    /**
+     * @expectedException Mustache_Exception_UnknownVariableException
+     */
+    public function testAnchoredDotNotationUnknownVariableThrowsException()
+    {
+        $context = new Mustache_Context(null, true);
+        $a = array(
+            'a' => array('b' => 1),
+        );
+        $context->push($a);
+        $context->find('a.c');
+    }
 }
 
 class Mustache_Test_TestDummy
