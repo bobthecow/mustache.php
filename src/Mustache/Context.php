@@ -120,18 +120,28 @@ class Mustache_Context
      * ... the `name` value is only searched for within the `child` value of the global Context, not within parent
      * Context frames.
      *
-     * @param string $id Dotted variable selector
+     * @param string $id              Dotted variable selector
+     * @param bool   $strictCallables (default: false)
      *
      * @return mixed Variable value, or '' if not found
      */
-    public function findDot($id)
+    public function findDot($id, $strictCallables = false)
     {
         $chunks = explode('.', $id);
         $first  = array_shift($chunks);
         $value  = $this->findVariableInStack($first, $this->stack);
 
+        // This wasn't really a dotted name, so we can just return the value.
+        if (empty($chunks)) {
+            return $value;
+        }
+
         foreach ($chunks as $chunk) {
-            if ($value === '') {
+            $isCallable = $strictCallables ? (is_object($value) && is_callable($value)) : (!is_string($value) && is_callable($value));
+
+            if ($isCallable) {
+                $value = $value();
+            } elseif ($value === '') {
                 return $value;
             }
 

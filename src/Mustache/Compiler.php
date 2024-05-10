@@ -322,7 +322,7 @@ class Mustache_Compiler
     }
 
     const SECTION_CALL = '
-        $value = $context->%s(%s);%s
+        $value = $context->%s(%s%s);%s
         $buffer .= $this->section%s($context, $indent, $value);
     ';
 
@@ -390,13 +390,14 @@ class Mustache_Compiler
 
         $method  = $this->getFindMethod($id);
         $id      = var_export($id, true);
+        $findArg = $this->getFindMethodArgs($method);
         $filters = $this->getFilters($filters, $level);
 
-        return sprintf($this->prepare(self::SECTION_CALL, $level), $method, $id, $filters, $key);
+        return sprintf($this->prepare(self::SECTION_CALL, $level), $method, $id, $findArg, $filters, $key);
     }
 
     const INVERTED_SECTION = '
-        $value = $context->%s(%s);%s
+        $value = $context->%s(%s%s);%s
         if (empty($value)) {
             %s
         }
@@ -416,12 +417,13 @@ class Mustache_Compiler
     {
         $method  = $this->getFindMethod($id);
         $id      = var_export($id, true);
+        $findArg = $this->getFindMethodArgs($method);
         $filters = $this->getFilters($filters, $level);
 
-        return sprintf($this->prepare(self::INVERTED_SECTION, $level), $method, $id, $filters, $this->walk($nodes, $level));
+        return sprintf($this->prepare(self::INVERTED_SECTION, $level), $method, $id, $findArg, $filters, $this->walk($nodes, $level));
     }
 
-    const DYNAMIC_NAME = '$this->resolveValue($context->%s(%s), $context)';
+    const DYNAMIC_NAME = '$this->resolveValue($context->%s(%s%s), $context)';
 
     /**
      * Generate Mustache Template dynamic name resolution PHP source.
@@ -437,12 +439,13 @@ class Mustache_Compiler
             return var_export($id, true);
         }
 
-        $method = $this->getFindMethod($id);
-        $id     = ($method !== 'last') ? var_export($id, true) : '';
+        $method  = $this->getFindMethod($id);
+        $id      = ($method !== 'last') ? var_export($id, true) : '';
+        $findArg = $this->getFindMethodArgs($method);
 
         // TODO: filters?
 
-        return sprintf(self::DYNAMIC_NAME, $method, $id);
+        return sprintf(self::DYNAMIC_NAME, $method, $id, $findArg);
     }
 
     const PARTIAL_INDENT = ', $indent . %s';
@@ -532,7 +535,7 @@ class Mustache_Compiler
     }
 
     const VARIABLE = '
-        $value = $this->resolveValue($context->%s(%s), $context);%s
+        $value = $this->resolveValue($context->%s(%s%s), $context);%s
         $buffer .= %s($value === null ? \'\' : %s);
     ';
 
@@ -550,14 +553,15 @@ class Mustache_Compiler
     {
         $method  = $this->getFindMethod($id);
         $id      = ($method !== 'last') ? var_export($id, true) : '';
+        $findArg = $this->getFindMethodArgs($method);
         $filters = $this->getFilters($filters, $level);
         $value   = $escape ? $this->getEscape() : '$value';
 
-        return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $filters, $this->flushIndent(), $value);
+        return sprintf($this->prepare(self::VARIABLE, $level), $method, $id, $findArg, $filters, $this->flushIndent(), $value);
     }
 
     const FILTER = '
-        $filter = $context->%s(%s);
+        $filter = $context->%s(%s%s);
         if (!(%s)) {
             throw new Mustache_Exception_UnknownFilterException(%s);
         }
@@ -581,10 +585,11 @@ class Mustache_Compiler
         $name     = array_shift($filters);
         $method   = $this->getFindMethod($name);
         $filter   = ($method !== 'last') ? var_export($name, true) : '';
+        $findArg  = $this->getFindMethodArgs($method);
         $callable = $this->getCallable('$filter');
         $msg      = var_export($name, true);
 
-        return sprintf($this->prepare(self::FILTER, $level), $method, $filter, $callable, $msg, $this->getFilters($filters, $level));
+        return sprintf($this->prepare(self::FILTER, $level), $method, $filter, $findArg, $callable, $msg, $this->getFilters($filters, $level));
     }
 
     const LINE = '$buffer .= "\n";';
@@ -679,6 +684,22 @@ class Mustache_Compiler
         }
 
         return 'findDot';
+    }
+
+    /**
+     * Get the args needed for a given find method.
+     *
+     * In this case, it's "true" iff it's a "find dot" method and strict callables is enabled.
+     *
+     * @param string $method Find method name
+     */
+    private function getFindMethodArgs($method)
+    {
+        if (($method === 'findDot' || $method === 'findAnchoredDot') && $this->strictCallables) {
+            return ', true';
+        }
+
+        return '';
     }
 
     const IS_CALLABLE        = '!is_string(%s) && is_callable(%s)';
