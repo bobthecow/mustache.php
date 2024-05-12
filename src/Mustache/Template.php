@@ -170,9 +170,15 @@ abstract class Mustache_Template
     protected function resolveValue($value, Mustache_Context $context)
     {
         if (($this->strictCallables ? is_object($value) : !is_string($value)) && is_callable($value)) {
-            return $this->mustache
-                ->loadLambda((string) call_user_func($value))
-                ->renderInternal($context);
+            $result = call_user_func($value);
+
+            if (is_string($result)) {
+                return $this->mustache
+                    ->loadLambda($result)
+                    ->renderInternal($context);
+            } else {
+                return $result;
+            }
         }
 
         return $value;
