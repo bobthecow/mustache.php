@@ -741,7 +741,7 @@ class Mustache_Engine
      *
      * @return Mustache_Template
      */
-    private function loadSource($source, Mustache_Cache $cache = null)
+    private function loadSource($source, ?Mustache_Cache $cache = null)
     {
         $className = $this->getTemplateClassName($source);
 

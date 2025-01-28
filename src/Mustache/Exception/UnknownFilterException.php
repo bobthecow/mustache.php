@@ -20,7 +20,7 @@ class Mustache_Exception_UnknownFilterException extends UnexpectedValueException
      * @param string    $filterName
      * @param Exception $previous
      */
-    public function __construct($filterName, Exception $previous = null)
+    public function __construct($filterName, ?Exception $previous = null)
     {
         $this->filterName = $filterName;
         $message = sprintf('Unknown filter: %s', $filterName);
