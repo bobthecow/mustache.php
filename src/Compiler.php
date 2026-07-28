@@ -936,7 +936,13 @@ class Compiler
 
         // TODO: filters?
 
-        return sprintf(self::DYNAMIC_NAME, $this->getFindValue($id, $strictTag));
+        $value = $this->getFindValue($id, $strictTag);
+
+        if (!$this->lambdas) {
+            return $value;
+        }
+
+        return sprintf(self::DYNAMIC_NAME, $value);
     }
 
     const PARTIAL_INDENT = ', $indent . %s';
@@ -1249,6 +1255,11 @@ class Compiler
         $buffer .= %s($value === null ? \'\' : %s);
     ';
 
+    const VARIABLE_NO_LAMBDAS = '
+        $value = %s;%s
+        $buffer .= %s($value === null ? \'\' : %s);
+    ';
+
     /**
      * Generate Mustache Template variable interpolation PHP source.
      *
@@ -1261,11 +1272,12 @@ class Compiler
      */
     private function variable($id, $filters, $escape, $level)
     {
-        $lookup  = $this->getFindValue($id, Engine::STRICT_INTERPOLATION);
-        $filters = $this->getFilters($filters, $level);
-        $value   = $escape ? $this->getEscape() : $this->getStringify('$value');
+        $lookup   = $this->getFindValue($id, Engine::STRICT_INTERPOLATION);
+        $filters  = $this->getFilters($filters, $level);
+        $value    = $escape ? $this->getEscape() : $this->getStringify('$value');
+        $template = $this->lambdas ? self::VARIABLE : self::VARIABLE_NO_LAMBDAS;
 
-        return sprintf($this->prepare(self::VARIABLE, $level), $lookup, $filters, $this->flushIndent(), $value);
+        return sprintf($this->prepare($template, $level), $lookup, $filters, $this->flushIndent(), $value);
     }
 
     const FILTER = '

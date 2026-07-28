@@ -238,6 +238,30 @@ class CompilerTest extends TestCase
         $this->assertFalse(strpos($compiled, '$frame = $context->last();'));
     }
 
+    public function testLambdasDisabledCompileDirectVariableLookups()
+    {
+        $compiled = $this->compileSource('{{ name }}{{ person.name }}{{ . }}', Engine::STRICT_NONE, false, false);
+
+        $this->assertStringContainsString('$value = $context->find(\'name\');', $compiled);
+        $this->assertStringContainsString('$value = $context->findDot(\'person.name\');', $compiled);
+        $this->assertStringContainsString('$value = $context->last();', $compiled);
+        $this->assertStringNotContainsString('$this->resolveValue(', $compiled);
+    }
+
+    public function testLambdasDisabledCompileDirectDynamicNameLookups()
+    {
+        $compiled = $this->compileSource(
+            '{{> *partial }}{{< *parent }}{{/ *parent }}',
+            Engine::STRICT_NONE,
+            false,
+            false
+        );
+
+        $this->assertStringContainsString('$this->mustache->loadPartial($context->find(\'partial\'))', $compiled);
+        $this->assertStringContainsString('$this->mustache->loadPartial($context->find(\'parent\'))', $compiled);
+        $this->assertStringNotContainsString('$this->resolveValue(', $compiled);
+    }
+
     public function testSectionBodyContextFrameFastPathIsHoistedAfterPush()
     {
         $compiled = $this->compileSource('{{# items }}{{ name }}{{ label }}{{/ items }}');
@@ -372,9 +396,11 @@ class CompilerTest extends TestCase
      *
      * @return string
      */
-    private function compileSource($source, $strictTags = Engine::STRICT_NONE, $debugRendering = false)
+    private function compileSource($source, $strictTags = Engine::STRICT_NONE, $debugRendering = false, $lambdas = true)
     {
         $compiler = new Compiler();
+        $compiler->setOptions(['lambdas' => $lambdas]);
+
         $tokens = (new Tokenizer())->scan($source);
         $tree = (new Parser())->parse($tokens);
 
