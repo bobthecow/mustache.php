@@ -687,6 +687,24 @@ Y',
         $this->assertSame($expect, $tpl->render($data));
     }
 
+    public function testPartialInsideBlockOverrideNestedInSection()
+    {
+        $partials = [
+            'parent' => '{{$content}}default{{/content}}',
+            'row'    => '{{name}} ',
+        ];
+
+        $this->mustache->setPartials($partials);
+
+        $tpl = $this->mustache->loadTemplate(
+            '{{#items}}{{<parent}}{{$content}}{{>row}}{{/content}}{{/parent}}{{/items}}'
+        );
+
+        $data = ['items' => [['name' => 'a'], ['name' => 'b']]];
+
+        $this->assertSame('a b ', $tpl->render($data));
+    }
+
     public function testDisabledInheritance()
     {
         // With inheritance disabled, the block tag (`{{$bar}}`) will be treated as a regular

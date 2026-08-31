@@ -523,7 +523,7 @@ class Compiler
     const BLOCK_FUNCTION = '
         public function block%s($context, $indent = \'\')
         {
-            $buffer = \'\';%s
+            $buffer = \'\';%s%s
 
             return $buffer;
         }
@@ -531,6 +531,14 @@ class Compiler
 
     /**
      * Generate Mustache Template inheritance block function PHP source.
+     *
+     * Block override content is compiled into its own standalone method, so
+     * it needs its own static partial cache scope -- just like section().
+     * Without this, a partial referenced directly inside a block override
+     * that is itself nested inside an active section (or another block)
+     * would register its cache variable in the *enclosing* scope, while the
+     * code using that variable lives in this method, leaving it undefined
+     * at render time.
      *
      * @param array $nodes Array of child tokens
      *
@@ -541,13 +549,16 @@ class Compiler
         $indentNextLine = $this->indentNextLine;
         $this->indentNextLine = true;
         $this->blockContentDepth++;
+        $this->beginPartialCacheScope();
         $code = $this->walkWithContextFrame($nodes);
+        $partialCacheInits = $this->getPartialCacheInitializers();
+        $this->endPartialCacheScope();
         $this->blockContentDepth--;
         $this->indentNextLine = $indentNextLine;
-        $key = ucfirst(md5($code));
+        $key = ucfirst(md5($partialCacheInits . "\n" . $code));
 
         if (!isset($this->blocks[$key])) {
-            $this->blocks[$key] = sprintf($this->prepare(self::BLOCK_FUNCTION, 0), $key, $code);
+            $this->blocks[$key] = sprintf($this->prepare(self::BLOCK_FUNCTION, 0), $key, $partialCacheInits, $code);
         }
 
         return $key;
